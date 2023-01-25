@@ -57,6 +57,12 @@ Once installed, subsequent server starts can skip installation steps
 
 The server will start at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
+## Running Tests
+
+```py
+pytest
+```
+
 ## License
 
 This project is licensed under the terms of the MIT license.

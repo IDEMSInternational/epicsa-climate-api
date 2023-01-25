@@ -1,16 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from functools import lru_cache
 
 from app.api.v1.router import v1_router
+from app.core.config import Settings
 
-from app.core.config import settings
 
-from app.models import create_tables
-
-create_tables()
+@lru_cache()
+def get_settings():
+    return Settings()
 
 
 def get_application():
+    settings = get_settings()
     _app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0",
                    docs_url="/")
 

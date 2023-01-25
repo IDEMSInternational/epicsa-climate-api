@@ -1,32 +1,25 @@
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 
-from app.db.session import get_session
-from . import schema, crud
+from .schema import Station
+from app.epicsa_python.main import get_stations
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schema.Station])
-def read_stations(
-    db: Session = Depends(get_session),
-) -> Any:
+@router.get("/")
+def read_stations() -> list[Station]:
     """
     Retrieve stations.
     """
-    stations = crud.station.get_multi(db)
+    stations = get_stations()
     print('stations', stations)
     return stations
 
 
-@router.get("/{id}", response_model=schema.Station)
-def read_station(
-    *,
-    db: Session = Depends(get_session),
-    id: int,
-) -> Any:
+@router.get("/{id}")
+def read_station(*, id: int) -> Station:
     """
     Get station by ID.
     """
