@@ -22,6 +22,7 @@ on:
   push:
     branches:
       - main
+      - feat/fast-api
 env:
   REGISTRY: europe-west1-docker.pkg.dev
   REGION: europe-west1
