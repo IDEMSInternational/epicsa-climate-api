@@ -74,24 +74,22 @@ jobs:
           tags: |
             type=raw,value=latest
 
-      - name: Build
-        id: build
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: false
-          # TODO - passed tags upload to artifact registry but can't be used by cloud run, need to debug
-          # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
-
-          # tags: ${{ steps.meta.outputs.tags }}
-          tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:latest
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha, scope=${{ github.workflow }}
-          cache-to: type=gha, scope=${{ github.workflow }}, mode=max
-
-      - name: Upload to GAR
+      # - name: Build
+      #   id: build
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: .
+      #     push: false
+      #     # TODO - passed tags upload to artifact registry but can't be used by cloud run, need to debug
+      #     # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
+      #     # tags: ${{ steps.meta.outputs.tags }}
+      #     tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:latest
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha, scope=${{ github.workflow }}
+      #     cache-to: type=gha, scope=${{ github.workflow }}, mode=max
+      - name: Build and push (manual)
         run: |
-          docker image ls
+          docker build -t  ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:latest .
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
 
         # TODO - set push to false and try manual push command?
