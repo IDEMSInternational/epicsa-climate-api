@@ -90,7 +90,9 @@ jobs:
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
       - name: Upload to GAR
-        run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
+        run: |
+          docker image ls
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
 
         # TODO - set push to false and try manual push command?
 
