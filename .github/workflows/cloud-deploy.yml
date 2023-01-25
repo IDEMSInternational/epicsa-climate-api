@@ -101,7 +101,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
-          labels: ${{ steps.meta.outputs.labels }}
+          # labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
