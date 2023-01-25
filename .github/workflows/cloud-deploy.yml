@@ -24,11 +24,10 @@ on:
       - main
       - feat/fast-api
 env:
-  REGISTRY: europe-west1-docker.pkg.dev
   REGION: europe-west1
   PROJECT_ID: glossy-attic-237012
   SERVICE_NAME: epicsa-python
-  REGISTRY_PATH: glossy-attic-237012/epicsa-python
+  IMAGE_NAME: epicsa-python
 
 jobs:
   cloud_deploy:
@@ -59,7 +58,7 @@ jobs:
       - name: Login to GAR
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.REGION }}-docker.pkg.dev
           username: _json_key_base64
           password: ${{ secrets.GCP_SA_KEY_B64 }}
 
@@ -70,13 +69,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_PATH }}/${{ env.SERVICE_NAME }}
+          images: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
           # set latest tag for default branch
           tags: |
             type=raw,value=latest
+
       - name: Build
         id: build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           push: true
@@ -102,3 +102,5 @@ jobs:
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
+# europe-west1-docker.pkg.dev/glossy-attic-237012/epicsa-python/epicsa-python:latest
+# europe-west1-docker.pkg.dev/glossy-attic-237012/epicsa-python/epicsa-python
