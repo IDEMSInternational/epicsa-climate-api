@@ -103,12 +103,13 @@ jobs:
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
+      #
+      # NOTE - build output metadata formatted as json
+      # https://docs.docker.com/engine/reference/commandline/buildx_build/#metadata-file
       - name: Check outputs
         run: |
           echo meta: ${{ steps.meta.outputs.json }}
-          echo imageid: ${{ steps.build.outputs.imageid }}
-          echo digest: ${{ steps.build.outputs.digest }}
-          echo metadata: ${{ toJSON(steps.build.outputs.metadata) }}
+          echo imageName: ${{ fromJSON(steps.build.outputs.Metadata)['image.name'] }}
 
       # Deploy to google cloud
       # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
