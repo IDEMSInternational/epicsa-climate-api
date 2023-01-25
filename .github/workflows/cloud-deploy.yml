@@ -76,7 +76,6 @@ jobs:
           tags: |
             type=sha
             type=semver,pattern={{version}},value=v1.0.0
-            type=raw,value=latest
 
           # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
           # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
