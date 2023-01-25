@@ -100,6 +100,7 @@ jobs:
         run: |
           echo ${{ steps.meta.outputs.json }}
           echo $DOCKER_METADATA_OUTPUT_JSON
+          echo $( fromJSON(steps.build.outputs.metadata)['image.name'] )
 
       # run: |
       #     echo meta: ${{ steps.meta.outputs.json }}
