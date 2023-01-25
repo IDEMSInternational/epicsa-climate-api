@@ -26,9 +26,9 @@ on:
 env:
   REGISTRY: europe-west1-docker.pkg.dev
   REGION: europe-west1
-  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  PROJECT_ID: glossy-attic-237012
   SERVICE_NAME: epicsa-python
-  REGISTRY_PATH: ${{ secrets.GCP_PROJECT }}/epicsa-python
+  REGISTRY_PATH: glossy-attic-237012/epicsa-python
 
 jobs:
   cloud_deploy:
