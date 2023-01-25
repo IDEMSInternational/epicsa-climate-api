@@ -11,7 +11,9 @@
 
 # Service Account Required Permissions (see notes in individual google actions)
 # - Cloud Run Admin
-# - Service Account Token Creator
+# - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
+# - Service Account Token Creator (?)
+# - Artifact registry writer (?)
 # - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User
 
 name: cloud_deploy
@@ -20,7 +22,6 @@ on:
   push:
     branches:
       - main
-      - feat/fast-api
 env:
   REGISTRY: europe-west1-docker.pkg.dev
   REGION: europe-west1
@@ -69,7 +70,9 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.REGISTRY }}/${{ env.REGISTRY_PATH }}/${{ env.SERVICE_NAME }}
-
+          # set latest tag for default branch
+          tags: |
+            type=raw,value=latest
       - name: Build
         id: build
         uses: docker/build-push-action@v2
