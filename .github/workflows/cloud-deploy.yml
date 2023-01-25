@@ -75,6 +75,18 @@ jobs:
           # set latest tag for default branch
           tags: |
             type=raw,value=latest
+          # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
+          # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
+          labels: |
+            org.opencontainers.image.vendor=MyCompany
+            org.opencontainers.image.title=epicsa-climate-api
+            org.opencontainers.image.description=""
+            org.opencontainers.image.url=https://github.com/IDEMSInternational/epicsa-climate-api
+            org.opencontainers.image.source=https://github.com/IDEMSInternational/epicsa-climate-api
+            org.opencontainers.image.version=latest
+            org.opencontainers.image.created=2023-01-25T20:30:24.293Z
+            org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
+            org.opencontainers.image.licenses=
 
       - name: Check outputs
         run: echo ${{ steps.meta.outputs.json }}
@@ -85,12 +97,9 @@ jobs:
         with:
           context: .
           push: false
-          # TODO - passed tags upload to artifact registry but can't be used by cloud run, need to debug
-          # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
           tags: ${{ steps.meta.outputs.tags }}
-          # tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:latest
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
-          # labels: ${{ steps.meta.outputs.labels }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
