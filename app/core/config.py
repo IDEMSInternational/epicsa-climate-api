@@ -5,7 +5,6 @@ from pydantic import AnyHttpUrl, BaseSettings,  validator
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = ''
     EPICSA_DATA_AUTH_TOKEN: str = ''
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
