@@ -109,8 +109,8 @@ jobs:
       - name: Check outputs
         run: |
           echo meta: ${{ steps.meta.outputs.json }}
-          echo ${{ fromJSON(steps.build.outputs.metadata)['image.name']}}
-          echo ${{ toJSON(steps.build.outputs.metadata) }}
+          echo build: ${{ toJSON(steps.build.outputs.metadata) }}
+          echo tag: ${{ ${{ steps.meta.outputs.tags }}[0] }}
 
       # Deploy to google cloud
       # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
