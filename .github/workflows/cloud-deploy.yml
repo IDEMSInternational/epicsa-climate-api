@@ -64,6 +64,10 @@ jobs:
           username: _json_key_base64
           password: ${{ secrets.GCP_SA_KEY_B64 }}
 
+    - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
 
@@ -72,9 +76,9 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
-          # set latest tag for default branch
+          # Manually set sha tag as auto-set harder to extract after
           tags: |
-            type=sha
+            type=raw,value=${{steps.vars.outputs.sha_short}}
             type=semver,pattern={{version}},value=v1.0.0
 
           # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
@@ -90,11 +94,12 @@ jobs:
           #   org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
           #   org.opencontainers.image.licenses=
 
+      
+
       - name: Check outputs
         run: |
           echo ${{ steps.meta.outputs.json }}
-          echo ${{ steps.meta.outputs.json.tags }}
-          echo ${{ steps.meta.outputs.json.tags[0] }}
+          echo $DOCKER_METADATA_OUTPUT_JSON
 
       # run: |
       #     echo meta: ${{ steps.meta.outputs.json }}
