@@ -108,7 +108,7 @@ jobs:
           echo meta: ${{ steps.meta.outputs.json }}
           echo imageid: ${{ steps.build.outputs.imageid }}
           echo digest: ${{ steps.build.outputs.digest }}
-          echo metadata: ${{ fromJSON(steps.build.outputs.metadata) }}
+          echo metadata: ${{ toJSON(steps.build.outputs.metadata) }}
 
       # Deploy to google cloud
       # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
