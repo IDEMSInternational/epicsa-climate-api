@@ -30,13 +30,13 @@ env:
   SERVICE: epicsa-python
 
 jobs:
-  cloud_deploy:
+  build:
     runs-on: ubuntu-latest
     # https://github.com/docker/build-push-action/issues/171
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
+    # permissions:
+    #   contents: read
+    #   packages: write
+    #   id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -65,34 +65,34 @@ jobs:
           password: ${{ secrets.GCP_SA_KEY_B64 }}
 
       # Manually set short sha as easier to access later, and shorthand for image path
-      - name: Set variables
-        id: vars
-        run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "image_path=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}" >> $GITHUB_OUTPUT
+      # - name: Set variables
+      #   id: vars
+      #   run: |
+      #     echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      #     echo "image_path=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}" >> $GITHUB_OUTPUT
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: ${{steps.vars.outputs.image_path}}
-          # Manually set sha tag as auto-set harder to extract after
-          tags: |
-            type=raw,value=${{steps.vars.outputs.sha_short}}
+      # - name: Extract Docker metadata
+      #   id: meta
+      #   uses: docker/metadata-action@v3
+      #   with:
+      #     images: ${{steps.vars.outputs.image_path}}
+      #     # Manually set sha tag as auto-set harder to extract after
+      #     tags: |
+      #       type=raw,value=${{steps.vars.outputs.sha_short}}
 
-          # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
-          # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
-          labels: |
-            org.opencontainers.image.title=epicsa-climate-api
-          #   org.opencontainers.image.description=""
-          #   org.opencontainers.image.url=https://github.com/IDEMSInternational/epicsa-climate-api
-          #   org.opencontainers.image.source=https://github.com/IDEMSInternational/epicsa-climate-api
-          #   org.opencontainers.image.version=latest
-          #   org.opencontainers.image.created=2023-01-25T20:30:24.293Z
-          #   org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
-          #   org.opencontainers.image.licenses=
+      #     # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
+      #     # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
+      #     labels: |
+      #       org.opencontainers.image.title=epicsa-climate-api
+      #     #   org.opencontainers.image.description=""
+      #     #   org.opencontainers.image.url=https://github.com/IDEMSInternational/epicsa-climate-api
+      #     #   org.opencontainers.image.source=https://github.com/IDEMSInternational/epicsa-climate-api
+      #     #   org.opencontainers.image.version=latest
+      #     #   org.opencontainers.image.created=2023-01-25T20:30:24.293Z
+      #     #   org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
+      #     #   org.opencontainers.image.licenses=
 
       - name: Build and upload
         id: build
@@ -101,14 +101,13 @@ jobs:
           context: .
           # platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
+          tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:{{github.sha}}
 
-          # tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
           # labels: ${{ steps.meta.outputs.labels }}
 
-          # cache-from: type=gha, scope=${{ github.workflow }}
-          # cache-to: type=gha, scope=${{ github.workflow }}, mode=max
+          cache-from: type=gha, scope=${{ github.workflow }}
+          cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
       # - name: Build and Upload (manual)
       #   run: |-
@@ -119,6 +118,18 @@ jobs:
       #   run: |-
       #     docker buildx build --push --platform=linux/arm/v7 --cache-from=type=gha,scope=${{ github.workflow }} --cache-to=type=gha,scope=${{ github.workflow }},mode=max -t "${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}" .
 
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Login to GAR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: _json_key_base64
+          password: ${{ secrets.GCP_SA_KEY_B64 }}
       # Deploy to google cloud
       # https://github.com/google-github-actions/deploy-cloudrun
       # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
@@ -134,13 +145,10 @@ jobs:
 
           # image: ${{ fromJSON(steps.build.outputs.metadata)['image.name']}}
 
-          image: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:{{github.sha}}
           project_id: ${{ env.PROJECT_ID }}
           labels: |
             commit-sha=${{steps.vars.outputs.sha_short}}
           # provide connection to production database
           env_vars: |
             EPICSA_DATA_AUTH_TOKEN=${{secrets.EPICSA_DATA_AUTH_TOKEN}}
-
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
