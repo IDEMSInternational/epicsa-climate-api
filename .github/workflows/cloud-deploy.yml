@@ -94,8 +94,8 @@ jobs:
       - name: Check outputs
         run: |
           echo ${{ steps.meta.outputs.json }}
-          echo ${{ steps.meta.outputs.tags }}
-          echo ${{ steps.meta.outputs.tags[0] }}
+          echo ${{ steps.meta.outputs.json.tags }}
+          echo ${{ steps.meta.outputs.json.tags[0] }}
 
       # run: |
       #     echo meta: ${{ steps.meta.outputs.json }}
