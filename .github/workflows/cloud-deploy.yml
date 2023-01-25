@@ -73,11 +73,10 @@ jobs:
         with:
           images: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
           # set latest tag for default branch
-          # tags: |
-          #   type=raw,value=latest
           tags: |
             type=sha
             type=semver,pattern={{version}},value=v1.0.0
+            type=raw,value=latest
 
           # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
           # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
@@ -92,6 +91,13 @@ jobs:
           #   org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
           #   org.opencontainers.image.licenses=
 
+      - name: Check outputs
+        run: |
+          echo meta: ${{ steps.meta.outputs.json }}
+          echo tags1: ${{ steps.meta.outputs.tags }}
+          echo tags2: ${{ steps.meta.outputs.tags[0] }}
+          echo tags3: ${{ fromJSON(steps.meta.outputs.tags)[0] }}
+
       - name: Build
         id: build
         uses: docker/build-push-action@v3
@@ -103,15 +109,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
-
-      #
-      # NOTE - build output metadata formatted as json
-      # https://docs.docker.com/engine/reference/commandline/buildx_build/#metadata-file
-      - name: Check outputs
-        run: |
-          echo meta: ${{ steps.meta.outputs.json }}
-          echo build: ${{ toJSON(steps.build.outputs.metadata) }}
-          echo tag: ${{ steps.meta.outputs.tags[0] }}
 
       # Deploy to google cloud
       # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
