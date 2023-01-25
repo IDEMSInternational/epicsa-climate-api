@@ -77,16 +77,16 @@ jobs:
             type=raw,value=latest
           # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
           # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
-          labels: |
-            org.opencontainers.image.vendor=MyCompany
-            org.opencontainers.image.title=epicsa-climate-api
-            org.opencontainers.image.description=""
-            org.opencontainers.image.url=https://github.com/IDEMSInternational/epicsa-climate-api
-            org.opencontainers.image.source=https://github.com/IDEMSInternational/epicsa-climate-api
-            org.opencontainers.image.version=latest
-            org.opencontainers.image.created=2023-01-25T20:30:24.293Z
-            org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
-            org.opencontainers.image.licenses=
+          # labels: |
+          #   org.opencontainers.image.vendor=MyCompany
+          #   org.opencontainers.image.title=epicsa-climate-api
+          #   org.opencontainers.image.description=""
+          #   org.opencontainers.image.url=https://github.com/IDEMSInternational/epicsa-climate-api
+          #   org.opencontainers.image.source=https://github.com/IDEMSInternational/epicsa-climate-api
+          #   org.opencontainers.image.version=latest
+          #   org.opencontainers.image.created=2023-01-25T20:30:24.293Z
+          #   org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
+          #   org.opencontainers.image.licenses=
 
       - name: Check outputs
         run: echo ${{ steps.meta.outputs.json }}
