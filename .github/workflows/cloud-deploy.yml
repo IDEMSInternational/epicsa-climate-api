@@ -100,26 +100,17 @@ jobs:
         with:
           context: .
           # platforms: linux/amd64,linux/arm64
-          push: false
+          push: true
           tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
-          outputs: type=image
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
           # labels: ${{ steps.meta.outputs.labels }}
-
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
-      - name: Upload
-        run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
-
-      # - name: Build and Upload (manual)
-      #   run: |-
-      #     docker build -t "${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}" .
-      #     docker push "${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}"
-
-      # - name: Build and Upload (buildx)
-      #   run: |-
-      #     docker buildx build --push --platform=linux/arm/v7 --cache-from=type=gha,scope=${{ github.workflow }} --cache-to=type=gha,scope=${{ github.workflow }},mode=max -t "${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}" .
+      - name: Build and Upload (manual)
+        run: |-
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}" .
+          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}"
 
     outputs:
       imageName: ${{ fromJSON(steps.build.outputs.metadata)['image.name']}}
