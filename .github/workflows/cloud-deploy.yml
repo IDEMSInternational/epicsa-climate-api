@@ -77,9 +77,7 @@ jobs:
             type=raw,value=latest
 
       - name: Check outputs
-        run: |
-          echo tags: ${{ steps.meta.outputs.tags }}
-          echo labels: ${{ steps.meta.outputs.labels }}
+        run: echo ${{ steps.meta.outputs.json }}
 
       - name: Build
         id: build
