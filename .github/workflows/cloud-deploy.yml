@@ -93,10 +93,13 @@ jobs:
 
       - name: Check outputs
         run: |
-          echo meta: ${{ steps.meta.outputs.json }}
           echo tags1: ${{ steps.meta.outputs.tags }}
-          echo tags2: ${{ steps.meta.outputs.tags[0] }}
-          echo tags3: ${{ fromJSON(steps.meta.outputs.tags)[0] }}
+
+      # run: |
+      #     echo meta: ${{ steps.meta.outputs.json }}
+      #     echo tags1: ${{ steps.meta.outputs.tags }}
+      #     echo tags2: ${{ steps.meta.outputs.tags[0] }}
+      #     echo tags3: ${{ fromJSON(steps.meta.outputs.tags)[0] }}
 
       - name: Build
         id: build
