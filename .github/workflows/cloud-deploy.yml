@@ -100,14 +100,17 @@ jobs:
         with:
           context: .
           # platforms: linux/amd64,linux/arm64
-          push: true
+          push: false
           tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
-
+          outputs: type=image
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
           # labels: ${{ steps.meta.outputs.labels }}
 
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
+
+      - name: Upload
+        run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
 
       # - name: Build and Upload (manual)
       #   run: |-
