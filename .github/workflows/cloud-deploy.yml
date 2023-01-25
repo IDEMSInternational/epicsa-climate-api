@@ -83,9 +83,8 @@ jobs:
 
           # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
           # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
-          # labels: |
-          #   org.opencontainers.image.vendor=MyCompany
-          #   org.opencontainers.image.title=epicsa-climate-api
+          labels: |
+            org.opencontainers.image.title=epicsa-climate-api
           #   org.opencontainers.image.description=""
           #   org.opencontainers.image.url=https://github.com/IDEMSInternational/epicsa-climate-api
           #   org.opencontainers.image.source=https://github.com/IDEMSInternational/epicsa-climate-api
