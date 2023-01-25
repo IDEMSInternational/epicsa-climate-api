@@ -73,8 +73,11 @@ jobs:
         with:
           images: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
           # set latest tag for default branch
+          # tags: |
+          #   type=raw,value=latest
           tags: |
-            type=raw,value=latest
+            type=raw,value=1.0.0
+
           # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
           # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
           # labels: |
@@ -88,9 +91,6 @@ jobs:
           #   org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
           #   org.opencontainers.image.licenses=
 
-      - name: Check outputs
-        run: echo ${{ steps.meta.outputs.json }}
-
       - name: Build
         id: build
         uses: docker/build-push-action@v3
@@ -103,6 +103,11 @@ jobs:
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
+      - name: Check outputs
+        run: |
+          echo ${{ steps.meta.outputs.json }}
+          echo ${{fromJSON(steps.build.outputs)}}
+
       # Deploy to google cloud
       # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
       # requires additional "service account user" and "cloud run admin" roles
@@ -112,8 +117,10 @@ jobs:
         with:
           service: ${{ env.SERVICE_NAME }}
           # https://github.com/docker/build-push-action/issues/554
+
           # image: ${{ fromJSON(steps.build.outputs.Metadata)['image.name']}}
-          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}
+
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:1.0.0
           region: ${{ env.REGION }}
           # provide connection to production database
           env_vars: |
