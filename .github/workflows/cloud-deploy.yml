@@ -94,15 +94,30 @@ jobs:
           #   org.opencontainers.image.revision=fc880e35ea4678a68aba1703fcfb57dbf88d8209
           #   org.opencontainers.image.licenses=
 
-      - name: Build
-        id: build
-        uses: docker/build-push-action@v3
+      # - name: Build
+      #   id: build
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64
+      #     push: true
+      #     tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
+      #     labels: |
+      #       test=hello
+      #     # tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
+      #     # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
+      #     # labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha, scope=${{ github.workflow }}
+      #     cache-to: type=gha, scope=${{ github.workflow }}, mode=max
+
+      - name: Build and Upload (manual)
+        run: |-
+          docker build -t ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}} .
+          docker upload ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
         with:
           context: .
           push: true
           tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
-          labels: |
-            test=hello
 
           # tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
