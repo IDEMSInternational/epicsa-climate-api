@@ -81,7 +81,6 @@ jobs:
           # Manually set sha tag as auto-set harder to extract after
           tags: |
             type=raw,value=${{steps.vars.outputs.sha_short}}
-            type=semver,pattern={{version}},value=v1.0.0
 
           # Overwrite labels to ensure cloud run compliance (will upload to artifact registry but not to cloud run)
           # https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements
@@ -101,7 +100,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{steps.vars.outputs.sha_short}}
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
           # labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}
