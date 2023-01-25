@@ -101,7 +101,7 @@ jobs:
           context: .
           # platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:{{github.sha}}
+          tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
 
           # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
           # labels: ${{ steps.meta.outputs.labels }}
@@ -145,7 +145,7 @@ jobs:
 
           # image: ${{ fromJSON(steps.build.outputs.metadata)['image.name']}}
 
-          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:{{github.sha}}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
           project_id: ${{ env.PROJECT_ID }}
           labels: |
             commit-sha=${{steps.vars.outputs.sha_short}}
