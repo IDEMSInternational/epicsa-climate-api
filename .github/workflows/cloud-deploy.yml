@@ -40,8 +40,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -75,7 +77,7 @@ jobs:
             type=raw,value=latest
 
       - name: Check outputs
-        run: echo ${{ steps.meta.outputs }}
+        run: echo ${{ toJSON(steps.meta.outputs) }}
 
       - name: Build
         id: build
@@ -110,5 +112,3 @@ jobs:
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
-# europe-west1-docker.pkg.dev/glossy-attic-237012/epicsa-python/epicsa-python:latest
-# europe-west1-docker.pkg.dev/glossy-attic-237012/epicsa-python/epicsa-python
