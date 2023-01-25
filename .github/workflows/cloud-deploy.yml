@@ -148,7 +148,7 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
           project_id: ${{ env.PROJECT_ID }}
           labels: |
-            commit-sha=${{steps.vars.outputs.sha_short}}
+            commit-sha=${{github.sha}}
           # provide connection to production database
           env_vars: |
             EPICSA_DATA_AUTH_TOKEN=${{secrets.EPICSA_DATA_AUTH_TOKEN}}
