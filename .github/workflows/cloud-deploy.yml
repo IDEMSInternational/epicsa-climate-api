@@ -61,25 +61,26 @@ jobs:
 
       # NOTE - buildx builds failing for unknown reason (says image not found). Possibly related to:
       # https://github.com/google-github-actions/deploy-cloudrun/issues/420
+      # https://github.com/google-github-actions/setup-gcloud/issues/135
 
-      - name: Build and upload
-        id: build
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          platforms: linux/amd64
-          push: true
-          tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:latest
-          # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
-          # labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha, scope=${{ github.workflow }}
-          cache-to: type=gha, scope=${{ github.workflow }}, mode=max
-
-      # - name: Build and Upload (manual)
+      # - name: Build and upload
       #   id: build
-      #   run: |-
-      #     docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}" .
-      #     docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}"
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:latest
+      #     # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
+      #     # labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha, scope=${{ github.workflow }}
+      #     cache-to: type=gha, scope=${{ github.workflow }}, mode=max
+
+      - name: Build and Upload (manual)
+        id: build
+        run: |-
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}" .
+          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}"
 
     outputs:
       imageName: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}
