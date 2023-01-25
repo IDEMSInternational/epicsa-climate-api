@@ -64,9 +64,9 @@ jobs:
           username: _json_key_base64
           password: ${{ secrets.GCP_SA_KEY_B64 }}
 
-    - name: Set outputs
-        id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Set SHA short output
+          id: vars
+          run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
