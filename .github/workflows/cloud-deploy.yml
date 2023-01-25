@@ -83,7 +83,7 @@ jobs:
           docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}"
 
     outputs:
-      imageName: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}
+      imageName: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
       authToken: ${{ steps.auth.outputs.access_token }}
 
   deploy:
