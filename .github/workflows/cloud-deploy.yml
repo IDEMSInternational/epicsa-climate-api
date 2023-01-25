@@ -109,7 +109,8 @@ jobs:
       - name: Check outputs
         run: |
           echo meta: ${{ steps.meta.outputs.json }}
-          echo imageName: ${{ fromJSON(steps.build.outputs.Metadata)['image.name'] }}
+          echo ${{ fromJSON(steps.build.outputs.metadata)['image.name']}}
+          echo ${{ toJSON(steps.build.outputs.metadata) }}
 
       # Deploy to google cloud
       # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
@@ -121,7 +122,7 @@ jobs:
           service: ${{ env.SERVICE_NAME }}
           # https://github.com/docker/build-push-action/issues/554
 
-          # image: ${{ fromJSON(steps.build.outputs.Metadata)['image.name']}}
+          # image: ${{ fromJSON(steps.build.outputs.metadata)['image.name']}}
 
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:1.0.0
           region: ${{ env.REGION }}
