@@ -114,16 +114,6 @@ jobs:
         run: |-
           docker build -t ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}} .
           docker upload ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
-        with:
-          context: .
-          push: true
-          tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
-
-          # tags: ${{steps.vars.outputs.image_path}}:${{steps.vars.outputs.sha_short}}
-          # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
-          # labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha, scope=${{ github.workflow }}
-          cache-to: type=gha, scope=${{ github.workflow }}, mode=max
 
       # Deploy to google cloud
       # https://github.com/google-github-actions/deploy-cloudrun
