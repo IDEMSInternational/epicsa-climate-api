@@ -22,7 +22,7 @@ on:
   push:
     branches:
       - main
-      - feat/fast-api
+
 env:
   REGION: europe-west1
   PROJECT_ID: glossy-attic-237012
