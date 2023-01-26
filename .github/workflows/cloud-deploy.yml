@@ -1,0 +1,140 @@
+# Build docker image and deploy to google cloud run
+
+# Note - while a similar build/deploy pipeline can be triggered directly from google cloud builder and run
+# this github action provides more flexibility for customising build variables, deployment targets,
+# tags, and build time resources
+
+# In order to run secrets will need to be provided for:
+# GCP_PROJECT - id of project from where google cloud run will be deployed
+# GCP_SA_KEY_B64 - base64 encoded service account with sufficient permissions for deploying (see various links throughout)
+# EPICSA_DATA_AUTH_TOKEN - auth token for access to e-picsa data (same as in local .env file)
+
+# Service Account Required Permissions (see notes in individual google actions)
+# - Cloud Run Admin
+# - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
+# - Service Account Token Creator (?)
+# - Artifact registry admin (initial build)
+# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User
+
+name: cloud_deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGION: europe-west1
+  PROJECT_ID: glossy-attic-237012
+  REPOSITORY: epicsa-python
+  SERVICE: epicsa-python
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Authenticate to google cloud with service account
+      # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
+      # https://cloud.google.com/artifact-registry/docs/access-control
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: ${{secrets.GCP_SA_KEY_B64}}
+          token_format: "access_token"
+
+      # Login to artifact repository using same credentials as above (could use output token instead of user/pass)
+      - name: Login to GAR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Build and Upload (manual)
+        id: build
+        run: |-
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}" .
+          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}"
+
+    outputs:
+      imageName: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{github.sha}}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{secrets.GCP_SA_KEY_B64}}
+          token_format: "access_token"
+
+      - name: Login to GAR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      # Deploy to google cloud
+      # https://github.com/google-github-actions/deploy-cloudrun
+      # https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
+      # requires additional "service account user" and "cloud run admin" roles
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+
+          # https://github.com/docker/build-push-action/issues/554
+
+          # image: ${{ fromJSON(steps.build.outputs.metadata)['image.name']}}
+
+          image: ${{ needs.build.outputs.imageName }}
+          project_id: ${{ env.PROJECT_ID }}
+          labels: |
+            commit-sha=${{github.sha}}
+          # provide connection to production database
+          env_vars: |
+            EPICSA_DATA_AUTH_TOKEN=${{secrets.EPICSA_DATA_AUTH_TOKEN}}
+
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+
+      # NOTE - buildx builds failing for unknown reason (says image not found). Possibly related to:
+      # https://github.com/google-github-actions/deploy-cloudrun/issues/420
+      # https://github.com/google-github-actions/setup-gcloud/issues/135
+
+      # Also seems like MediaType tag can differ which is a feature of buildx builds
+      # "application/vnd.docker.distribution.manifest.v2+json" vs "application/vnd.oci.image.index.v1+json"
+      # https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
+
+      # But strange as working in builds such as
+      # https://github.com/yewstack/yew-playground/actions/runs/2367392240/workflow
+      # https://github.com/Doarakko/cloud-run-playground/blob/main/.github/workflows/deploy.yml
+
+      # recommended
+      # https://github.com/google-github-actions/example-workflows/blob/main/workflows/deploy-cloudrun/cloudrun-docker.yml
+
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
+
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
+
+      # - name: Build and upload
+      #   id: build
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:latest
+      #     # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
+      #     # labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha, scope=${{ github.workflow }}
+      #     cache-to: type=gha, scope=${{ github.workflow }}, mode=max
