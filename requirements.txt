@@ -7,4 +7,5 @@ pytest
 pytest-cov
 pytest-dotenv
 pandas
-#epicsa-python@git+https://github.com/IDEMSInternational/epicsa-python.git@main
+rpy2
+epicsa-python@git+https://github.com/IDEMSInternational/epicsa-python.git@main
