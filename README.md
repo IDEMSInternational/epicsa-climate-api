@@ -35,6 +35,7 @@ The scripts below will create a python [virtual environment](https://docs.python
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
     pip install -r requirements.txt
+    pip install -r requirements_picsa.txt
     uvicorn app.main:app --reload
     ```
 
@@ -44,6 +45,7 @@ The scripts below will create a python [virtual environment](https://docs.python
     python -m venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt
+    pip install -r requirements_picsa.txt
     uvicorn app.main:app --reload
     ```
 
@@ -54,12 +56,14 @@ Windows (run as administrator)
 
 ```
 Rscript install_packages.R
+Rscript install_packages_picsa.R
 ```
 
 Linux
 
 ```
 sudo Rscript install_packages.R
+sudo Rscript install_packages_picsa.R
 ```
 
 ## Running locally
