@@ -14,15 +14,17 @@ The api requires python and R runtimes installed. It has been tested with the ve
 - R (4.3.2)  
   [https://cran.r-project.org/bin/windows/base](https://cran.r-project.org/bin/windows/base)
 
-## Installation
+## Configuration
 
+**Environment**
 Create an environment file from the sample. These will be populated using [Pydantic](https://docs.pydantic.dev/usage/settings/)
 
 ```
 cp .env.sample .env
 ```
 
-The scripts below will create a python [virtual environment](https://docs.python.org/3/library/venv.html), activate, install required dependencies and start local server
+**Python**
+The scripts below will create a python [virtual environment](https://docs.python.org/3/library/venv.html), activate, install required python and R dependencies and start local server
 
 === "Windows (powershell)"
 
@@ -41,6 +43,21 @@ The scripts below will create a python [virtual environment](https://docs.python
     pip install -r requirements.txt
     uvicorn app.main:app --reload
     ```
+
+**R**
+Once installed you will need to call R from an elevated shell to install dependencies
+
+Windows (run as administrator)
+
+```
+Rscript install_packages.R
+```
+
+Linux
+
+```
+sudo Rscript install_packages.R
+```
 
 ## Running locally
 
