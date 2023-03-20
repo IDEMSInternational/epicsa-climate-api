@@ -18,6 +18,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key '95C0FAF38DB3CCAD0C0
 
 # Install R core dependencies (adapted from https://hub.docker.com/r/thomaschln/r-devtools/dockerfile)
 # https://github.com/guigolab/ggsashimi/issues/45
+COPY ./install_packages.R /app/
 RUN apt-get install -y libcurl4-openssl-dev libssl-dev libssh2-1-dev libxml2-dev zlib1g-dev libharfbuzz-dev libfribidi-dev && \
   Rscript ./install_packages.R
 
