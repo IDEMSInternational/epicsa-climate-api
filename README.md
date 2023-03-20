@@ -6,8 +6,13 @@ Build with [FastAPI](https://fastapi.tiangolo.com/)
 
 ## Pre-Requisites
 
-The documentation requires python 3.10+ to be installed:  
-[https://www.python.org/downloads/](https://www.python.org/downloads/)
+The api requires python and R runtimes installed. It has been tested with the versions listed below
+
+- Python (3.11)  
+  [https://www.python.org/downloads](https://www.python.org/downloads)
+
+- R (4.3.2)  
+  [https://cran.r-project.org/bin/windows/base](https://cran.r-project.org/bin/windows/base)
 
 ## Installation
 
@@ -62,6 +67,17 @@ The server will start at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 ```py
 pytest
 ```
+
+## Troubleshooting
+
+**Pip won't install dependencies**
+Depending on local versions of R and python (as well as operating system) there may be issues when installing certain packages. Recommend attempting install using the `requirements_dev.txt` file which pins exact versions of packages shown to be compatible with each other, i.e.
+
+```sh
+pip install -r requirements_dev.txt
+```
+
+Any other issues should be raised on GitHub
 
 ## License
 
