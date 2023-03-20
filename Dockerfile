@@ -28,6 +28,6 @@ RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.t
 
 ## Install R dependencies
 COPY ./install_packages.R /app/
-RUN Rscript /code/install_packages.R
+RUN Rscript install_packages.R
 
 COPY ./app /app
