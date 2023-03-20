@@ -101,6 +101,11 @@ Depending on local versions of R and python (as well as operating system) there 
 pip install -r requirements_dev.txt
 ```
 
+**Called endpoint method does not exist**
+The library calls methods from various other git repos where code is hosted both in python and R. These are installed during initial setup, but will need reinstallation whenever new versions of the external repos exist.
+
+Simply repeat the steps above to install dependencies from `requirements_picsa.txt` `install_packages_picsa.R`
+
 Any other issues should be raised on GitHub
 
 ## License

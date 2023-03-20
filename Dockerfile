@@ -22,13 +22,6 @@ COPY ./install_packages.R /app/
 RUN apt-get install -y libcurl4-openssl-dev libssl-dev libssh2-1-dev libxml2-dev zlib1g-dev libharfbuzz-dev libfribidi-dev && \
   Rscript ./install_packages.R
 
-# Setup virtual environment
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-RUN pip install --upgrade pip
-
 # Install python dependencies
 COPY ./requirements.txt /app/
 RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.txt
