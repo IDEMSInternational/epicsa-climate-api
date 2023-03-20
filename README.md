@@ -11,8 +11,11 @@ The api requires python and R runtimes installed. It has been tested with the ve
 - Python (3.11)  
   [https://www.python.org/downloads](https://www.python.org/downloads)
 
-- R (4.3.2)  
+- R and Rtools (4.2.3)  
   [https://cran.r-project.org/bin/windows/base](https://cran.r-project.org/bin/windows/base)
+  [https://cran.r-project.org/bin/windows/Rtools/](https://cran.r-project.org/bin/windows/Rtools/)
+
+Relevant documentation should also be followed to ensure runtimes can be executed from PATH environment variable.
 
 ## Configuration
 
