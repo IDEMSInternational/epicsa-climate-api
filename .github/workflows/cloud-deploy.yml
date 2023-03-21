@@ -5,7 +5,6 @@
 # tags, and build time resources
 
 # In order to run secrets will need to be provided for:
-# GCP_PROJECT - id of project from where google cloud run will be deployed
 # GCP_SA_KEY_B64 - base64 encoded service account with sufficient permissions for deploying (see note below)
 # EPICSA_DATA_SA_KEY_B64 - base64 encoded service account with permission to access project data storage (i.e. GCS)
 
@@ -45,7 +44,7 @@ jobs:
       - name: Write Service Account fromJSON
         run: |
           echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} > app/service-account.json
-          cat app/service-account.json
+          echo $(cat app/service-account.json)
 
       # Authenticate to google cloud with service account
       # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
