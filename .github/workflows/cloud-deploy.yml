@@ -54,7 +54,7 @@ jobs:
       - id: "auth"
         uses: "google-github-actions/auth@v1"
         with:
-          credentials_json: ${{secrets.GCP_SA_KEY_B64}}
+          credentials_json: ${{secrets.GCP_SA_KEY_B64 | base64 --decode}}
           token_format: "access_token"
 
       # Login to artifact repository using same credentials as above (could use output token instead of user/pass)
