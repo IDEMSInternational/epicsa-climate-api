@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - refactor/dockerfile-r-support
+      - main
 
 env:
   REGION: europe-west1
