@@ -10,15 +10,15 @@
 # EPICSA_DATA_SA_KEY_B64 - base64 encoded service account with permission to access project data storage (i.e. GCS)
 # EPICSA_DATA_AUTH_TOKEN - (DEPRECATED) auth token for access to e-picsa data (same as in local .env file)
 
-# Additionally the relevant Artifact Registry must be manually created before use
+# Additionally the relevant Artifact Registry must be manually created before use (tbc?)
 
 # GCP Service Account - Permissions required (additional notes in individual google actions)
 # - Cloud Run Admin
 # - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
 # - Service Account Token Creator (?)
 # - Artifact registry admin (initial build)
-# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User
-#   May additionally required same role as above applied from the main project IAM page via "Grant Access" button (TBC)
+# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com, with role Service Account User
+# - the parent  PROJECT_NUMBER-compute@developer.gserviceaccount.com also needs Service Account Token Creator permission on itself
 
 # DATA Service Account - Required permissions
 # - Cloud storage bucket data viewer (?)
@@ -58,7 +58,6 @@ jobs:
           token_format: "access_token"
 
       # Login to artifact repository using same credentials as above (could use output token instead of user/pass)
-      # NOTE - will need to be manually created first matching info from env details above
       - name: Login to GAR
         uses: docker/login-action@v2
         with:
