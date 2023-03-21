@@ -15,7 +15,8 @@
 # - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
 # - Service Account Token Creator (?)
 # - Artifact registry admin (initial build)
-# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User and Service Account Token Creator
+# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User
+#   May additionally required same role as above applied from the main project IAM page via "Grant Access" button
 
 # DATA Service Account - Required permissions
 # - Cloud storage bucket data viewer (?)
