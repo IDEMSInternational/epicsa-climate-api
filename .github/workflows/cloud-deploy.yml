@@ -15,7 +15,7 @@
 # - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
 # - Service Account Token Creator (?)
 # - Artifact registry admin (initial build)
-# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User
+# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User and Service Account Token Creator
 
 # DATA Service Account - Required permissions
 # - Cloud storage bucket data viewer (?)
@@ -41,10 +41,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Write Service Account fromJSON
+      # Write base64-encoded service account
+      - name: Write data service account JSON
         run: |
-          echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} > app/service-account.json
+          echo ewogICJoZWxsbyI6IndvcmxkIgp9 | base64 --decode > app/service-account.json
           echo $(cat app/service-account.json)
+        # run: echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} | base64 --decode  > app/service-account.json
 
       # Authenticate to google cloud with service account
       # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
@@ -111,7 +113,6 @@ jobs:
           # provide connection to production database and service-account
           env_vars: |
             EPICSA_DATA_AUTH_TOKEN=${{secrets.EPICSA_DATA_AUTH_TOKEN}}
-            GOOGLE_APPLICATION_CREDENTIALS=/app/service-account.json
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
