@@ -44,9 +44,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Write base64-encoded service account
+      # Decode and populate service account credentials
       - name: Write data service account JSON
-        run: echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} | base64 --decode  > app/service-account.json
+        id: service-account
+        run: |
+          echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} | base64 --decode  > app/service-account.json
+          echo "GCP_SA_KEY=${{secrets.GCP_SA_KEY_B64}}" | base64 --decode  >> $GITHUB_OUTPUT
 
       # Authenticate to google cloud with service account
       # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
@@ -54,7 +57,7 @@ jobs:
       - id: "auth"
         uses: "google-github-actions/auth@v1"
         with:
-          credentials_json: ${{secrets.GCP_SA_KEY_B64 | base64 --decode}}
+          credentials_json: ${{steps.service-account.outputs.GCP_SA_KEY}}
           token_format: "access_token"
 
       # Login to artifact repository using same credentials as above (could use output token instead of user/pass)
