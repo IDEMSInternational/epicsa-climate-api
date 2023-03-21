@@ -114,7 +114,9 @@ jobs:
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
-# NOTES
+#===========================================================================
+#     Notes
+#===========================================================================
 
 # While a similar build/deploy pipeline can be triggered directly from google cloud builder and run
 # this github action provides more flexibility for customising build variables, deployment targets,
@@ -142,3 +144,22 @@ jobs:
 
 # DATA Service Account - Required permissions
 # - Cloud storage bucket data viewer (?)
+
+#===========================================================================
+#     TROUBLESHOOTING
+#===========================================================================
+
+# buildx builds failing for unknown reason (says image not found). Possibly related to:
+# https://github.com/google-github-actions/deploy-cloudrun/issues/420
+# https://github.com/google-github-actions/setup-gcloud/issues/135
+
+# Also seems like MediaType tag can differ which is a feature of buildx builds
+# "application/vnd.docker.distribution.manifest.v2+json" vs "application/vnd.oci.image.index.v1+json"
+# https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
+
+# But strange as working in builds such as
+# https://github.com/yewstack/yew-playground/actions/runs/2367392240/workflow
+# https://github.com/Doarakko/cloud-run-playground/blob/main/.github/workflows/deploy.yml
+
+# recommended
+# https://github.com/google-github-actions/example-workflows/blob/main/workflows/deploy-cloudrun/cloudrun-docker.yml
