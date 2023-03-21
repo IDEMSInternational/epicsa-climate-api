@@ -49,7 +49,7 @@ jobs:
         id: service-account
         run: |
           echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} | base64 --decode  > app/service-account.json
-          echo "GCP_SA_KEY=${{secrets.GCP_SA_KEY_B64}}" | base64 --decode  >> $GITHUB_OUTPUT
+          echo "GCP_SA_KEY=$(${{secrets.GCP_SA_KEY_B64}}| base64 --decode)"   >> $GITHUB_OUTPUT
 
       # Authenticate to google cloud with service account
       # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
