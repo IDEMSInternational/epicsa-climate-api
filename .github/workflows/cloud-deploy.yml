@@ -11,6 +11,7 @@
 # EPICSA_DATA_AUTH_TOKEN - (DEPRECATED) auth token for access to e-picsa data (same as in local .env file)
 
 # Additionally the relevant Artifact Registry must be manually created before use (tbc?)
+# Additionally first run may need owner permission on Service account to ensure relevant APIs enabled (tbc?)
 
 # GCP Service Account - Permissions required (additional notes in individual google actions)
 # - Cloud Run Admin
