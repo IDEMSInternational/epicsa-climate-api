@@ -1,30 +1,7 @@
-# Build docker image and deploy to google cloud run
+# Build docker image using buildx  and deploy to google cloud run
+# See implementation notes at bottom of file
 
-# Note - while a similar build/deploy pipeline can be triggered directly from google cloud builder and run
-# this github action provides more flexibility for customising build variables, deployment targets,
-# tags, and build time resources
-
-# In order to run secrets will need to be provided for:
-
-# GCP_SA_KEY_B64 - base64 encoded service account with sufficient permissions for deploying (see note below)
-# EPICSA_DATA_SA_KEY_B64 - base64 encoded service account with permission to access project data storage (i.e. GCS)
-# EPICSA_DATA_AUTH_TOKEN - (DEPRECATED) auth token for access to e-picsa data (same as in local .env file)
-
-# Additionally the relevant Artifact Registry must be manually created before use (tbc?)
-# Additionally first run may need owner permission on Service account to ensure relevant APIs enabled (tbc?)
-
-# GCP Service Account - Permissions required (additional notes in individual google actions)
-# - Cloud Run Admin
-# - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
-# - Service Account Token Creator (?)
-# - Artifact registry admin (initial build)
-# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com, with role Service Account User
-# - the parent  PROJECT_NUMBER-compute@developer.gserviceaccount.com also needs Service Account Token Creator permission on itself
-
-# DATA Service Account - Required permissions
-# - Cloud storage bucket data viewer (?)
-
-name: cloud_deploy
+name: cloud_deploy_buildx
 
 on:
   push:
@@ -137,37 +114,31 @@ jobs:
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
+# NOTES
 
-      # NOTE - buildx builds failing for unknown reason (says image not found). Possibly related to:
-      # https://github.com/google-github-actions/deploy-cloudrun/issues/420
-      # https://github.com/google-github-actions/setup-gcloud/issues/135
+# While a similar build/deploy pipeline can be triggered directly from google cloud builder and run
+# this github action provides more flexibility for customising build variables, deployment targets,
+# tags, and build time resources
 
-      # Also seems like MediaType tag can differ which is a feature of buildx builds
-      # "application/vnd.docker.distribution.manifest.v2+json" vs "application/vnd.oci.image.index.v1+json"
-      # https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
+# In order to run secrets will need to be provided for:
 
-      # But strange as working in builds such as
-      # https://github.com/yewstack/yew-playground/actions/runs/2367392240/workflow
-      # https://github.com/Doarakko/cloud-run-playground/blob/main/.github/workflows/deploy.yml
+# GCP_SA_KEY_B64 - base64 encoded service account with sufficient permissions for deploying (see note below)
+# EPICSA_DATA_SA_KEY_B64 - base64 encoded service account with permission to access project data storage (i.e. GCS)
+# EPICSA_DATA_AUTH_TOKEN - (DEPRECATED) auth token for access to e-picsa data (same as in local .env file)
 
-      # recommended
-      # https://github.com/google-github-actions/example-workflows/blob/main/workflows/deploy-cloudrun/cloudrun-docker.yml
+# Additionally the relevant Artifact Registry must be manually created before use (tbc?)
+# Additionally first run may need owner permission on Service account to ensure relevant APIs enabled (tbc?)
 
-      # - name: Set up QEMU
-      #   uses: docker/setup-qemu-action@v2
+# The following APIs will need to be enabled
+# https://console.cloud.google.com/apis/library/run.googleapis.com
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v2
+# GCP Service Account - Permissions required (additional notes in individual google actions)
+# - Cloud Run Admin
+# - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
+# - Service Account Token Creator (?)
+# - Artifact registry admin (initial build)
+# - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com, with role Service Account User
+# - the parent  PROJECT_NUMBER-compute@developer.gserviceaccount.com also needs Service Account Token Creator permission on itself
 
-      # - name: Build and upload
-      #   id: build
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: .
-      #     platforms: linux/amd64
-      #     push: true
-      #     tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:latest
-      #     # NOTE - avoid passing labels as seems to break google cloud deployment (says image not found)
-      #     # labels: ${{ steps.meta.outputs.labels }}
-      #     cache-from: type=gha, scope=${{ github.workflow }}
-      #     cache-to: type=gha, scope=${{ github.workflow }}, mode=max
+# DATA Service Account - Required permissions
+# - Cloud storage bucket data viewer (?)
