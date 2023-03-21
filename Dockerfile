@@ -22,14 +22,14 @@ COPY ./install_packages.R /app/
 RUN apt-get install -y libcurl4-openssl-dev libssl-dev libssh2-1-dev libxml2-dev zlib1g-dev libharfbuzz-dev libfribidi-dev && \
   Rscript ./install_packages.R
 
-# Install python dependencies
+# Install Python core dependencies
 COPY ./requirements.txt /app/
 RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.txt
 
 # Install linked picsa python and R repos
 # Perform last to allow caching of steps above
 COPY ./requirements_picsa.txt /app/
-RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements_picsa.txt
 
 COPY ./install_packages_picsa.R /app/
 RUN Rscript ./install_packages_picsa.R
