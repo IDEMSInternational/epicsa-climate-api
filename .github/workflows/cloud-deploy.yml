@@ -18,7 +18,7 @@
 # - Service Account Token Creator (?)
 # - Artifact registry admin (initial build)
 # - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User
-#   May additionally required same role as above applied from the main project IAM page via "Grant Access" button
+#   May additionally required same role as above applied from the main project IAM page via "Grant Access" button (TBC)
 
 # DATA Service Account - Required permissions
 # - Cloud storage bucket data viewer (?)
