@@ -1,12 +1,12 @@
-# EPICSA Climate Api
+# E-PICSA Climate Api
 
-API for accessing e-picsa climate services
+API for accessing E-PICSA climate services
 
 Build with [FastAPI](https://fastapi.tiangolo.com/)
 
 ## Pre-Requisites
 
-The api requires python and R runtimes installed. It has been tested with the versions listed below
+The api requires Python and R runtimes installed. It has been tested with the versions listed below
 
 - Python (3.11)  
   [https://www.python.org/downloads](https://www.python.org/downloads)
@@ -20,6 +20,7 @@ Relevant documentation should also be followed to ensure runtimes can be execute
 ## Configuration
 
 **Environment**
+
 Create an environment file from the sample. These will be populated using [Pydantic](https://docs.pydantic.dev/usage/settings/)
 
 ```
@@ -27,6 +28,7 @@ cp .env.sample .env
 ```
 
 **Python**
+
 The scripts below will create a python [virtual environment](https://docs.python.org/3/library/venv.html), activate, install required python and R dependencies and start local server
 
 === "Windows (powershell)"
@@ -48,6 +50,7 @@ The scripts below will create a python [virtual environment](https://docs.python
     ```
 
 **R**
+
 Once installed you will need to call R from an elevated shell to install dependencies
 
 Windows (run as administrator)
@@ -60,6 +63,23 @@ Linux
 
 ```
 sudo Rscript install_packages.R
+```
+
+**Working Folder**
+
+In order to run the package, you will need to create the following folder structure in the main repository folder (i.e. the folder where this `README.md` file is stored).
+
+```
+working_data
+working_data/zm
+working_data/zm/data
+```
+Note: `zm` is the country code for Zambia. You will need different/additional `<country_code>/data` folders depending on the data you specify for calculations.
+
+You will also need to add the following authorization file:
+
+```
+working_data/service-account.json
 ```
 
 ## Running locally
