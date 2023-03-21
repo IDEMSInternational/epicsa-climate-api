@@ -6,15 +6,20 @@
 
 # In order to run secrets will need to be provided for:
 # GCP_PROJECT - id of project from where google cloud run will be deployed
-# GCP_SA_KEY_B64 - base64 encoded service account with sufficient permissions for deploying (see various links throughout)
-# EPICSA_DATA_AUTH_TOKEN - auth token for access to e-picsa data (same as in local .env file)
+# GCP_SA_KEY_B64 - base64 encoded service account with sufficient permissions for deploying (see note below)
+# EPICSA_DATA_SA_KEY_B64 - base64 encoded service account with permission to access project data storage (i.e. GCS)
 
-# Service Account Required Permissions (see notes in individual google actions)
+# EPICSA_DATA_AUTH_TOKEN - (DEPRECATED) auth token for access to e-picsa data (same as in local .env file)
+
+# GCP Service Account - Permissions required (additional notes in individual google actions)
 # - Cloud Run Admin
 # - Cloud Run Sevice Agent (?) (comments in https://stackoverflow.com/a/55788899/5693245)
 # - Service Account Token Creator (?)
 # - Artifact registry admin (initial build)
 # - be a member of PROJECT_NUMBER-compute@developer.gserviceaccount.com), with role Service Account User
+
+# DATA Service Account - Required permissions
+# - Cloud storage bucket data viewer (?)
 
 name: cloud_deploy
 
@@ -26,7 +31,7 @@ on:
 
 env:
   REGION: europe-west1
-  PROJECT_ID: glossy-attic-237012
+  PROJECT_ID: e-picsa
   REPOSITORY: epicsa-python
   SERVICE: epicsa-python
 
@@ -36,6 +41,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Write Service Account fromJSON
+        run: |
+          echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} > app/service-account.json
+          cat app/service-account.json
 
       # Authenticate to google cloud with service account
       # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
@@ -99,9 +109,10 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           labels: |
             commit-sha=${{github.sha}}
-          # provide connection to production database
+          # provide connection to production database and service-account
           env_vars: |
             EPICSA_DATA_AUTH_TOKEN=${{secrets.EPICSA_DATA_AUTH_TOKEN}}
+            GOOGLE_APPLICATION_CREDENTIALS=/app/service-account.json
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
