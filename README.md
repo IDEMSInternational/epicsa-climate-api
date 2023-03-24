@@ -36,7 +36,7 @@ The scripts below will create a python [virtual environment](https://docs.python
     ``` ps1 linenums="1"
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
-    pip install -r requirements.txt
+    pip install -r requirements.txt -U
     uvicorn app.main:app --reload
     ```
 
@@ -45,7 +45,7 @@ The scripts below will create a python [virtual environment](https://docs.python
     ```sh linenums="1"
     python -m venv .venv
     source .venv/bin/activate
-    pip install -r requirements.txt
+    pip install -r requirements.txt -U
     uvicorn app.main:app --reload
     ```
 
@@ -105,7 +105,7 @@ pytest
 Depending on local versions of R and python (as well as operating system) there may be issues when installing certain packages. Recommend attempting install using the `requirements_dev.txt` file which pins exact versions of packages shown to be compatible with each other, i.e.
 
 ```sh
-pip install -r requirements_dev.txt
+pip install -r requirements_dev.txt -U
 ```
 
 Any other issues should be raised on GitHub
