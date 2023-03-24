@@ -1,8 +1,11 @@
 # FastAPI base image (builds on python official debian image, currently bullseye)
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
 
+# Set a top-level folder that will be used to host all files
+WORKDIR /project
+
 # Allow python to find locally installed modules
-ENV PYTHONPATH "${PYTHONPATH}:/app"
+ENV PYTHONPATH "/project"
 ENV PORT=8000
 
 # Install core dependencies for adding R and python dependencies
@@ -19,20 +22,20 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key '95C0FAF38DB3CCAD0C0
 
 # Install R core dependencies (adapted from https://hub.docker.com/r/thomaschln/r-devtools/dockerfile)
 # https://github.com/guigolab/ggsashimi/issues/45
-COPY ./install_packages.R /app/
+COPY ./install_packages.R .
 RUN apt-get install -y libcurl4-openssl-dev libssl-dev libssh2-1-dev libxml2-dev zlib1g-dev libharfbuzz-dev libfribidi-dev && \
   Rscript ./install_packages.R
 
 # Install Python core dependencies
-COPY ./requirements.txt /app/
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.txt
 
 # Install linked picsa python and R repos
 # Perform last to allow caching of steps above
-COPY ./requirements_picsa.txt /app/
+COPY ./requirements_picsa.txt .
 RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements_picsa.txt
 
-COPY ./install_packages_picsa.R /app/
+COPY ./install_packages_picsa.R .
 RUN Rscript ./install_packages_picsa.R
 
 COPY ./app /app
