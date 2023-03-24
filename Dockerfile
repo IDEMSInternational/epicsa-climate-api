@@ -1,7 +1,8 @@
 # FastAPI base image (builds on python official debian image, currently bullseye)
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
 
-ENV PYTHONPATH "${PYTHONPATH}:/"
+# Allow python to find locally installed modules
+ENV PYTHONPATH "${PYTHONPATH}:/app"
 ENV PORT=8000
 
 # Install core dependencies for adding R and python dependencies
