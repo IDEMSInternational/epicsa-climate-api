@@ -142,3 +142,9 @@ cython_debug/
 
 demo
 *.db
+
+# working area for data used in R calculations
+working_data/
+
+# service account key
+service-account.json
