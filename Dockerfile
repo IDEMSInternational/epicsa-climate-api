@@ -2,10 +2,11 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
 
 # Set a top-level folder that will be used to host all files
-WORKDIR /project
+# Matches https://github.com/tiangolo/uvicorn-gunicorn-docker/blob/master/docker-images/python3.11.dockerfile
+WORKDIR /app
 
 # Allow python to find locally installed modules
-ENV PYTHONPATH "/project"
+ENV PYTHONPATH "/app"
 ENV PORT=8000
 
 # Install core dependencies for adding R and python dependencies
@@ -38,4 +39,5 @@ RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements_p
 COPY ./install_packages_picsa.R .
 RUN Rscript ./install_packages_picsa.R
 
-COPY ./app /app
+# Copy runtime application (will sit in nested /app/app as expected by uvicorn gunicorn)
+COPY ./app ./app
