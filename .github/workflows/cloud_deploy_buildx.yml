@@ -26,8 +26,7 @@ jobs:
       - name: Write data service account JSON
         id: service-account
         run: |
-          echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} | base64 --decode  > app/service-account.json
-          echo $(cat app/service-account.json)
+          echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} | base64 --decode  > ./service-account.json
 
       # Authenticate to google cloud with service account
       # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
