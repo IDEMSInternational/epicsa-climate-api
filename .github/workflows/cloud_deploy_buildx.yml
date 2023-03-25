@@ -147,6 +147,9 @@ jobs:
 # DATA Service Account - Required permissions
 # - Cloud storage bucket data viewer (?)
 
+# Post successful deployment cloud run may need to be configured to allow higher memory limit (min 1GB),
+# which will also apply to all future deployments
+
 #===========================================================================
 #     TROUBLESHOOTING
 #===========================================================================
