@@ -27,6 +27,7 @@ jobs:
         id: service-account
         run: |
           echo ${{secrets.EPICSA_DATA_SA_KEY_B64}} | base64 --decode  > app/service-account.json
+          echo $(cat app/service-account.json)
 
       # Authenticate to google cloud with service account
       # https://github.com/google-github-actions/auth#authenticating-via-service-account-key-json
@@ -110,6 +111,7 @@ jobs:
           labels: |
             commit-sha=${{github.sha}}
           # provide connection to production database and service-account
+          # DEPRECATED - use service account instead, will need removal from frontend code once confirmed not needed
           env_vars: |
             EPICSA_DATA_AUTH_TOKEN=${{secrets.EPICSA_DATA_AUTH_TOKEN}}
 
