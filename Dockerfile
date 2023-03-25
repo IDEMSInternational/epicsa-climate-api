@@ -40,4 +40,5 @@ COPY ./install_packages_picsa.R .
 RUN Rscript ./install_packages_picsa.R
 
 # Copy runtime application (will sit in nested /app/app as expected by uvicorn gunicorn)
+COPY ./service-account.json .
 COPY ./app ./app
