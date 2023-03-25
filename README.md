@@ -103,6 +103,10 @@ The server will start at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 pytest
 ```
 
+## Deployment
+
+This repo contains example workflow to build as a docker image and deploy to google cloud run. See action yaml for details
+
 ## Troubleshooting
 
 **Pip won't install dependencies**
