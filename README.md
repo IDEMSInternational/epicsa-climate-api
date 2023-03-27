@@ -36,7 +36,8 @@ The scripts below will create a python [virtual environment](https://docs.python
     ``` ps1 linenums="1"
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
-    pip install -r requirements.txt -U
+    pip install --upgrade -r requirements.txt
+    pip install --upgrade -r requirements_picsa.txt
     uvicorn app.main:app --reload
     ```
 
@@ -45,7 +46,8 @@ The scripts below will create a python [virtual environment](https://docs.python
     ```sh linenums="1"
     python -m venv .venv
     source .venv/bin/activate
-    pip install -r requirements.txt -U
+    pip install --upgrade -r requirements.txt
+    pip install --upgrade -r requirements_picsa.txt
     uvicorn app.main:app --reload
     ```
 
@@ -57,12 +59,14 @@ Windows (run as administrator)
 
 ```
 Rscript install_packages.R
+Rscript install_packages_picsa.R
 ```
 
 Linux
 
 ```
 sudo Rscript install_packages.R
+sudo Rscript install_packages_picsa.R
 ```
 
 **Authorization File**
@@ -99,14 +103,23 @@ The server will start at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 pytest
 ```
 
+## Deployment
+
+This repo contains example workflow to build as a docker image and deploy to google cloud run. See action yaml for details
+
 ## Troubleshooting
 
 **Pip won't install dependencies**
 Depending on local versions of R and python (as well as operating system) there may be issues when installing certain packages. Recommend attempting install using the `requirements_dev.txt` file which pins exact versions of packages shown to be compatible with each other, i.e.
 
 ```sh
-pip install -r requirements_dev.txt -U
+pip install --upgrade -r requirements_dev.txt
 ```
+
+**Called endpoint method does not exist**
+The library calls methods from various other git repos where code is hosted both in python and R. These are installed during initial setup, but will need reinstallation whenever new versions of the external repos exist.
+
+Simply repeat the steps above to install dependencies from `requirements_picsa.txt` `install_packages_picsa.R`
 
 Any other issues should be raised on GitHub
 
