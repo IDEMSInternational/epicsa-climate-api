@@ -18,5 +18,5 @@ def get_annual_rainfall_summaries(params: AnnualRainfallSummariesParameters):
     """
     TODO.
     """
-    df = annual_rainfall_summaries(params.country, params.station_id, params.summaries)
-    return get_dataframe_response(df)
+    result_json = annual_rainfall_summaries(params.country, params.station_id, params.summaries)
+    return result_json

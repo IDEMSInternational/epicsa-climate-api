@@ -7,7 +7,8 @@ def get_stations():
 
 
 def annual_rainfall_summaries(
+    country: str,
     station_id: str,
     summaries: List[str] = None,
 ):
-    return DataFrame(data=[])
+    return ""

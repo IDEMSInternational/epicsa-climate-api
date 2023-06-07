@@ -1,2 +1,2 @@
 # Linked epicsa repos
-epicsa-python@git+https://github.com/IDEMSInternational/epicsa-python.git@d9d625699c3c023645b33707548f7bfd222c2282
+epicsa-python@git+https://github.com/IDEMSInternational/epicsa-python.git@6f64de988ab70c2e9633b5769e8ffe79996d8ac1
