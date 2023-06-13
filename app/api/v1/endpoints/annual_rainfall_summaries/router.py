@@ -1,6 +1,7 @@
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 
 from .schema import AnnualRainfallSummariesParameters
 
@@ -14,9 +15,11 @@ router = APIRouter()
 
 
 @router.post("/")
-def get_annual_rainfall_summaries(params: AnnualRainfallSummariesParameters):
+def get_annual_rainfall_summaries(params: AnnualRainfallSummariesParameters) -> JSONResponse:
     """
     TODO.
     """
     result_json = annual_rainfall_summaries(params.country, params.station_id, params.summaries)
-    return result_json
+    print("result_json ", result_json)
+    #return result_json
+    return JSONResponse(content=result_json)
