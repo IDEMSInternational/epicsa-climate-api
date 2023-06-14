@@ -33,23 +33,19 @@ The scripts below will create a python [virtual environment](https://docs.python
 
 === "Windows (powershell)"
 
-    ``` ps1 linenums="1"
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
     pip install --upgrade -r requirements.txt
-    pip install --upgrade -r requirements_picsa.txt
+    pip install --upgrade --no-cache-dir -r requirements_picsa.txt
     uvicorn app.main:app --reload
-    ```
 
 === "Linux (bash)"
 
-    ```sh linenums="1"
     python -m venv .venv
     source .venv/bin/activate
     pip install --upgrade -r requirements.txt
-    pip install --upgrade -r requirements_picsa.txt
+    pip install --upgrade --no-cache-dir -r requirements_picsa.txt
     uvicorn app.main:app --reload
-    ```
 
 **R**
 
@@ -83,17 +79,13 @@ Once installed, subsequent server starts can skip installation steps
 
 === "Windows (powershell)"
 
-    ``` ps1 linenums="1"
     .\.venv\Scripts\Activate.ps1
     uvicorn app.main:app --reload
-    ```
 
 === "Linux (bash)"
 
-    ```sh linenums="1"
     source .venv/bin/activate
     uvicorn app.main:app --reload
-    ```
 
 The server will start at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
