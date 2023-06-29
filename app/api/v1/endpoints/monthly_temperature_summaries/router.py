@@ -1,25 +1,25 @@
 from typing import OrderedDict
 
-from epicsa_python.epicsa import annual_rainfall_summaries
+from epicsa_python.epicsa import monthly_temperature_summaries
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.utils.response import get_dataframe_response
 
 from .schema import (
-    AnnualRainfallSummariesParameters,
+    MonthlyTemperatureSummariesParameters,
 )
 
 router = APIRouter()
 
 
 @router.post("/")
-def get_annual_rainfall_summaries(
-    params: AnnualRainfallSummariesParameters,
+def get_monthly_temperature_summaries(
+    params: MonthlyTemperatureSummariesParameters,
 ) -> OrderedDict:
     """
     TODO.
     """
-    result: OrderedDict = annual_rainfall_summaries(
+    result: OrderedDict = monthly_temperature_summaries(
         params.country, params.station_id, params.summaries
     )
     # TODO move to shared function

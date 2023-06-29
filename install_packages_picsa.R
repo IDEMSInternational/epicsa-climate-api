@@ -1,5 +1,11 @@
+# HACK Ensure devtools configured with correct library path
+# https://stackoverflow.com/questions/24646065/how-to-specify-lib-directory-when-installing-development-version-r-packages-from
+.libPaths()
+
 # Linked epicsa git repos
-devtools::install_github("IDEMSInternational/cdms.products", ref = "2d4babe")
-devtools::install_github("IDEMSInternational/epicsawrap", ref = "2fa1a6e")
-devtools::install_github("IDEMSInternational/epicsadata", ref = "db742f9")
+
+devtools::install_github("IDEMSInternational/cdms.products", ref = "2d4babe", force=TRUE)
+devtools::install_github("IDEMSInternational/epicsawrap", ref = "b8ad152", force=TRUE)
+devtools::install_github("IDEMSInternational/epicsadata", ref = "db742f9", force=TRUE)
+
 q()

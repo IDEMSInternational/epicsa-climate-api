@@ -44,14 +44,14 @@ The scripts below will create a python [virtual environment](https://docs.python
     python -m venv .venv
     source .venv/bin/activate
     pip install --upgrade -r requirements.txt
-    pip install --upgrade --no-cache-dir -r requirements_picsa.txt
+    pip install --force-reinstall -r requirements_picsa.txt
     uvicorn app.main:app --reload
 
 **R**
 
 Once installed you will need to call R from an elevated shell to install dependencies
 
-Windows (run as administrator)
+Windows
 
 ```
 Rscript install_packages.R
@@ -93,6 +93,12 @@ The server will start at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ```py
 pytest
+```
+
+## Running locally (docker)
+
+```sh
+docker compose up --build
 ```
 
 ## Deployment
