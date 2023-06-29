@@ -51,7 +51,7 @@ The scripts below will create a python [virtual environment](https://docs.python
 
 Once installed you will need to call R from an elevated shell to install dependencies
 
-Windows (run as administrator)
+Windows
 
 ```
 Rscript install_packages.R
