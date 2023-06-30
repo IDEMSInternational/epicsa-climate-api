@@ -5,7 +5,8 @@
 # Linked epicsa git repos
 
 devtools::install_github("IDEMSInternational/cdms.products", ref = "2d4babe", force=TRUE)
-devtools::install_github("IDEMSInternational/epicsawrap", ref = "b8ad152", force=TRUE)
-devtools::install_github("IDEMSInternational/epicsadata", ref = "db742f9", force=TRUE)
+devtools::install_github("IDEMSInternational/rpicsa", ref = "4494333", force=TRUE)
+devtools::install_github("IDEMSInternational/epicsawrap", ref = "ae1675c", force=TRUE)
+devtools::install_github("IDEMSInternational/epicsadata", ref = "3e799f9", force=TRUE)
 
 q()
