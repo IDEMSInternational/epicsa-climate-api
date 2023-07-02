@@ -19,6 +19,11 @@ def get_annual_rainfall_summaries(
     """
     TODO.
     """
+    # For lists, Fast API does not handle None default parameter values as expected.
+    #    So convert empty lists to 'None' values
+    if params.summaries == []:
+        params.summaries = None
+
     result: OrderedDict = annual_rainfall_summaries(
         params.country, params.station_id, params.summaries
     )

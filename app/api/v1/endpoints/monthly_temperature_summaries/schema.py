@@ -9,4 +9,4 @@ country_name = Literal["zm", "mw"]
 class MonthlyTemperatureSummariesParameters(BaseModel):
     country: country_name = "zm"
     station_id: str = "16"
-    summaries: Optional[List[summary_name]] = ["mean_tmin", "mean_tmax"]
+    summaries: Optional[List[summary_name]] = []

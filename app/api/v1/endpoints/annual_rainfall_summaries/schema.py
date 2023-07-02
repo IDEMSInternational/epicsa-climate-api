@@ -12,4 +12,4 @@ country_name = Literal["zm", "mw"]
 class AnnualRainfallSummariesParameters(BaseModel):
     country: country_name = "zm"
     station_id: str = "01122"
-    summaries: Optional[List[summary_name_annual_rainfall]] = None
+    summaries: Optional[List[summary_name_annual_rainfall]] = []

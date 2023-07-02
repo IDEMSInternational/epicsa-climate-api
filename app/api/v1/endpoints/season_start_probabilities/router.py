@@ -19,6 +19,11 @@ def get_season_start_probabilities(
     """
     TODO.
     """
+    # For lists, Fast API does not handle None default parameter values as expected.
+    #    So convert empty lists to 'None' values
+    if params.start_dates == []:
+        params.start_dates = None
+
     result: OrderedDict = season_start_probabilities(
         params.country,
         params.station_id,
