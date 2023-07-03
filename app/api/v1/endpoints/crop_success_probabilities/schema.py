@@ -7,7 +7,7 @@ country_name = Literal["zm", "mw"]
 class CropSuccessProbabilitiesParameters(BaseModel):
     country: country_name = "zm"
     station_id: str = "16"
-    water_requirements: Optional[List[int]] = []
-    planting_length: Optional[List[int]] = []
-    planting_dates: Optional[List[int]] = []
-    start_before_season: Optional[bool] = None
+    water_requirements: List[int] | None = None
+    planting_length: List[int] | None = None
+    planting_dates: List[int] | None = None
+    start_before_season: bool | None = None

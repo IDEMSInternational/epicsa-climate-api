@@ -19,15 +19,6 @@ def get_crop_success_probabilities(
     """
     TODO.
     """
-    # For lists, Fast API does not handle None default parameter values as expected.
-    #    So convert empty lists to 'None' values
-    if params.water_requirements == []:
-        params.water_requirements = None
-    if params.planting_length == []:
-        params.planting_length = None
-    if params.planting_dates == []:
-        params.planting_dates = None
-
     result: OrderedDict = crop_success_probabilities(
         params.country,
         params.station_id,
