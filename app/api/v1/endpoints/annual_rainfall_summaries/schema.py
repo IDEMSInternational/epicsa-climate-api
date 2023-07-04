@@ -1,4 +1,4 @@
-from typing import Literal, List, Optional
+from typing import Literal
 from pydantic import BaseModel
 
 summary_name_annual_rainfall = Literal[
@@ -15,7 +15,7 @@ country_name = Literal["zm", "mw"]
 class AnnualRainfallSummariesParameters(BaseModel):
     country: country_name = "zm"
     station_id: str = "01122"
-    summaries: List[summary_name_annual_rainfall] = [
+    summaries: list[summary_name_annual_rainfall] = [
         "annual_rain",
         "start_rains",
         "end_rains",
