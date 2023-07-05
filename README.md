@@ -36,7 +36,7 @@ The scripts below will create a python [virtual environment](https://docs.python
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
     pip install --upgrade -r requirements.txt
-    pip install --upgrade --no-cache-dir -r requirements_picsa.txt
+    pip install --force-reinstall -r requirements_picsa.txt
     uvicorn app.main:app --reload
 
 === "Linux (bash)"
