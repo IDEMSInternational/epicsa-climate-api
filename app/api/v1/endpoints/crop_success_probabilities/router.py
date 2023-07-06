@@ -23,7 +23,7 @@ def get_crop_success_probabilities(
         params.country,
         params.station_id,
         params.water_requirements,
-        params.crop_length,
+        params.planting_length,
         params.planting_dates,
         params.start_before_season,
     )
