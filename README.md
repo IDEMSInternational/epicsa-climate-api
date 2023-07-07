@@ -37,7 +37,6 @@ The scripts below will create a python [virtual environment](https://docs.python
     .\.venv\Scripts\Activate.ps1
     pip install --upgrade -r requirements.txt
     pip install --force-reinstall -r requirements_picsa.txt
-    uvicorn app.main:app --reload
 
 === "Linux (bash)"
 
@@ -45,7 +44,13 @@ The scripts below will create a python [virtual environment](https://docs.python
     source .venv/bin/activate
     pip install --upgrade -r requirements.txt
     pip install --force-reinstall -r requirements_picsa.txt
-    uvicorn app.main:app --reload
+
+If you wish to check that the expected versions have been installed:
+
+```
+pip freeze                 # shows SHA for packages installed from GitHub
+pip list --format=freeze   # shows version number for all packages
+```
 
 **R**
 
