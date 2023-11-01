@@ -11,6 +11,7 @@ def get_status():
     Check server up and authorized to access data
     """
     checkServiceAccount()
+    # TODO - add test within epicsa wrapper to check if R installed and correct version
     return 'Server Up'
 
 
