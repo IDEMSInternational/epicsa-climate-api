@@ -125,7 +125,7 @@ pip install --upgrade -r requirements_dev.txt
 **R Dependency incompatibility**
 Ensure R installed a per prerequisites, verify version via `rscript --version`.
 
-If faciing issues with a specific package it may help to download [RStudio](https://posit.co/download/rstudio-desktop/), and using the `packages` tab to check what version of packages are installed and update any indicated within error logs.
+If facing issues with a specific package it may help to download [RStudio](https://posit.co/download/rstudio-desktop/), and using the `packages` tab to check what version of packages are installed and update any indicated within error logs.
 
 **Called endpoint method does not exist**
 The library calls methods from various other git repos where code is hosted both in python and R. These are installed during initial setup, but will need reinstallation whenever new versions of the external repos exist.
