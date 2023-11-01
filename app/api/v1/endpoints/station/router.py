@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from .schema import Station
-from app.epicsa_python.main import get_stations
 
 router = APIRouter()
 
@@ -11,9 +10,7 @@ def read_stations() -> list[Station]:
     """
     Retrieve stations.
     """
-    stations = get_stations()
-    print('stations', stations)
-    return stations
+    raise HTTPException(status_code=404, detail="Method not yet implemented")
 
 
 @router.get("/{id}")
@@ -21,4 +18,4 @@ def read_station(*, id: int) -> Station:
     """
     Get station by ID.
     """
-    return {id: 1}
+    raise HTTPException(status_code=404, detail="Method not yet implemented")
