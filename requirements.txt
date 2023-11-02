@@ -7,4 +7,5 @@ pytest
 pytest-cov
 pytest-dotenv
 pandas
-rpy2
+# https://github.com/rpy2/rpy2/issues/1045
+rpy2==3.5.12
