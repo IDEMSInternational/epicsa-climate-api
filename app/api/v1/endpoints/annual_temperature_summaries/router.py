@@ -1,9 +1,8 @@
 from typing import OrderedDict
 
 from epicsa_python.epicsa import annual_temperature_summaries
-from fastapi import APIRouter, Depends, HTTPException
-
-from app.utils.response import get_dataframe_response
+from fastapi import APIRouter
+from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
 
 from .schema import (
     AnnualTemperatureSummariesParameters,
@@ -16,21 +15,13 @@ router = APIRouter()
 def get_annual_temperature_summaries(
     params: AnnualTemperatureSummariesParameters,
 ) -> OrderedDict:
-    """
-    TODO.
-    """
-    result: OrderedDict = annual_temperature_summaries(
-        params.country, params.station_id, params.summaries
+    
+    return run_epicsa_function_and_get_dataframe(
+        annual_temperature_summaries,
+        country=params.country,
+        station_id=params.station_id,
+        summaries=params.summaries,
     )
-    # TODO move to shared function
-    # `get_dataframe_response()` function cannot cope with categorical data.
-    #    So convert categorical columns to strings
-    data_frame = result["data"]
-    for col in data_frame.columns:
-        if data_frame[col].dtype.name == "category":
-            data_frame[col] = data_frame[col].astype(str)
 
-    # ensure that data frame can be serialized
-    result["data"] = get_dataframe_response(data_frame)
 
-    return result
+

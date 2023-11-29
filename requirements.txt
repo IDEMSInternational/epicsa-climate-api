@@ -6,6 +6,7 @@ httpx
 pytest
 pytest-cov
 pytest-dotenv
+requests==2.26.0
 pandas
 # https://github.com/rpy2/rpy2/issues/1045
 rpy2==3.5.12
