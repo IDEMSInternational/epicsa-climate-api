@@ -1,0 +1,177 @@
+{
+    "metadata": {
+      "annual_rain": {
+        "annual_rain": [
+          "TRUE"
+        ],
+        "n_rain": [
+          "TRUE"
+        ],
+        "na_rm": [
+          "FALSE"
+        ]
+      },
+      "start_rains": {
+        "threshold": [
+          1
+        ],
+        "start_day": [
+          1
+        ],
+        "end_day": [
+          366
+        ],
+        "total_rainfall": [
+          "TRUE"
+        ],
+        "amount_rain": [
+          25
+        ],
+        "over_days": [
+          3
+        ],
+        "proportion": [
+          "FALSE"
+        ],
+        "number_rain_days": [
+          "FALSE"
+        ],
+        "dry_spell": [
+          "TRUE"
+        ],
+        "spell_max_dry_days": [
+          10
+        ],
+        "spell_interval": [
+          21
+        ],
+        "dry_period": [
+          "FALSE"
+        ],
+        "_last_updated": [
+          "2022-11-25"
+        ]
+      },
+      "end_rains": {
+        "start_day": [
+          121
+        ],
+        "end_day": [
+          366
+        ],
+        "interval_length": [
+          1
+        ],
+        "min_rainfall": [
+          10
+        ]
+      },
+      "end_season": {
+        "start_day": [
+          121
+        ],
+        "end_day": [
+          366
+        ],
+        "capacity": [
+          100
+        ],
+        "water_balance_max": [
+          60
+        ],
+        "evaporation": [
+          "value"
+        ],
+        "evaporation_value": [
+          5
+        ]
+      },
+      "seasonal_rain": {
+        "seasonal_rain": [
+          "TRUE"
+        ],
+        "end_type": [
+          "rains"
+        ],
+        "n_rain": [
+          "TRUE"
+        ],
+        "na_rm": [
+          "FALSE"
+        ],
+        "rain_day": [
+          0.85
+        ],
+        "total_rain": [
+          0
+        ]
+      },
+      "seasonal_length": {
+        "end_type": [
+          "rains"
+        ]
+      }
+    },
+    "data": [
+      {
+        "year": 1946,
+        "station_name": "Agades",
+        "annual_rain": "",
+        "n_rain": "",
+        "start_rains": "",
+        "end_rains": 239,
+        "end_season": 121,
+        "seasonal_rain": "",
+        "n_seasonal_rain": "",
+        "season_length": ""
+      },
+      {
+        "year": 1947,
+        "station_name": "Agades",
+        "annual_rain": 330.8,
+        "n_rain": 33,
+        "start_rains": 212,
+        "end_rains": 292,
+        "end_season": 121,
+        "seasonal_rain": 264.9,
+        "n_seasonal_rain": 22,
+        "season_length": 80
+      },
+      {
+        "year": 1948,
+        "station_name": "Agades",
+        "annual_rain": 54.8,
+        "n_rain": 12,
+        "start_rains": "",
+        "end_rains": 227,
+        "end_season": 121,
+        "seasonal_rain": "",
+        "n_seasonal_rain": "",
+        "season_length": ""
+      },
+      {
+        "year": 1949,
+        "station_name": "Agades",
+        "annual_rain": 118.2,
+        "n_rain": 11,
+        "start_rains": "",
+        "end_rains": 225,
+        "end_season": 121,
+        "seasonal_rain": "",
+        "n_seasonal_rain": "",
+        "season_length": ""
+      },
+      {
+        "year": 1950,
+        "station_name": "Agades",
+        "annual_rain": 261.8,
+        "n_rain": 22,
+        "start_rains": 231,
+        "end_rains": 255,
+        "end_season": 121,
+        "seasonal_rain": 154.2,
+        "n_seasonal_rain": 7,
+        "season_length": 24
+      }
+    ]
+  }

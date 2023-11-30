@@ -11,9 +11,17 @@ The api requires Python and R runtimes installed. It has been tested with the ve
 - Python (3.11)  
   [https://www.python.org/downloads](https://www.python.org/downloads)
 
-- R and Rtools (4.2.3)  
-  [https://cran.r-project.org/bin/windows/base](https://cran.r-project.org/bin/windows/base)
-  [https://cran.r-project.org/bin/windows/Rtools/](https://cran.r-project.org/bin/windows/Rtools/)
+- R and Rtools (4.2.3)
+
+  Windows  
+  [https://cran.r-project.org/bin/windows/base/old/4.2.3/](https://cran.r-project.org/bin/windows/base/old/4.2.3/)  
+  [https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html](https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html)
+
+  Linux  
+  https://cran.r-project.org/bin/linux/
+
+  Mac (untested)  
+  https://cran.r-project.org/bin/macosx/
 
 Relevant documentation should also be followed to ensure runtimes can be executed from PATH environment variable.
 
@@ -118,6 +126,11 @@ Depending on local versions of R and python (as well as operating system) there 
 ```sh
 pip install --upgrade -r requirements_dev.txt
 ```
+
+**R Dependency incompatibility**
+Ensure R installed a per prerequisites, verify version via `rscript --version`.
+
+If facing issues with a specific package it may help to download [RStudio](https://posit.co/download/rstudio-desktop/), and using the `packages` tab to check what version of packages are installed and update any indicated within error logs.
 
 **Called endpoint method does not exist**
 The library calls methods from various other git repos where code is hosted both in python and R. These are installed during initial setup, but will need reinstallation whenever new versions of the external repos exist.
