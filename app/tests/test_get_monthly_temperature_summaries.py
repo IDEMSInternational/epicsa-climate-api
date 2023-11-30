@@ -1,14 +1,46 @@
+import json
+import os
 from fastapi.testclient import TestClient
-from app.main import app  # Assuming your FastAPI app instance is named 'app'
+from app.main import app 
 
 client = TestClient(app)
 
-def test_get_monthly_temperature_summaries():
+
+def assert_result_structure(result):
+    assert "metadata" in result
+    assert "data" in result
+
+def assert_mean_tmin(metadata):
+    assert "mean_tmin" in metadata
+    assert "to" in metadata["mean_tmin"]
+    assert "na_rm" in metadata["mean_tmin"]
+
+def assert_mean_tmax(metadata):
+    assert "mean_tmax" in metadata
+    assert "to" in metadata["mean_tmax"]
+    assert "na_rm" in metadata["mean_tmax"]
+
+def assert_first_data_entry_structure_mean_tmin(first_data_entry):
+    assert "year" in first_data_entry
+    assert "station_name" in first_data_entry
+    assert "month" in first_data_entry
+    assert "mean_tmin" in first_data_entry
+
+def assert_first_data_entry_structure_mean_tmax(first_data_entry):
+    assert "year" in first_data_entry
+    assert "station_name" in first_data_entry
+    assert "month" in first_data_entry
+    assert "mean_tmax" in first_data_entry
+
+def test_get_monthly_temperature_summaries_structure_zm_test_1():
     # Define test input data
     test_data = {
         "country": "zm",
-        "station_id": "16",
-        "summaries": ["mean_tmin","mean_tmax"]
+        "station_id": "test_1",
+        "summaries": [
+            "mean_tmin",
+            "mean_tmax"
+        ],
     }
 
     # Make a request to the endpoint using the TestClient
@@ -17,32 +49,115 @@ def test_get_monthly_temperature_summaries():
     # Check that the response has a 200 status code
     assert response.status_code == 200
 
-   # Check the structure of the response JSON
     result = response.json()
-    assert "metadata" in result
-    assert "data" in result
 
-   # Check the metadata
-    assert "mean_tmin" in result["metadata"]
-    assert "mean_tmax" in result["metadata"]
+    assert_result_structure(result)
 
-    # Check the data
-    assert "data" in result
-    assert len(result["data"]) == 799  # Assuming there is one entry in the data list
+    assert_mean_tmin(result["metadata"])
+    assert_mean_tmax(result["metadata"])
+   
+    assert_first_data_entry_structure_mean_tmin(result["data"][0])
+    assert_first_data_entry_structure_mean_tmax(result["data"][0])
 
-    # Example: Check the structure of the first data entry
-    first_data_entry = result["data"][0]
-    assert "station_name" in first_data_entry
-    assert "year" in first_data_entry
-    assert "month" in first_data_entry
-    assert "mean_tmin" in first_data_entry
-    assert "mean_tmax" in first_data_entry
 
-    # Add more specific assertions based on the expected output
+def test_get_monthly_temperature_summaries_data_zm_test_1():
+    # Define test input data
+    test_data = {
+        "country": "zm",
+        "station_id": "test_1",
+        "summaries": [
+            "mean_tmin",
+            "mean_tmax"
+        ],
+    }
 
-    # Example: Check the values of the first data entry
-    assert first_data_entry["station_name"] == "LUNDAZI MET"
-    assert first_data_entry["year"] == 1956
-    assert first_data_entry["month"] == 1
-    assert first_data_entry["mean_tmin"] == ""
-    assert first_data_entry["mean_tmax"] == ""
+    # Make a request to the endpoint using the TestClient
+    response = client.post("/v1/monthly_temperature_summaries/", json=test_data)
+
+    # Check that the response has a 200 status code
+    assert response.status_code == 200
+
+
+    test_folder = os.path.dirname(os.path.abspath(__file__))
+    results_folder = os.path.join(test_folder, "results")
+    expected_result_path = os.path.join(results_folder, "monthly_temperature_summaries_test_1.json")
+    # Read the expected result from a file
+    with open(expected_result_path, "r") as file:
+        expected_result = json.load(file)
+
+    # Compare the response with the expected result
+    assert response.json() == expected_result
+
+def test_get_monthly_temperature_summaries_structure_zm_test_1_mean_tmax_only():
+        # Define test input data
+    test_data = {
+        "country": "zm",
+        "station_id": "test_1",
+        "summaries": [
+            "mean_tmax"
+        ],
+    }
+
+    # Make a request to the endpoint using the TestClient
+    response = client.post("/v1/monthly_temperature_summaries/", json=test_data)
+
+    # Check that the response has a 200 status code
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert_result_structure(result)
+
+    assert_mean_tmax(result["metadata"])
+   
+    assert_first_data_entry_structure_mean_tmax(result["data"][0])
+
+def test_get_monthly_temperature_summaries_structure_zm_test_1_mean_tmin_only():
+        # Define test input data
+    test_data = {
+        "country": "zm",
+        "station_id": "test_1",
+        "summaries": [
+            "mean_tmin"
+        ],
+    }
+
+    # Make a request to the endpoint using the TestClient
+    response = client.post("/v1/monthly_temperature_summaries/", json=test_data)
+
+    # Check that the response has a 200 status code
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert_result_structure(result)
+
+    assert_mean_tmin(result["metadata"])
+   
+    assert_first_data_entry_structure_mean_tmin(result["data"][0])
+  
+def test_get_monthly_temperature_summaries_structure_zm_01122():
+    test_data = {
+        "country": "zm",
+        "station_id": "01122",
+        "summaries": [
+            "mean_tmin",
+            "mean_tmax"
+        ],
+    }
+
+    # Make a request to the endpoint using the TestClient
+    response = client.post("/v1/monthly_temperature_summaries/", json=test_data)
+
+    # Check that the response has a 200 status code
+    assert response.status_code == 200
+    
+    result = response.json()
+
+    assert_result_structure(result)
+
+    assert_mean_tmin(result["metadata"])
+    assert_mean_tmax(result["metadata"])
+   
+    assert_first_data_entry_structure_mean_tmin(result["data"][0])
+    assert_first_data_entry_structure_mean_tmax(result["data"][0])
