@@ -1,0 +1,52 @@
+{
+    "metadata": {
+      "mean_tmin": {
+        "to": [
+          "c('annual', 'monthly')"
+        ],
+        "na_rm": [
+          "TRUE"
+        ]
+      },
+      "mean_tmax": {
+        "to": [
+          "c('annual', 'monthly')"
+        ],
+        "na_rm": [
+          "TRUE"
+        ]
+      }
+    },
+    "data": [
+      {
+        "station_name": "Agades",
+        "year": 1946,
+        "mean_tmin": "",
+        "mean_tmax": ""
+      },
+      {
+        "station_name": "Agades",
+        "year": 1947,
+        "mean_tmin": "",
+        "mean_tmax": ""
+      },
+      {
+        "station_name": "Agades",
+        "year": 1948,
+        "mean_tmin": "",
+        "mean_tmax": ""
+      },
+      {
+        "station_name": "Agades",
+        "year": 1949,
+        "mean_tmin": 18.214520547945206,
+        "mean_tmax": 37.193698630136986
+      },
+      {
+        "station_name": "Agades",
+        "year": 1950,
+        "mean_tmin": 17.861643835616437,
+        "mean_tmax": 35.92602739726028
+      }
+    ]
+  }

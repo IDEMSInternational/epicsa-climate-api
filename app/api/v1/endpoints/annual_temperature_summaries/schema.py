@@ -9,4 +9,7 @@ country_name = Literal["zm", "mw"]
 class AnnualTemperatureSummariesParameters(BaseModel):
     country: country_name = "zm"
     station_id: str = "16"
-    summaries: list[summary_name] | None = None
+    summaries: list[summary_name] = [
+        "mean_tmin", 
+        "mean_tmax"
+    ]
