@@ -45,6 +45,10 @@ jobs:
         sudo Rscript -e 'install.packages(c("pkgdown"), repos="http://cran.rstudio.com/")'
         sudo Rscript install_packages.R
         sudo Rscript install_packages_picsa.R
+    
+    - name: Create service-account.json
+      run: echo "$SERVICE_ACCOUNT_JSON" > app/service-account.json
+
 
     - name: Run Pytest
       run: |
