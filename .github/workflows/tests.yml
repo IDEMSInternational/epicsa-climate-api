@@ -39,6 +39,7 @@ jobs:
 
     - name: Install R Packages
       run: |
+        sudo Rscript -e 'install.packages(c("pkgdown"), repos="http://cran.rstudio.com/")'
         sudo Rscript install_packages.R
         sudo Rscript install_packages_picsa.R
 
