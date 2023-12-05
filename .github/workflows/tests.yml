@@ -43,6 +43,7 @@ jobs:
         sudo apt-get install -y libharfbuzz-dev libfribidi-dev libfreetype6-dev libnetcdf-dev
 
         sudo Rscript -e 'install.packages("PCICt", repos="http://cran.rstudio.com/")'
+        sudo Rscript -e 'install.packages("Rcpp", repos="http://cran.rstudio.com/")'
         sudo Rscript -e 'install.packages("https://pacificclimate.org/R/climdex.pcic_1.1-11.tar.gz")'
 
         sudo Rscript -e 'install.packages(c("pkgdown"), repos="http://cran.rstudio.com/")'
