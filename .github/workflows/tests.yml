@@ -37,6 +37,10 @@ jobs:
         make
         sudo make install
 
+    - name: Set R Library Paths
+      run: |
+        export LD_LIBRARY_PATH=/usr/local/lib/R/lib:$LD_LIBRARY_PATH
+
     - name: Install R Packages
       run: |
         sudo apt-get update
@@ -49,6 +53,15 @@ jobs:
         sudo Rscript -e 'install.packages(c("pkgdown"), repos="http://cran.rstudio.com/")'
         sudo Rscript install_packages.R
         sudo Rscript install_packages_picsa.R
+
+    - name: Update R Packages
+      run: |
+        sudo Rscript -e 'update.packages(ask = FALSE, checkBuilt = TRUE)'
+
+
+    - name: Debug R Environment
+      run: |
+        sudo Rscript -e 'sessionInfo()'
     
     - name: Create service-account.json
       run: echo "$SERVICE_ACCOUNT_JSON" > app/service-account.json
