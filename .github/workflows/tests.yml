@@ -85,7 +85,8 @@ jobs:
 
     - name: Start Server
       run: |
-        uvicorn app.main:app --reload
+        uvicorn app.main:app --reload &
+        sleep 5
 
     - name: Run Pytest
       run: |
