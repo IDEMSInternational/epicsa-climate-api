@@ -24,33 +24,36 @@ jobs:
         pip install --upgrade -r requirements.txt
         pip install --force-reinstall -r requirements_picsa.txt
 
-    - name: Install R and R Tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y r-base
-        # Install libcurl dependencies
-        sudo apt-get install -y libcurl4-openssl-dev        
-        wget https://cran.rstudio.com/src/base/R-4/R-4.2.3.tar.gz
-        tar -zxvf R-4.2.3.tar.gz
-        cd R-4.2.3
-        ./configure
-        make
-        sudo make install
+    - name: Install R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '4.2.3' 
 
-    - name: Set R Library Paths
-      run: |
-        export LD_LIBRARY_PATH=/usr/local/lib/R/lib:$LD_LIBRARY_PATH
+#    - name: Install R and R Tools
+#      run: |
+#        sudo apt-get update
+#        sudo apt-get install -y r-base
+#        # Install libcurl dependencies
+#        sudo apt-get install -y libcurl4-openssl-dev        
+##        wget https://cran.rstudio.com/src/base/R-4/R-4.2.3.tar.gz
+#        tar -zxvf R-4.2.3.tar.gz
+#        cd R-4.2.3
+#        ./configure
+#        make
+#        sudo make install
 
-    - name: Check LD_LIBRARY_PATH
-      run: python -m rpy2.situation LD_LIBRARY_PATH
+#    - name: Set R Library Paths
+#      run: |
+#        export LD_LIBRARY_PATH=/usr/local/lib/R/lib:$LD_LIBRARY_PATH
+
+#    - name: Check LD_LIBRARY_PATH
+#      run: python -m rpy2.situation LD_LIBRARY_PATH
 
 
     - name: Install R Packages
       run: |
         sudo apt-get update
         sudo apt-get install -y libharfbuzz-dev libfribidi-dev libfreetype6-dev libnetcdf-dev
-
-        echo "LD_LIBRARY_PATH=/usr/local/lib/R/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
         sudo Rscript -e 'install.packages("PCICt", repos="http://cran.rstudio.com/")'
         sudo Rscript -e 'install.packages("Rcpp", repos="http://cran.rstudio.com/")'
@@ -60,9 +63,9 @@ jobs:
         sudo Rscript install_packages.R
         sudo Rscript install_packages_picsa.R
 
-    - name: Update R Packages
-      run: |
-        sudo Rscript -e 'update.packages(ask = FALSE, checkBuilt = TRUE, repos="http://cran.rstudio.com/")'
+#    - name: Update R Packages
+#      run: |
+#        sudo Rscript -e 'update.packages(ask = FALSE, checkBuilt = TRUE, repos="http://cran.rstudio.com/")'
 
 
     - name: Debug R Environment
