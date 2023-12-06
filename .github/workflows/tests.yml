@@ -41,6 +41,10 @@ jobs:
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib/R/lib:$LD_LIBRARY_PATH
 
+    - name: Check LD_LIBRARY_PATH
+      run: python -m rpy2.situation LD_LIBRARY_PATH
+
+
     - name: Install R Packages
       run: |
         sudo apt-get update
