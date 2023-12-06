@@ -56,7 +56,7 @@ jobs:
 
     - name: Update R Packages
       run: |
-        sudo Rscript -e 'update.packages(ask = FALSE, checkBuilt = TRUE)'
+        sudo Rscript -e 'update.packages(ask = FALSE, checkBuilt = TRUE, repos="http://cran.rstudio.com/")'
 
 
     - name: Debug R Environment
