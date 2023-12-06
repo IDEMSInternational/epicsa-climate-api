@@ -75,7 +75,14 @@ jobs:
     - name: Create service-account.json
       run: echo "$SERVICE_ACCOUNT_JSON" > app/service-account.json
 
+    - name: Create service-account.json again
+      run: echo "$SERVICE_ACCOUNT_JSON" > service-account.json
+
+#    - name: Test with pytest
+#      run: |
+#        pip install pytest pytest-cov
+#        pytest tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
 
     - name: Run Pytest
       run: |
-        pytest
+        pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
