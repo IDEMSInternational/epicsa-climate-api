@@ -15,6 +15,12 @@ from app.api.v1.endpoints.monthly_temperature_summaries.router import (
 from app.api.v1.endpoints.season_start_probabilities.router import (
     router as season_start_probabilities_router,
 )
+from app.api.v1.endpoints.seasonal_forecast_list.router import (
+    router as seasonal_forecast_list_router,
+)
+from app.api.v1.endpoints.seasonal_forecast_pdf.router import (
+    router as seasonal_forecast_pdf_router,
+)
 from app.api.v1.endpoints.station.router import router as station_router
 from app.api.v1.endpoints.status.router import router as status_router
 
@@ -46,6 +52,16 @@ v1_router.include_router(
     season_start_probabilities_router,
     prefix="/season_start_probabilities",
     tags=["Climate"],
+)
+v1_router.include_router(
+    seasonal_forecast_list_router,
+    prefix="/seasonal_forecast_list",
+    tags=["Forecast"],
+)
+v1_router.include_router(
+    seasonal_forecast_pdf_router,
+    prefix="/seasonal_forecast_pdf",
+    tags=["Forecast"],
 )
 v1_router.include_router(station_router, prefix="/station", tags=["Work In Progress"])
 
