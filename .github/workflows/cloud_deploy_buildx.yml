@@ -6,7 +6,6 @@ name: cloud_deploy_buildx
 on:
   push:
     branches:
-      - refactor/dockerfile-r-support
       - main
 
 env:
