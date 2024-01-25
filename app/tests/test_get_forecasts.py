@@ -14,10 +14,6 @@ def assert_country_structure(country):
     assert "district" in country[0]
     assert "type" in country[0]
 
-def assert_country_not_set_up_zm(result):
-    assert "detail" in result
-    assert result["detail"] == "Seasonal Forecasts not set up 'zm'"
-
 def test_get_forecasts_structure():
     response = client.get("/v1/forecasts")
     assert response.status_code == 200
