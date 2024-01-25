@@ -10,4 +10,4 @@ requests==2.31.0
 pandas
 # https://github.com/rpy2/rpy2/issues/1045
 rpy2==3.5.12
-beautifulsoup4
+google-cloud-storage
