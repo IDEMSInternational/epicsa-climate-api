@@ -1,7 +1,6 @@
 from typing import Literal
 from pydantic import BaseModel
-
-country_name = Literal["zm", "mw"]
+from app.definitions import country_name
 
 
 class CropSuccessProbabilitiesParameters(BaseModel):
