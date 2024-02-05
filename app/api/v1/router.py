@@ -18,6 +18,9 @@ from app.api.v1.endpoints.season_start_probabilities.router import (
 from app.api.v1.endpoints.forecasts.router import (
     router as forecasts,
 )
+from app.api.v1.endpoints.extremes_summaries.router import (
+    router as extremes_summaries_router,
+)
 
 from app.api.v1.endpoints.station.router import router as station_router
 from app.api.v1.endpoints.status.router import router as status_router
@@ -49,6 +52,11 @@ v1_router.include_router(
 v1_router.include_router(
     season_start_probabilities_router,
     prefix="/season_start_probabilities",
+    tags=["Climate"],
+)
+v1_router.include_router(
+    extremes_summaries_router,
+    prefix="/extremes_summaries",
     tags=["Climate"],
 )
 v1_router.include_router(
