@@ -1,6 +1,6 @@
 from typing import OrderedDict
 
-from epicsa_python.epicsa import crop_success_probabilities
+from app.epicsawrap_link  import crop_success_probabilities
 from fastapi import APIRouter
 from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
 

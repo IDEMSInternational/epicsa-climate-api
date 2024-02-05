@@ -31,10 +31,8 @@ RUN apt-get install -y libcurl4-openssl-dev libssl-dev libssh2-1-dev libxml2-dev
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.txt
 
-# Install linked picsa python and R repos
+# Install R repos
 # Perform last to allow caching of steps above
-COPY ./requirements_picsa.txt .
-RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements_picsa.txt
 
 COPY ./install_packages_picsa.R .
 RUN Rscript ./install_packages_picsa.R

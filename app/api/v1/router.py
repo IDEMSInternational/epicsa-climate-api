@@ -47,5 +47,9 @@ v1_router.include_router(
     prefix="/season_start_probabilities",
     tags=["Climate"],
 )
-v1_router.include_router(station_router, prefix="/station", tags=["Work In Progress"])
+v1_router.include_router(
+    station_router, 
+    prefix="/station", 
+    tags=["Metadata"],
+)
 
