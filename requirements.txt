@@ -15,3 +15,4 @@ click
 setuptools
 numpy
 pygeoapi
+google-cloud-storage

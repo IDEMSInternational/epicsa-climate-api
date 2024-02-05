@@ -15,6 +15,10 @@ from app.api.v1.endpoints.monthly_temperature_summaries.router import (
 from app.api.v1.endpoints.season_start_probabilities.router import (
     router as season_start_probabilities_router,
 )
+from app.api.v1.endpoints.forecasts.router import (
+    router as forecasts,
+)
+
 from app.api.v1.endpoints.station.router import router as station_router
 from app.api.v1.endpoints.status.router import router as status_router
 
@@ -51,5 +55,10 @@ v1_router.include_router(
     station_router, 
     prefix="/station", 
     tags=["Metadata"],
+)
+v1_router.include_router(
+    forecasts,
+    prefix="/forecasts",
+    tags=["Forecast"],
 )
 
