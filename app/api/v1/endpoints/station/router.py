@@ -3,13 +3,10 @@ from typing import Literal, OrderedDict
 from app.epicsawrap_link import station_metadata
 from fastapi import APIRouter
 from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
+from app.definitions import country_name
 
-from .schema import Station
 
 router = APIRouter()
-
-#TODO remove this to use shared
-country_name = Literal["zm", "mw"]
 
 @router.get("/")
 def read_stations() -> OrderedDict:
