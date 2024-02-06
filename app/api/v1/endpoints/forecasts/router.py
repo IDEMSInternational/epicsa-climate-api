@@ -1,8 +1,7 @@
 from io import BytesIO
-from typing import OrderedDict
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
-from app.definitions import country_name
+from app.definitions import country_name, Language,language_code
 from google.cloud import storage
 import os
 
@@ -57,6 +56,23 @@ def get_file_from_bucket(bucket_name : str, file_name:str):
         return blob.download_as_bytes()
     except Exception as e:
         return None
+    
+def upload_file_to_bucket(bucket_name : str,file: UploadFile, new_filename: str):
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(new_filename)    
+    try:
+        blob.upload_from_file(file.file, content_type="application/pdf")
+        return {"status": "success", "message": f"PDF '{new_filename}' uploaded successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading PDF: {str(e)}")
+    
+def get_file_name(
+    language: Language,
+    district : str,
+    forecast_type : str,
+):
+    return district + "-" + forecast_type + "-" + language_code.get(language) + ".pdf"
+
 
 @router.get("/")
 def get_forecasts() :    
@@ -83,6 +99,26 @@ def get_forecasts(*, country: country_name, file_name: str) :
     return StreamingResponse(BytesIO(content), 
                             media_type="application/pdf", 
                             headers={"Content-Disposition": f"attachment; filename={file_name}"})
+
+
+@router.post("/")
+def upload_forecast(
+    country: country_name,
+    language: Language,
+    district : str,
+    forecast_type : str,
+    file: UploadFile = File(...)
+) :
+    if country == "mw":
+        bucket_name = mw_forecast_bucket
+    elif country == "zm":
+        bucket_name = zm__forecast_bucket
+    else: #This should never be reached. due to how country is passed in
+        raise HTTPException(status_code=404, detail=f"Country not found: {country}")
+    
+    return upload_file_to_bucket(bucket_name,file,get_file_name(language,district,forecast_type))
+    
+
 
 
 
