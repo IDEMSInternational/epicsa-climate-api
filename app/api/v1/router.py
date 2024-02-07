@@ -52,9 +52,13 @@ v1_router.include_router(
     tags=["Climate"],
 )
 v1_router.include_router(
+    station_router, 
+    prefix="/station", 
+    tags=["Metadata"],
+)
+v1_router.include_router(
     forecasts,
     prefix="/forecasts",
     tags=["Forecast"],
 )
-v1_router.include_router(station_router, prefix="/station", tags=["Work In Progress"])
 

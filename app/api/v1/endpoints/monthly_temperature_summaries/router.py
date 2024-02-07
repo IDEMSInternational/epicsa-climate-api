@@ -1,6 +1,6 @@
 from typing import OrderedDict
 
-from epicsa_python.epicsa import monthly_temperature_summaries
+from app.epicsawrap_link import monthly_temperature_summaries
 from fastapi import APIRouter
 from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
 
