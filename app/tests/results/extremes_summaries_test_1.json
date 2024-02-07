@@ -1,0 +1,212 @@
+{
+  "metadata": {
+    "extremes_rain": {
+      "type": [
+        "percentile"
+      ],
+      "value": [
+        99
+      ]
+    }
+  },
+  "data": [
+    {
+      "station": "Agades",
+      "date": -8557,
+      "year": 1946,
+      "month": 6,
+      "doy": 211,
+      "day": 29,
+      "tmax": 41.4,
+      "tmin": 25,
+      "rain": 18.1
+    },
+    {
+      "station": "Agades",
+      "date": -8542,
+      "year": 1946,
+      "month": 2,
+      "doy": 226,
+      "day": 13,
+      "tmax": 39,
+      "tmin": 24.8,
+      "rain": 18.5
+    },
+    {
+      "station": "Agades",
+      "date": -8530,
+      "year": 1946,
+      "month": 2,
+      "doy": 238,
+      "day": 25,
+      "tmax": 38.8,
+      "tmin": 23.8,
+      "rain": 19
+    },
+    {
+      "station": "Agades",
+      "date": -8210,
+      "year": 1947,
+      "month": 6,
+      "doy": 193,
+      "day": 11,
+      "tmax": 41.8,
+      "tmin": 23,
+      "rain": 23.7
+    },
+    {
+      "station": "Agades",
+      "date": -8191,
+      "year": 1947,
+      "month": 6,
+      "doy": 212,
+      "day": 30,
+      "tmax": 39,
+      "tmin": 22,
+      "rain": 28
+    },
+    {
+      "station": "Agades",
+      "date": -8183,
+      "year": 1947,
+      "month": 2,
+      "doy": 220,
+      "day": 7,
+      "tmax": 37,
+      "tmin": 23.2,
+      "rain": 37.2
+    },
+    {
+      "station": "Agades",
+      "date": -8182,
+      "year": 1947,
+      "month": 2,
+      "doy": 221,
+      "day": 8,
+      "tmax": 38.8,
+      "tmin": 21.6,
+      "rain": 36.5
+    },
+    {
+      "station": "Agades",
+      "date": -8174,
+      "year": 1947,
+      "month": 2,
+      "doy": 229,
+      "day": 16,
+      "tmax": 38,
+      "tmin": 21.8,
+      "rain": 14.6
+    },
+    {
+      "station": "Agades",
+      "date": -8171,
+      "year": 1947,
+      "month": 2,
+      "doy": 232,
+      "day": 19,
+      "tmax": 40,
+      "tmin": 23.8,
+      "rain": 14.9
+    },
+    {
+      "station": "Agades",
+      "date": -8122,
+      "year": 1947,
+      "month": 11,
+      "doy": 281,
+      "day": 7,
+      "tmax": 38.2,
+      "tmin": 16,
+      "rain": 20
+    },
+    {
+      "station": "Agades",
+      "date": -8111,
+      "year": 1947,
+      "month": 11,
+      "doy": 292,
+      "day": 18,
+      "tmax": 37.2,
+      "tmin": 14,
+      "rain": 15
+    },
+    {
+      "station": "Agades",
+      "date": -7470,
+      "year": 1949,
+      "month": 6,
+      "doy": 202,
+      "day": 20,
+      "tmax": 37,
+      "tmin": 26,
+      "rain": 15.3
+    },
+    {
+      "station": "Agades",
+      "date": -7453,
+      "year": 1949,
+      "month": 2,
+      "doy": 219,
+      "day": 6,
+      "tmax": 36,
+      "tmin": 24,
+      "rain": 31.9
+    },
+    {
+      "station": "Agades",
+      "date": -7447,
+      "year": 1949,
+      "month": 2,
+      "doy": 225,
+      "day": 12,
+      "tmax": 36.6,
+      "tmin": 25,
+      "rain": 19.4
+    },
+    {
+      "station": "Agades",
+      "date": -7085,
+      "year": 1950,
+      "month": 2,
+      "doy": 222,
+      "day": 9,
+      "tmax": 35.4,
+      "tmin": 23.5,
+      "rain": 22
+    },
+    {
+      "station": "Agades",
+      "date": -7076,
+      "year": 1950,
+      "month": 2,
+      "doy": 231,
+      "day": 18,
+      "tmax": 33.2,
+      "tmin": 24,
+      "rain": 44.9
+    },
+    {
+      "station": "Agades",
+      "date": -7069,
+      "year": 1950,
+      "month": 2,
+      "doy": 238,
+      "day": 25,
+      "tmax": 35.7,
+      "tmin": 22.4,
+      "rain": 30.2
+    },
+    {
+      "station": "Agades",
+      "date": -7052,
+      "year": 1950,
+      "month": 12,
+      "doy": 255,
+      "day": 11,
+      "tmax": 38,
+      "tmin": 21.4,
+      "rain": 56.5
+    }
+  ]
+}

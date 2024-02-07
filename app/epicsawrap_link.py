@@ -69,6 +69,26 @@ from rpy2.robjects.vectors import (
 r_epicsawrap = packages.importr("epicsawrap")
 r_epicsadata = packages.importr("epicsadata")
 
+def extremes_summaries(
+    country: str,
+    station_id: str,
+    summaries: List[str] = None,  
+) -> OrderedDict:
+    if summaries is None:
+        summaries = [
+            "extremes_rain",
+            "extremes_tmin",
+            "extremes_tmax",
+        ]
+
+    __init_data_env()
+    r_params: Dict = __get_r_params(locals())
+    r_list_vector: ListVector = r_epicsawrap.overall_extremes_summaries(
+        country=r_params["country"],
+        station_id=r_params["station_id"],
+        summaries=r_params["summaries"],
+    )
+    return __get_list_vector_as_ordered_dict(r_list_vector)
 
 def annual_rainfall_summaries(
     country: str,
