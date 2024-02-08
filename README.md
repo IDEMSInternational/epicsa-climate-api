@@ -44,7 +44,6 @@ The scripts below will create a python [virtual environment](https://docs.python
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
     pip install --upgrade -r requirements.txt
-    pip install --force-reinstall -r requirements_picsa.txt
     uvicorn app.main:app --reload
 
 === "Linux (bash)"
@@ -52,7 +51,6 @@ The scripts below will create a python [virtual environment](https://docs.python
     python -m venv .venv
     source .venv/bin/activate
     pip install --upgrade -r requirements.txt
-    pip install --force-reinstall -r requirements_picsa.txt
     uvicorn app.main:app --reload
 
 **R**
@@ -130,7 +128,7 @@ If facing issues with a specific package it may help to download [RStudio](https
 **Called endpoint method does not exist**
 The library calls methods from various other git repos where code is hosted both in python and R. These are installed during initial setup, but will need reinstallation whenever new versions of the external repos exist.
 
-Simply repeat the steps above to install dependencies from `requirements_picsa.txt` `install_packages_picsa.R`
+Simply repeat the steps above to install dependencies from `install_packages_picsa.R`
 
 Any other issues should be raised on GitHub
 
