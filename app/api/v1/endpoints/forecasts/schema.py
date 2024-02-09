@@ -10,4 +10,4 @@ class Forecast(BaseModel):
     filename:str
     id:str
     language_code:Optional[lang_code] = None
-    type:Optional[Literal["downscale_forecast"]] = None
+    type:Optional[Literal["downscale_forecast", "annual_forecast"]] = None
