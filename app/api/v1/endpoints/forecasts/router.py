@@ -1,16 +1,19 @@
 from io import BytesIO
-from typing import OrderedDict
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
-from app.definitions import country_name
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import StreamingResponse,FileResponse
 from google.cloud import storage
+from typing import get_args, List
+from app.definitions import country_code
+from .schema import Forecast
 import os
 
 client = storage.Client.from_service_account_json('service-account.json')
 
 #TODO buckets will need to be configurable from outside the source code
-zm__forecast_bucket = "zambia_pdf_forecasts"
-mw_forecast_bucket = "malawi_pdf_forecasts"
+forecast_buckets = {
+    "zm": "zambia_pdf_forecasts",
+    "mw": "malawi_pdf_forecasts"
+}
 
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "app/service-account.json"
@@ -28,26 +31,27 @@ def get_metadata_from_name(filename: str):
             }
     else:
         return {
-            "district": "error",
-            "type" : "error",
-            "language" : "error"
+            "district": None,
+            "type" : None,
+            "language" : None
             } 
 
 def get_forecasts_from_buckets(bucket_name : str):
-    pdfs = []
+    pdfs:   List[Forecast] = []
     bucket = client.bucket(bucket_name)
     blobs = bucket.list_blobs()
     for blob in blobs:
         if blob.name.endswith('.pdf'):
             metadata = get_metadata_from_name(blob.name.split(".")[0])
-            pdfs.append({
-                "id":blob.id,
-                "date_modified":blob.updated,
-                "language": metadata["language"],
-                "filename":blob.name,
-                "district" : metadata["district"],
-                "type" :metadata["type"]
-                })
+            forecast=Forecast(
+                id=blob.id,
+                date_modified=blob.updated,
+                language= metadata["language"],
+                filename=blob.name,
+                district = metadata["district"],
+                type =metadata["type"]
+            )
+            pdfs.append(forecast)
     return pdfs
 
 def get_file_from_bucket(bucket_name : str, file_name:str):
@@ -58,31 +62,49 @@ def get_file_from_bucket(bucket_name : str, file_name:str):
     except Exception as e:
         return None
 
-@router.get("/")
-def get_forecasts() :    
-    forecasts = {
-        "mw" : get_forecasts_from_buckets(mw_forecast_bucket), 
-        "zm" : get_forecasts_from_buckets(zm__forecast_bucket)
-        }
-    return {"forecasts": forecasts}   
+@router.get("/", response_model=List[str])
+def list_endpoints(request:Request) :   
+    """
+    List available forecast endpoints
+    """
+    codes = get_args(country_code)
+    endpoints = [
+        str(request.url) +   code
+        for code in codes
+    ]
+    return endpoints
+
+@router.get("/{country_code}",response_model=List[Forecast])
+def list_forecasts(*,country_code:country_code) :
+    """
+    Get available forecasts for country
+    """
+    bucket = forecast_buckets[country_code] 
+    if bucket:
+        return  get_forecasts_from_buckets(bucket)
+    else:
+        raise HTTPException(status_code==404,  detail=f"Country not found: {country_code}")
 
 
 
-@router.get("/{country}/{file_name}")
-def get_forecasts(*, country: country_name, file_name: str) :
-    if country == "mw":
-        bucket_name = mw_forecast_bucket
-    elif country == "zm":
-        bucket_name = zm__forecast_bucket
+
+@router.get("/{country_code}/{file_name}")
+def get_forecast(*, country_code: country_code, file_name: str) :
+    """
+    Get forecast file
+    """
+    bucket = forecast_buckets[country_code] 
+    if bucket:
+        content = get_file_from_bucket(bucket, file_name)
+        if content == None:
+            raise HTTPException(status_code=404, detail=f"File not found: {file_name}")
+        return StreamingResponse(BytesIO(content), 
+                                media_type="application/pdf", 
+                                headers={"Content-Disposition": f"attachment; filename={file_name}"})
     else: #This should never be reached. due to how country is passed in
-        raise HTTPException(status_code=404, detail=f"Country not found: {country}")
+        raise HTTPException(status_code=404, detail=f"Country not found: {country_code}")
     
-    content = get_file_from_bucket(bucket_name, file_name)
-    if content == None:
-        raise HTTPException(status_code=404, detail=f"File not found: {file_name}")
-    return StreamingResponse(BytesIO(content), 
-                            media_type="application/pdf", 
-                            headers={"Content-Disposition": f"attachment; filename={file_name}"})
+   
 
 
 
