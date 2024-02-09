@@ -1,6 +1,6 @@
 from typing import Literal
 from pydantic import BaseModel
-from app.definitions import country_name
+from app.definitions import country_code
 
 summary_name_annual_rainfall = Literal[
     "annual_rain",
@@ -13,7 +13,7 @@ summary_name_annual_rainfall = Literal[
 
 
 class AnnualRainfallSummariesParameters(BaseModel):
-    country: country_name = "zm"
+    country: country_code = "zm"
     station_id: str = "01122"
     summaries: list[summary_name_annual_rainfall] = [
         "annual_rain",

@@ -1,10 +1,10 @@
 from typing import Literal
 from pydantic import BaseModel
-from app.definitions import country_name
+from app.definitions import country_code
 
 
 class CropSuccessProbabilitiesParameters(BaseModel):
-    country: country_name = "zm"
+    country: country_code = "zm"
     station_id: str = "16"
     water_requirements: list[int] | None = None
     planting_length: list[int] | None = None

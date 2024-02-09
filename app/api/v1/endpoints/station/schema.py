@@ -1,8 +1,8 @@
 from pydantic import BaseModel
-from app.definitions import country_name
+from app.definitions import country_code
 
 class Station(BaseModel):
-    country_code: country_name
+    country_code: country_code
     district: str
     elevation: int
     latitude: float
