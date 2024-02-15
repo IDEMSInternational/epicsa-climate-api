@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from typing import OrderedDict, List
 from app.epicsawrap_link import station_metadata
 from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
-from app.definitions import country_name
+from app.definitions import country_code
 from .schema import Station
 
 router = APIRouter()
@@ -18,7 +18,7 @@ def read_stations() -> OrderedDict:
     return res['data']
 
 @router.get("/{country}")
-def read_stations(country: country_name ) -> OrderedDict:
+def read_stations(country: country_code ) -> OrderedDict:
     return run_epicsa_function_and_get_dataframe(
         station_metadata,
         country=country,
@@ -27,7 +27,7 @@ def read_stations(country: country_name ) -> OrderedDict:
     )
 
 @router.get("/{country}/{station_id}")
-def read_stations(country: country_name, station_id:str ) -> OrderedDict:
+def read_stations(country: country_code, station_id:str ) -> OrderedDict:
     return run_epicsa_function_and_get_dataframe(
         station_metadata,
         country=country,
