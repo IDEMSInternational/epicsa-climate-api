@@ -4,7 +4,8 @@ from fastapi.responses import StreamingResponse,FileResponse
 from google.cloud import storage
 from typing import get_args, List
 from app.definitions import country_code
-from .schema import Forecast
+from app.utils.model import with_fallback
+from .schema import Forecast, ForecastType
 import os
 
 client = storage.Client.from_service_account_json('service-account.json')
@@ -26,7 +27,7 @@ def get_metadata_from_name(filename: str):
     if len(parts) > 2:
         return {
             "district": parts[0],
-            "type" : parts[1],
+            "type" : with_fallback(parts[1],ForecastType,None),
             "language" : parts[2]
             }
     else:

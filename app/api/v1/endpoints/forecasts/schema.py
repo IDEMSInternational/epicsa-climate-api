@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from typing import Literal, Optional
 from app.definitions import  country_code, language_code as lang_code
 
+ForecastType = Literal["downscaled_forecast", "annual_forecast"]
+
 class Forecast(BaseModel):
     country_code
     date_modified:datetime 
@@ -10,4 +12,4 @@ class Forecast(BaseModel):
     filename:str
     id:str
     language_code:Optional[lang_code] = None
-    type:Optional[Literal["downscale_forecast", "annual_forecast"]] = None
+    type:Optional[ForecastType] = None
