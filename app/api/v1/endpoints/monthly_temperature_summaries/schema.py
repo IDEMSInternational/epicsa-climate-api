@@ -7,5 +7,12 @@ summary_name = Literal["mean_tmin", "mean_tmax"]
 
 class MonthlyTemperatureSummariesParameters(BaseModel):
     country: country_code = "zm"
-    station_id: str = "16"
-    summaries: list[summary_name] = ["mean_tmin", "mean_tmax"]
+    station_id: str = "test_1"
+    summaries: list[summary_name] = [
+        "mean_tmin", 
+        "mean_tmax",
+        "min_tmin",
+        "min_tmax",
+        "max_tmin",
+        "max_tmax"
+        ]

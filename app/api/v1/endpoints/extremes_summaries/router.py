@@ -3,6 +3,7 @@ from typing import OrderedDict
 from app.epicsawrap_link import extremes_summaries
 from fastapi import APIRouter
 from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
+from app.core.responce_models.extremes_summaries_responce_model import ExtremesSummariesResponce
 
 from .schema import (
     ExtremesSummariesParameters,
@@ -11,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/",response_model=ExtremesSummariesResponce)
 def get_extremes_summaries(
     params: ExtremesSummariesParameters,
 ) -> OrderedDict:

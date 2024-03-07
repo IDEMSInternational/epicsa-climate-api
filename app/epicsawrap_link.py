@@ -120,7 +120,7 @@ def annual_temperature_summaries(
 ) -> OrderedDict:
     """TODO"""
     if summaries is None:
-        summaries = ["mean_tmin", "mean_tmax"]
+        summaries = ["mean_tmin", "mean_tmax", "min_tmin", "min_tmax", "max_tmin", "max_tmax"]
 
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
@@ -161,7 +161,7 @@ def monthly_temperature_summaries(
 ) -> OrderedDict:
     """TODO"""
     if summaries is None:
-        summaries = ["mean_tmin", "mean_tmax"]
+        summaries = ["mean_tmin", "mean_tmax", "min_tmin", "min_tmax", "max_tmin", "max_tmax"]
 
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
@@ -283,9 +283,9 @@ def __get_python_types(data):
         else:
             return OrderedDict(zip(data.names, converted_values))
     elif type(data) in r_list_types:
-        return [__get_python_types(elt) for elt in data]
+        return [__get_python_types(elt) for elt in data][0]
     elif type(data) in r_array_types:
-        return numpy.array(data).tolist()
+        return numpy.array(data).tolist()[0]
     else:
         if hasattr(data, "rclass"):  # An unsupported r class
             raise KeyError(
