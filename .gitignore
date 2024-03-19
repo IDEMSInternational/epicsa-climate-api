@@ -142,6 +142,7 @@ cython_debug/
 
 demo
 *.db
+junit/
 
 # working area for data used in R calculations
 working_data/

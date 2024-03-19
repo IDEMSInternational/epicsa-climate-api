@@ -2,9 +2,18 @@ version: "3.8"
 
 services:
   app:
+    image: ${IMAGE_TAG:-epicsa-climate-api:latest}
     build: .
-    container_name: epicsa-cliamte-api
     env_file:
       - .env
     ports:
       - "8000:8000"
+    secrets:
+      - service_account_key
+    volumes:
+      - "./app:/app/app"
+      - "./junit:/tmp/junit"
+
+secrets:
+  service_account_key:
+    file: ./service-account.json

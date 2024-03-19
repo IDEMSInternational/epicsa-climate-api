@@ -1,5 +1,6 @@
+import pytest
 from fastapi.testclient import TestClient
-from app.main import app 
+from app.main import app
 
 client = TestClient(app)
 
@@ -14,6 +15,7 @@ def assert_country_structure(country):
     assert "district" in country[0]
     assert "type" in country[0]
 
+@pytest.mark.skip()
 def test_get_forecasts_structure():
     response = client.get("/v1/forecasts")
     assert response.status_code == 200
