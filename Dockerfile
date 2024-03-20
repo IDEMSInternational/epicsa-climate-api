@@ -10,33 +10,36 @@ ENV PYTHONPATH "/app"
 ENV PORT=8000
 
 # Install core dependencies for adding R and python dependencies
-RUN apt-get update && \
-  apt-get install -y software-properties-common build-essential libpq-dev libnetcdf-dev gcc \
+RUN apt update && \
+  apt-get install --yes --no-install-recommends \
+    build-essential \
+    gcc \
+    libcurl4-openssl-dev \
+    libfribidi-dev \
+    libharfbuzz-dev \
+    libnetcdf-dev \
+    libpq-dev \
+    libssh2-1-dev \
+    libssl-dev \
+    libxml2-dev \
+    r-base \
+    r-base-dev \
+    r-cran-devtools \
+    software-properties-common \
+    zlib1g-dev \
   && rm -rf /var/lib/apt/lists/*
 
-# Install R v4
-# https://cran.r-project.org/bin/linux/debian/
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key '95C0FAF38DB3CCAD0C080A7BDC78B2DDEABC47B7' && \
-  add-apt-repository 'deb http://cloud.r-project.org/bin/linux/debian bullseye-cran40/' && \
-  apt update && \
-  apt-get install -y --no-install-recommends r-base r-base-dev
-
-# Install R core dependencies (adapted from https://hub.docker.com/r/thomaschln/r-devtools/dockerfile)
-# https://github.com/guigolab/ggsashimi/issues/45
-COPY ./install_packages.R .
-RUN apt-get install -y libcurl4-openssl-dev libssl-dev libssh2-1-dev libxml2-dev zlib1g-dev libharfbuzz-dev libfribidi-dev && \
-  Rscript ./install_packages.R
-
-# Install Python core dependencies
-COPY ./requirements.txt .
-RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.txt
-
-# Install R repos
-# Perform last to allow caching of steps above
-
+# Install R dependencies
 COPY ./install_packages_picsa.R .
 RUN Rscript ./install_packages_picsa.R
 
+# Install Python dependencies
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir --default-timeout=100 --upgrade -r requirements.txt
+
 # Copy runtime application (will sit in nested /app/app as expected by uvicorn gunicorn)
-COPY ./service-account.json .
 COPY ./app ./app
+
+COPY ./entrypoint.sh .
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["/start.sh"]

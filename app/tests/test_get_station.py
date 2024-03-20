@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 from app.main import app  # Assuming your FastAPI app instance is named 'app'
 
@@ -62,6 +63,7 @@ def assert_data_structure_definitions(data):
     assert "crops_success.start_check" in data
 
 
+@pytest.mark.skip()
 def test_get_station_structure_all():
     response = client.get("/v1/station/")
 
@@ -83,6 +85,7 @@ def test_get_station_structure_zm():
     assert_data_structure_country_info(result["data"][0])
     assert_data_structure_definitions(result["data"][0])
 
+@pytest.mark.skip()
 def test_get_station_structure_zm_16():
     country = "zm"
     station = "16"

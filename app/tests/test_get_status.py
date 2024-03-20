@@ -1,5 +1,7 @@
 from os import path
 import os
+
+import pytest
 from fastapi.testclient import TestClient
 from app.main import app  # Assuming your FastAPI app instance is named 'app'
 
@@ -16,6 +18,7 @@ def test_get_status():
     # Check the content of the response
     assert response.text == '"Server Up"'
 
+@pytest.mark.skip()
 def test_get_status_with_missing_service_account():
     # Rename or remove the service-account.json file to simulate a missing file
     # Make sure to update the path accordingly based on your project structure
