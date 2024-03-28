@@ -14,7 +14,7 @@ summary_name_annual_rainfall = Literal[
 
 class AnnualRainfallSummariesParameters(BaseModel):
     country: country_code = "zm"
-    station_id: str = "01122"
+    station_id: str = "test_1"
     summaries: list[summary_name_annual_rainfall] = [
         "annual_rain",
         "start_rains",
@@ -23,3 +23,4 @@ class AnnualRainfallSummariesParameters(BaseModel):
         "seasonal_rain",
         "seasonal_length",
     ]
+
