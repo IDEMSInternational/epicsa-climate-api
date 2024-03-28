@@ -14,7 +14,7 @@ summary_name = Literal[
 
 class AnnualTemperatureSummariesParameters(BaseModel):
     country: country_code = "zm"
-    station_id: str = "test_1"
+    station_id: str = "1"
     summaries: list[summary_name] = [
         "mean_tmin", 
         "mean_tmax",

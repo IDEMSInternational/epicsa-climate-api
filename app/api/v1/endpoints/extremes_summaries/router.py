@@ -12,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/",response_model=ExtremesSummariesResponce)
+@router.post("/")#,response_model=ExtremesSummariesResponce)
 def get_extremes_summaries(
     params: ExtremesSummariesParameters,
 ) -> OrderedDict:

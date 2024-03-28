@@ -83,7 +83,7 @@ def extremes_summaries(
 
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
-    r_list_vector: ListVector = r_epicsawrap.overall_extremes_summaries(
+    r_list_vector: ListVector = r_epicsawrap.extremes_summaries(
         country=r_params["country"],
         station_id=r_params["station_id"],
         summaries=r_params["summaries"],
@@ -95,7 +95,6 @@ def annual_rainfall_summaries(
     station_id: str,
     summaries: List[str] = None,
 ) -> OrderedDict:
-    """TODO"""
     if summaries is None:
         summaries = [
             "annual_rain",
@@ -118,7 +117,6 @@ def annual_temperature_summaries(
     station_id: str,
     summaries: List[str] = None,
 ) -> OrderedDict:
-    """TODO"""
     if summaries is None:
         summaries = ["mean_tmin", "mean_tmax", "min_tmin", "min_tmax", "max_tmin", "max_tmax"]
 
@@ -140,7 +138,6 @@ def crop_success_probabilities(
     planting_dates: List[int] = None,
     start_before_season: bool = None,
 ) -> OrderedDict:
-    """TODO"""
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
     r_list_vector: ListVector = r_epicsawrap.crop_success_probabilities(
@@ -159,7 +156,6 @@ def monthly_temperature_summaries(
     station_id: str,
     summaries: List[str] = None,
 ) -> OrderedDict:
-    """TODO"""
     if summaries is None:
         summaries = ["mean_tmin", "mean_tmax", "min_tmin", "min_tmax", "max_tmin", "max_tmax"]
 
@@ -176,7 +172,6 @@ def monthly_temperature_summaries(
 def season_start_probabilities(
     country: str, station_id: str, start_dates: List[int] = None
 ) -> OrderedDict:
-    """TODO"""
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
     r_list_vector: ListVector = r_epicsawrap.season_start_probabilities(
@@ -197,18 +192,23 @@ def station_metadata(
         r_list_vector: RDataFrame = r_epicsawrap.station_metadata(
             include_definitions=r_params["include_definitions"],  
         )
+        data = OrderedDict([("data", __get_data_frame(r_list_vector))])
     elif station_id =="":
-         r_list_vector: RDataFrame = r_epicsawrap.station_metadata(
+        r_list_vector: RDataFrame = r_epicsawrap.station_metadata(
             country=r_params["country"],   
             include_definitions=r_params["include_definitions"],  
         )   
+        data = OrderedDict([("data", __get_data_frame(r_list_vector))])
     else:
         r_list_vector: RDataFrame = r_epicsawrap.station_metadata(
             country=r_params["country"],   
             station_id=r_params["station_id"],
             include_definitions=r_params["include_definitions"],  
+            format = "list",
         )
-    return OrderedDict([("data", __get_data_frame(r_list_vector))])
+        data = __get_python_types(r_list_vector[0])
+
+    return  data
 
 
 
@@ -242,7 +242,6 @@ def __get_data_frame(r_data_frame: RDataFrame) -> DataFrame:
 
 
 def __get_list_vector_as_ordered_dict(r_list_vector: ListVector) -> OrderedDict:
-    """TODO"""
     data_frame = __get_data_frame(r_list_vector[1])
     r_list_as_dict = OrderedDict(
         [
@@ -331,7 +330,6 @@ def __get_r_params(params: Dict) -> Dict:
 
 
 def __init_data_env():
-    """TODO"""
     # ensure that this function is only called once per session
     # (because it relies on the current working folder when session started)
     if not hasattr(__init_data_env, "called"):

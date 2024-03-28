@@ -1,7 +1,7 @@
 from typing import Dict
 from pydantic import BaseModel
 from app.definitions import country_code
-from app.core.responce_models.definitions_responce_model import AnnualRain, CropsSuccess, EndRains, EndSeason, ExtremesRain, ExtremesTemp, SeasonalRain, Temp, SeasonalLength, SeasonalTotalRainfall, StartRains
+from app.core.responce_models.definitions_responce_model import AnnualRain, CropsSuccess, EndRains, EndSeason, ExtremesRain, ExtremesTemp, SeasonStartProbabilities, SeasonalRain, Temp, SeasonalLength, SeasonalTotalRainfall, StartRains
 
 
 class StationDataResponce(BaseModel):
@@ -13,7 +13,7 @@ class StationDataResponce(BaseModel):
     station_id: int
     station_name: str 
 
-class StationDefinitionDataResponce(StationDataResponce):
+class StationDefinitionDataResponce(BaseModel):
     start_rains: StartRains
     end_rains: EndRains
     end_season : EndSeason
@@ -24,10 +24,13 @@ class StationDefinitionDataResponce(StationDataResponce):
     max_tmax : Temp
     min_tmin : Temp    
     annual_rain : AnnualRain
-    season_start_probabilities : Dict[str, int] # SeasonStartProbabilities
+    season_start_probabilities : SeasonStartProbabilities
     seasonal_rain : SeasonalRain    
     extremes_tmin : ExtremesTemp
     extremes_tmax : ExtremesTemp
     extremes_rain : ExtremesRain
     crops_success : CropsSuccess
+
+class StationAndDefintionResponce(StationDataResponce):
+    data : StationDefinitionDataResponce
 
