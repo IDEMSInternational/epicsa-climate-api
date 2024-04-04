@@ -12,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/")#, response_model=AnnualRainfallSummariesResponce)
+@router.post("/", response_model=AnnualRainfallSummariesResponce)
 def get_annual_rainfall_summaries(
     params: AnnualRainfallSummariesParameters
 ) -> OrderedDict:

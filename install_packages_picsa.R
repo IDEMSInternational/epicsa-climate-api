@@ -12,11 +12,11 @@ if ("epicsawrap" %in% installed_packages) {
     remove.packages("epicsawrap")
 }
 if ("epicsadata" %in% installed_packages) {
-    remove.packages("epicsadata")
+   remove.packages("epicsadata")
 }
 
-devtools::install_github("IDEMSInternational/rpicsa", ref = "9801eaf", force = TRUE)
-devtools::install_github("IDEMSInternational/epicsawrap", ref = "a3a2d37", force = TRUE)
-devtools::install_github("IDEMSInternational/epicsadata", ref = "a943644", force = TRUE)
+devtools::install_github("IDEMSInternational/rpicsa", ref = "ccb2979", force = TRUE)
+devtools::install_github("IDEMSInternational/epicsawrap", ref = "10adb6c", force = TRUE)
+devtools::install_github("IDEMSInternational/epicsadata", ref = "fb98cec", force = TRUE)
 
 q()

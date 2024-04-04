@@ -28,7 +28,7 @@ def read_stations(country: country_code ) -> OrderedDict:
     )
     return res['data']
 
-@router.get("/{country}/{station_id}")#,response_model=StationAndDefintionResponce)
+@router.get("/{country}/{station_id}",response_model=StationAndDefintionResponce)
 def read_stations(country: country_code, station_id:str ): #-> OrderedDict:
     res = station_metadata(
         country=country,

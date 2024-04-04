@@ -11,10 +11,11 @@ class SeasonStartProbabilitiesMetadata(BaseModel):
 #ToDo Not used as return structure incorrect
 class SeasonStartProbabilitiesdata(BaseModel):
     station: str
-    proportions : Dict[str, float] 
+    day: int
+    proportion : float
 
 class SeasonStartProbabilitiesResponce(BaseModel):
     metadata: SeasonStartProbabilitiesMetadata
-    data: List[Dict[str, Union[str, float]]] 
+    data: List[SeasonStartProbabilitiesdata]
 
 

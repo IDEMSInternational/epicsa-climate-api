@@ -12,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/")#,response_model=MonthlyTemperatureSummariesResponce)
+@router.post("/",response_model=MonthlyTemperatureSummariesResponce)
 def get_monthly_temperature_summaries(
     params: MonthlyTemperatureSummariesParameters,
 ) -> OrderedDict:

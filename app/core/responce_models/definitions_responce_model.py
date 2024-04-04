@@ -6,32 +6,41 @@ class AnnualRain(BaseModel):
     annual_rain: Optional[bool]
     n_rain : Optional[bool]
     na_rm : Optional[bool]
+    na_prop : Optional[float]
+    na_n : Optional[int]
+    na_consec : Optional[int]
+    na_n_non : Optional[int]
 
 class StartRains(BaseModel):
     threshold: Optional[int]
-    s_start_doy: Optional[int]
     start_day: Optional[int]
     end_day: Optional[int]
     total_rainfall: Optional[bool]
     amount_rain: Optional[int]
     over_days: Optional[int]
     proportion: Optional[bool]
+    prob_rain_day: Optional[float]
     number_rain_days: Optional[bool]
+    min_rain_days: Optional[int]
+    rain_day_interval: Optional[int]
     dry_spell: Optional[bool]
     spell_max_dry_days: Optional[int]
     spell_interval: Optional[int]
     dry_period: Optional[bool]
+    period_interval: Optional[int]
+    max_rain: Optional[int]
+    period_max_dry_days: Optional[int]
     _last_updated: Optional[date]
 
 class EndRains(BaseModel):
-    s_start_doy: Optional[int]
+  #  s_start_doy: Optional[int]
     start_day: Optional[int]
     end_day: Optional[int]
     interval_length: Optional[int]
     min_rainfall: Optional[int]
     
 class EndSeason(BaseModel):
-    s_start_doy : Optional[int]
+  #  s_start_doy : Optional[int]
     start_day: Optional[int]
     end_day: Optional[int]
     capacity: Optional[int]
@@ -40,12 +49,16 @@ class EndSeason(BaseModel):
     evaporation_value: Optional[int]
    
 class SeasonalRain(BaseModel):
-    seasonal_rain: Optional[bool]
+  #  seasonal_rain: Optional[bool]
+    total_rain: Optional[int] | Optional[bool]
     end_type: Optional[str]
-    total_rain: Optional[bool]
     n_rain: Optional[bool]
-    na_rm: Optional[bool]
     rain_day: Optional[float]
+    na_rm: Optional[bool]
+    na_prop: Optional[float]
+    na_n: Optional[int]
+    na_consec: Optional[int]
+    na_n_non: Optional[int]
 
 class SeasonalLength(BaseModel):
     end_type : Optional[str]
@@ -73,4 +86,4 @@ class CropsSuccess(BaseModel):
     start_check: Optional[bool]
 
 class SeasonStartProbabilities(BaseModel):
-    specified_day: Optional[List[int]]
+    specified_day: Optional[Dict[str, int]]

@@ -11,9 +11,9 @@ class CropSuccessProbabilitiesMetadata(BaseModel):
 
 class CropSuccessProbabilitiesdata(BaseModel):
     station: str
-    water_requirements : int
-    planting_dates : int
-    planting_length : int
+    rain_total : int
+    plant_day : int
+    plant_length : int
     prop_success : float
 
 class CropSuccessProbabilitiesResponce(BaseModel):

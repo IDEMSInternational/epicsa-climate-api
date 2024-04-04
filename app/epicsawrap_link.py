@@ -65,6 +65,7 @@ from rpy2.robjects.vectors import (
     ListVector,
     StrVector,
 )
+from rpy2.rinterface_lib import sexp
 
 r_epicsawrap = packages.importr("epicsawrap")
 r_epicsadata = packages.importr("epicsadata")
@@ -285,10 +286,12 @@ def __get_python_types(data):
         return [__get_python_types(elt) for elt in data][0]
     elif type(data) in r_array_types:
         return numpy.array(data).tolist()[0]
+    elif (type(data) == sexp.NULLType):
+        return None   
     else:
         if hasattr(data, "rclass"):  # An unsupported r class
             raise KeyError(
-                "Could not proceed, type {} is not defined"
+                "Could not proceed, type {} is not defined "
                 "to add support for this type, just add it to the imports "
                 "and to the appropriate type list above".format(type(data))
             )
