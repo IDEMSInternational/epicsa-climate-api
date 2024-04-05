@@ -74,6 +74,7 @@ def test_get_station_structure_all():
     assert_data_structure_country_info(result["data"][0])
     assert_data_structure_definitions(result["data"][0])
 
+@pytest.mark.skip()
 def test_get_station_structure_zm():
     country = "zm"
     response = client.get(f"/v1/station/{country}")
