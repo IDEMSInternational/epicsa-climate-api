@@ -12,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/")#,response_model=SeasonStartProbabilitiesResponce)
+@router.post("/",response_model=SeasonStartProbabilitiesResponce)
 def get_season_start_probabilities(
     params: SeasonStartProbabilitiesParameters,
 ) -> OrderedDict:

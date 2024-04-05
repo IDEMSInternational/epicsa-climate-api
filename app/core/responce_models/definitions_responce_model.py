@@ -86,4 +86,4 @@ class CropsSuccess(BaseModel):
     start_check: Optional[bool]
 
 class SeasonStartProbabilities(BaseModel):
-    specified_day: Optional[Dict[str, int]]
+    specified_day: Optional[list[int]]
