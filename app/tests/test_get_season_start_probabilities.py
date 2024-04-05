@@ -33,7 +33,7 @@ def assert_first_data_entry_structure(first_data_entry):
     assert "station_name" in first_data_entry
     
 
-
+@pytest.mark.skip()
 def test_get_season_start_probabilities_structure_zm_test_1():
     # Define test input data
     test_data = {

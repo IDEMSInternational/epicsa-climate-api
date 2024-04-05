@@ -8,7 +8,7 @@ if ("epicsawrap" %in% installed_packages) {
     remove.packages("epicsawrap")
 }
 if ("epicsadata" %in% installed_packages) {
-   remove.packages("epicsadata")
+    remove.packages("epicsadata")
 }
 
 devtools::install_github("IDEMSInternational/rpicsa", ref = "ccb2979", force = TRUE)

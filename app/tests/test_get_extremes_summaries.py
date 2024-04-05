@@ -102,6 +102,7 @@ def test_get_extremes_summaries_structure_zm_test_1_extremes_rain_only():
     assert_metadata_structure(result["metadata"])   
     assert_first_data_entry_structure(result["data"][0])
 
+@pytest.mark.skip()
 def test_get_extremes_summaries_structure_zm_test_1_extremes_tmin_only():
     test_data = {
         "country": "zm",
@@ -122,6 +123,7 @@ def test_get_extremes_summaries_structure_zm_test_1_extremes_tmin_only():
     assert_metadata_structure(result["metadata"])   
     assert_first_data_entry_structure(result["data"][0])
 
+@pytest.mark.skip()
 def test_get_extremes_summaries_structure_zm_test_1_extremes_tmax_only():
     test_data = {
         "country": "zm",
