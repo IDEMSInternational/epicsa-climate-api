@@ -3,6 +3,7 @@ from typing import OrderedDict
 from app.epicsawrap_link import annual_rainfall_summaries
 from fastapi import APIRouter
 from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
+from app.core.responce_models.rainfall_summaries_responce_model import AnnualRainfallSummariesResponce
 
 from .schema import (
     AnnualRainfallSummariesParameters,
@@ -11,9 +12,9 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/", response_model=AnnualRainfallSummariesResponce)
 def get_annual_rainfall_summaries(
-    params: AnnualRainfallSummariesParameters,
+    params: AnnualRainfallSummariesParameters
 ) -> OrderedDict:
     
     return run_epicsa_function_and_get_dataframe(

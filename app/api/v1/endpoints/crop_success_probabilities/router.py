@@ -3,6 +3,7 @@ from typing import OrderedDict
 from app.epicsawrap_link  import crop_success_probabilities
 from fastapi import APIRouter
 from app.api.v1.endpoints.epicsa_data import run_epicsa_function_and_get_dataframe
+from app.core.responce_models.crop_success_probabilities_model import CropSuccessProbabilitiesResponce
 
 from .schema import (
     CropSuccessProbabilitiesParameters,
@@ -11,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/",response_model=CropSuccessProbabilitiesResponce)
 def get_crop_success_probabilities(
     params: CropSuccessProbabilitiesParameters,
 ) -> OrderedDict:

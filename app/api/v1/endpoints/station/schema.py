@@ -10,7 +10,3 @@ class Station(BaseModel):
     station_id: int
     station_name: str
     
-# TODO - define more cleanly (or generate from R?)
-# This should then either be merged with station or a 'definition' child property
-class StationDefinition(BaseModel):
-    annual_rain:str

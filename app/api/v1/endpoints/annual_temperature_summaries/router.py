@@ -1,4 +1,5 @@
 from typing import OrderedDict
+from app.core.responce_models.temperature_responce_model import AnnualTemperatureSummariesResponce
 
 from app.epicsawrap_link  import annual_temperature_summaries
 from fastapi import APIRouter
@@ -11,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/", response_model=AnnualTemperatureSummariesResponce)
 def get_annual_temperature_summaries(
     params: AnnualTemperatureSummariesParameters,
 ) -> OrderedDict:

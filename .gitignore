@@ -149,3 +149,4 @@ working_data/
 
 # service account key
 service-account.json
+ENV_DIR/
