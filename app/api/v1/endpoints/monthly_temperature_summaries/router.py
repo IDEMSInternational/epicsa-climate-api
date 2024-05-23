@@ -16,10 +16,12 @@ router = APIRouter()
 def get_monthly_temperature_summaries(
     params: MonthlyTemperatureSummariesParameters,
 ) -> OrderedDict:
-    
+    if (params.override == None):
+        params.override = False
     return run_epicsa_function_and_get_dataframe(
         monthly_temperature_summaries,
         country=params.country,
         station_id=params.station_id,
+        override=params.override,
         summaries=params.summaries,
     )
