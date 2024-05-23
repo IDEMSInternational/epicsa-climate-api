@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel
 from app.definitions import country_code
 
@@ -24,5 +24,5 @@ class AnnualTemperatureSummariesParameters(BaseModel):
         "max_tmax"
 
     ]
-
+    override: Optional[bool] = False
 

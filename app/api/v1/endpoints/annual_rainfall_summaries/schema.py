@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel
 from app.definitions import country_code
 
@@ -23,4 +23,5 @@ class AnnualRainfallSummariesParameters(BaseModel):
         "seasonal_rain",
         "seasonal_length",
     ]
+    override: Optional[bool] = False
 

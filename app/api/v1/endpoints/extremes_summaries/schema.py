@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel
 from app.definitions import country_code
 
@@ -16,6 +16,6 @@ class ExtremesSummariesParameters(BaseModel):
         "extremes_tmin",
         "extremes_tmax",
     ]
-
+    override: Optional[bool] = False
 
 

@@ -73,7 +73,8 @@ r_epicsadata = packages.importr("epicsadata")
 def extremes_summaries(
     country: str,
     station_id: str,
-    summaries: List[str] = None,  
+    override: bool, 
+    summaries: List[str] = None,     
 ) -> OrderedDict:
     if summaries is None:
         summaries = [
@@ -84,18 +85,19 @@ def extremes_summaries(
 
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
-    r_list_vector: ListVector = r_epicsawrap.extremes_summaries1(
+    r_list_vector: ListVector = r_epicsawrap.extremes_summaries(
         country=r_params["country"],
         station_id=r_params["station_id"],
         summaries=r_params["summaries"],
-        override = True,
+        override = r_params["override"],
     )
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
 def annual_rainfall_summaries(
     country: str,
     station_id: str,
-    summaries: List[str] = None,
+    override: bool,
+    summaries: List[str] = None,    
 ) -> OrderedDict:
     if summaries is None:
         summaries = [
@@ -110,7 +112,7 @@ def annual_rainfall_summaries(
         country=r_params["country"],
         station_id=r_params["station_id"],
         summaries=r_params["summaries"],
-        override= True,
+        override= r_params["override"],
     )
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
@@ -118,6 +120,7 @@ def annual_rainfall_summaries(
 def annual_temperature_summaries(
     country: str,
     station_id: str,
+    override: bool, 
     summaries: List[str] = None,
 ) -> OrderedDict:
     if summaries is None:
@@ -129,7 +132,7 @@ def annual_temperature_summaries(
         country=r_params["country"],
         station_id=r_params["station_id"],
         summaries=r_params["summaries"],
-        override= True,
+        override= r_params["override"],
     )
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
@@ -137,6 +140,7 @@ def annual_temperature_summaries(
 def crop_success_probabilities(
     country: str,
     station_id: str,
+    override: bool, 
     water_requirements: List[int] = None,
     planting_length: List[int] = None,
     planting_dates: List[int] = None,
@@ -151,7 +155,7 @@ def crop_success_probabilities(
         planting_length=r_params["planting_length"],
         planting_dates=r_params["planting_dates"],
         start_before_season=r_params["start_before_season"],
-        override= True,
+        override= r_params["override"],
     )
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
@@ -159,6 +163,7 @@ def crop_success_probabilities(
 def monthly_temperature_summaries(
     country: str,
     station_id: str,
+    override: bool, 
     summaries: List[str] = None,
 ) -> OrderedDict:
     if summaries is None:
@@ -170,13 +175,16 @@ def monthly_temperature_summaries(
         country=r_params["country"],
         station_id=r_params["station_id"],
         summaries=r_params["summaries"],
-        override= True,
+        override= r_params["override"],
     )
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
 
 def season_start_probabilities(
-    country: str, station_id: str, start_dates: List[int] = None
+    country: str, 
+    station_id: str, 
+    override: bool, 
+    start_dates: List[int] = None
 ) -> OrderedDict:
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
@@ -184,7 +192,7 @@ def season_start_probabilities(
         country=r_params["country"],
         station_id=r_params["station_id"],
         start_dates=r_params["start_dates"],
-        override = True,
+        override= r_params["override"],
     )
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
