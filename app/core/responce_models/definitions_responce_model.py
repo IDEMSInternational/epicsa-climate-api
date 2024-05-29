@@ -67,7 +67,7 @@ class SeasonalTotalRainfall(BaseModel):
     na_prop: Optional[float]
 
 class Temp(BaseModel):
-    to: Optional[str]
+    to: Optional[str] | Optional[List[str]]
     na_rm : Optional[bool]
 
 class ExtremesRain(BaseModel):
