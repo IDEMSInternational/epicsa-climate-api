@@ -3,13 +3,12 @@ from pydantic import BaseModel
 from typing import Literal, Optional
 from app.definitions import  country_code, language_code as lang_code
 
-ForecastType = Literal["downscaled_forecast", "annual_forecast"]
+
+FormatType = Literal["html","pdf"]
 
 class Forecast(BaseModel):
     country_code
-    date_modified:datetime 
-    district:Optional[str]=None
+    date: datetime
     filename:str
-    id:str
-    language_code:Optional[lang_code] = None
-    type:Optional[ForecastType] = None
+    type:str
+    format: FormatType
