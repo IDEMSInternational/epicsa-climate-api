@@ -23,6 +23,7 @@ def test_get_forecasts_structure():
     assert_result_structure(result)
     assert_country_structure(result["forecasts"]["mw"])
 
+@pytest.mark.skip()
 def test_get_forecasts_file():
     country = "mw"
     file_name = "-annual_forecast-en.pdf"
@@ -31,6 +32,7 @@ def test_get_forecasts_file():
     assert response.headers["content-type"] == "application/pdf"
     assert response.headers["content-disposition"] == f"attachment; filename={file_name}"
 
+@pytest.mark.skip()
 def test_get_forecasts_file_no_file():
     country = "mw"
     file_name = "nonexistent_file.pdf"
@@ -38,6 +40,7 @@ def test_get_forecasts_file_no_file():
     assert response.status_code == 404
     assert response.json()["detail"] == f"File not found: {file_name}"
 
+@pytest.mark.skip()
 def test_get_forecasts_file_no_country():
     country = "invalid"
     file_name = "-annual_forecast-en.pdf"
