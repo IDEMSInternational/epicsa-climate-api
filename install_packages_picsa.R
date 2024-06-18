@@ -12,7 +12,7 @@ if ("epicsadata" %in% installed_packages) {
 }
 
 devtools::install_github("IDEMSInternational/rpicsa", ref = "4e63501", force = TRUE)
-devtools::install_github("IDEMSInternational/epicsawrap", ref = "2ba2b5f", force = TRUE)
+devtools::install_github("IDEMSInternational/epicsawrap", ref = "dadd6b2", force = TRUE)
 devtools::install_github("IDEMSInternational/epicsadata", ref = "edda166", force = TRUE)
 
 q()
