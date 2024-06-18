@@ -26,6 +26,6 @@ def get_crop_success_probabilities(
         water_requirements=params.water_requirements,
         planting_length=params.planting_length,
         planting_dates=params.planting_dates,
-        start_before_season=params.start_before_season, 
+        start_before_season=params.start_before_season,
     )
 
