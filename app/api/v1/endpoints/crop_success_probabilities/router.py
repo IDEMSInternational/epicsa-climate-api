@@ -12,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/",response_model=CropSuccessProbabilitiesResponce)
+@router.post("/")#,response_model=CropSuccessProbabilitiesResponce)
 def get_crop_success_probabilities(
     params: CropSuccessProbabilitiesParameters,
 ) -> OrderedDict:
@@ -22,10 +22,10 @@ def get_crop_success_probabilities(
         crop_success_probabilities,
         country=params.country,
         station_id=params.station_id,
-        override=params.override,
         water_requirements=params.water_requirements,
         planting_length=params.planting_length,
         planting_dates=params.planting_dates,
         start_before_season=params.start_before_season,
+        override=params.override,
     )
 
