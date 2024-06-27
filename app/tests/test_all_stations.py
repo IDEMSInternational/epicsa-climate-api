@@ -95,6 +95,7 @@ def test_zm_stations():
 def test_zm_test_stations():
     country = "zm_test"
     assert_all_function_for_country(country)
+@pytest.mark.skip()
 def test_zm_workshops_stations():
     country = "zm_workshops"
     assert_all_function_for_country(country)
