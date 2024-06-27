@@ -1,5 +1,3 @@
-version: "3"
-
 secrets:
   service_account_key: !override
     environment: SERVICE_ACCOUNT_JSON
