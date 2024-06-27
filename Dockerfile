@@ -38,6 +38,7 @@ ENV UVICORN_PORT=8000
 
 RUN apt update && \
   apt-get install --yes --no-install-recommends \
+    mariadb-client-core \
     r-base \
     r-cran-magrittr \
     r-cran-memoise \
