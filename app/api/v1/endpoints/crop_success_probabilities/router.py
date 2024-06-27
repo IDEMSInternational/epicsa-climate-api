@@ -12,7 +12,7 @@ from .schema import (
 router = APIRouter()
 
 
-@router.post("/",response_model=CropSuccessProbabilitiesResponce)
+@router.post("/")#,response_model=CropSuccessProbabilitiesResponce)
 def get_crop_success_probabilities(
     params: CropSuccessProbabilitiesParameters,
 ) -> OrderedDict:

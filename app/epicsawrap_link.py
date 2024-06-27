@@ -206,12 +206,14 @@ def station_metadata(
     if country == "":
         r_list_vector: RDataFrame = r_epicsawrap.station_metadata(
             include_definitions=r_params["include_definitions"],  
+            include_definitions_id=False,
         )
         data = OrderedDict([("data", __get_data_frame(r_list_vector))])
     elif station_id =="":
         r_list_vector: RDataFrame = r_epicsawrap.station_metadata(
             country=r_params["country"],   
             include_definitions=r_params["include_definitions"],  
+            include_definitions_id=False,
         )   
         data = OrderedDict([("data", __get_data_frame(r_list_vector))])
     else:
@@ -220,6 +222,7 @@ def station_metadata(
             station_id=r_params["station_id"],
             include_definitions=r_params["include_definitions"],  
             format = "list",
+            include_definitions_id=False,
         )
         data = __get_python_types(r_list_vector[0])
 
