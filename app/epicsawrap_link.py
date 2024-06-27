@@ -148,6 +148,7 @@ def crop_success_probabilities(
 ) -> OrderedDict:
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
+    print(r_params)
     r_list_vector: ListVector = r_epicsawrap.crop_success_probabilities(
         country=r_params["country"],
         station_id=r_params["station_id"],
