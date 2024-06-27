@@ -10,23 +10,21 @@ router = APIRouter()
 
 @router.get("/")#,response_model=List[StationDataResponce])
 def read_stations() -> OrderedDict:
-    res = run_epicsa_function_and_get_dataframe(
+    return run_epicsa_function_and_get_dataframe(
         station_metadata,
         country="",
         station_id="",
         include_definitions=False,
     )
-    return res['data']
 
 @router.get("/{country}")#,response_model=List[StationDataResponce])
 def read_stations(country: country_code ) -> OrderedDict:
-    res = run_epicsa_function_and_get_dataframe(
+    return run_epicsa_function_and_get_dataframe(
         station_metadata,
         country=country,
         station_id="",
         include_definitions=False,
     )
-    return res['data']
 
 @router.get("/{country}/{station_id}")#,response_model=StationAndDefintionResponce)
 def read_stations(country: country_code, station_id:str ): #-> OrderedDict:
