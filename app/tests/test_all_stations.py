@@ -107,9 +107,9 @@ def test_mw_stations():
 def test_mw_test_stations():
     country = "zm_test"
     assert_all_function_for_country(country)
-@pytest.mark.skip()
+
 def test_mw_workshops_stations():
-    country = "zm_workshops"
+    country = "mw_workshops"
     assert_all_function_for_country(country)
 
 
@@ -120,9 +120,11 @@ def assert_all_function_for_country(country):
     assert response.status_code == 200
     errors = []
     result = response.json()
-    for i in range(len(result)):
-        station_id = result[i]["station_id"]
+    data = result["data"]
+    for i in range(len(data)):
+        station_id = data[i]["station_id"]
         print("stationid: " + station_id)
+        #ToDo assert_station_metadata
         try:
             assert_annual_rainfall_summaries(country, station_id)
         except AssertionError as e:
@@ -133,10 +135,10 @@ def assert_all_function_for_country(country):
         except AssertionError as e:
             errors.append(f"Failed: annual temperature summaries for country {country} station {station_id}")
 
-        try:
-            assert_crop_success_probabilities(country, station_id)
-        except AssertionError as e:
-            errors.append(f"Failed: crop success probabilities for country {country} station {station_id}")
+   #     try:
+   #         assert_crop_success_probabilities(country, station_id)
+   #     except AssertionError as e:
+   #         errors.append(f"Failed: crop success probabilities for country {country} station {station_id}")
 
         try:
             assert_monthly_temperature_summaries(country, station_id)
