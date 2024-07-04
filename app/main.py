@@ -13,7 +13,7 @@ def get_settings():
 
 def get_application():
     settings = get_settings()
-    _app = FastAPI(title="E-PICSA Climate API", version="1.3.5",
+    _app = FastAPI(title="E-PICSA Climate API", version="1.3.6",
                    docs_url="/")
 
     _app.add_middleware(
