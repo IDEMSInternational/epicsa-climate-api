@@ -87,6 +87,10 @@ def assert_extremes_summaries(country, station_id):
     response = client.post("/v1/extremes_summaries/", json=test_data)
     assert response.status_code == 200
 
+def assert_station_definitions(country, station_id):
+    response = client.get(f"/v1/station/{country}/{station_id}")
+    assert response.status_code == 200
+
 @pytest.mark.skip()
 def test_zm_stations():
     country = "zm"
@@ -105,7 +109,7 @@ def test_mw_stations():
     assert_all_function_for_country(country)
 @pytest.mark.skip()
 def test_mw_test_stations():
-    country = "zm_test"
+    country = "mw_test"
     assert_all_function_for_country(country)
 
 def test_mw_workshops_stations():
@@ -124,7 +128,12 @@ def assert_all_function_for_country(country):
     for i in range(len(data)):
         station_id = data[i]["station_id"]
         print("stationid: " + station_id)
-        #ToDo assert_station_metadata
+
+        try:
+            assert_station_definitions(country,station_id)
+        except AssertionError as e:
+            errors.append(f"Failed: station definitions for country {country} station {station_id}")
+
         try:
             assert_annual_rainfall_summaries(country, station_id)
         except AssertionError as e:
