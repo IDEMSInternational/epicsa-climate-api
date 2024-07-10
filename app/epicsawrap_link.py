@@ -68,7 +68,6 @@ from rpy2.robjects.vectors import (
 from rpy2.rinterface_lib import sexp
 
 r_epicsawrap = packages.importr("epicsawrap")
-r_epicsadata = packages.importr("epicsadata")
 
 def extremes_summaries(
     country: str,
@@ -362,7 +361,7 @@ def __init_data_env():
 
     service_file: str = os.path.join(working_folder, "service-account.json")
     service_file = os.path.normpath(service_file).replace("\\", "/")
-    r_epicsadata.gcs_auth_file(service_file)
+    r_epicsawrap.gcs_auth_file(service_file)
 
     data_folder: str = os.path.join(working_folder, "working_data")
     data_folder = os.path.normpath(data_folder).replace("\\", "/")

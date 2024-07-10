@@ -8,7 +8,6 @@ class SeasonStartProbabilitiesMetadata(BaseModel):
     start_rains: Optional[StartRains]
     season_start_probabilities:Optional[SeasonStartProbabilities]
 
-#ToDo Not used as return structure incorrect
 class SeasonStartProbabilitiesdata(BaseModel):
     station: str
     day: int

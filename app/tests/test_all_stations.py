@@ -91,23 +91,22 @@ def assert_station_definitions(country, station_id):
     response = client.get(f"/v1/station/{country}/{station_id}")
     assert response.status_code == 200
 
-@pytest.mark.skip()
 def test_zm_stations():
     country = "zm"
     assert_all_function_for_country(country)
-@pytest.mark.skip()
+
 def test_zm_test_stations():
     country = "zm_test"
     assert_all_function_for_country(country)
-@pytest.mark.skip()
+
 def test_zm_workshops_stations():
     country = "zm_workshops"
     assert_all_function_for_country(country)
-@pytest.mark.skip()
+
 def test_mw_stations():
     country = "mw"
     assert_all_function_for_country(country)
-@pytest.mark.skip()
+
 def test_mw_test_stations():
     country = "mw_test"
     assert_all_function_for_country(country)
