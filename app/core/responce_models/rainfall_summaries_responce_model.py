@@ -24,8 +24,7 @@ class AnnualRainfallSummariesdata(BaseModel):
     seasonal_rain:Optional[int] 
     season_length: Optional[float]   
     end_season_doy:Optional[int] 
-    end_season_date:Optional[str] | object #rpy2 has issue with no recognising null strings
-    season_length: Optional[float]     
+    end_season_date:Optional[str] | object #rpy2 has issue with no recognising null strings  
      
 
 class AnnualRainfallSummariesResponce(BaseModel):
