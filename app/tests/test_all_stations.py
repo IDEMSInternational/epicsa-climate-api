@@ -91,7 +91,6 @@ def assert_station_definitions(country, station_id):
     response = client.get(f"/v1/station/{country}/{station_id}")
     assert response.status_code == 200
 
-
 def test_zm_stations():
     country = "zm"
     assert_all_function_for_country(country)
