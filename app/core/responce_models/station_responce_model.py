@@ -32,7 +32,7 @@ class StationDefinitionDataResponce(BaseModel):
     
 
 class StationAndDefintionResponce(StationDataResponce):
-    definitions_id: list[str]
+    definitions_id: list[str|object]
     climsoft_list: Optional[list[Optional[str]]]
     data : StationDefinitionDataResponce
 

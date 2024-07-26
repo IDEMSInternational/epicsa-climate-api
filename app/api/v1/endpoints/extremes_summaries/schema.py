@@ -9,8 +9,8 @@ summary_name_extremes_summaries = Literal[
 ]
 
 class ExtremesSummariesParameters(BaseModel):
-    country: country_code = "zm"
-    station_id: str = "test_1"
+    country: country_code = "mw_test"
+    station_id: str = "Kasungu"
     summaries: list[summary_name_extremes_summaries] = [
         "extremes_rain",
         "extremes_tmin",
