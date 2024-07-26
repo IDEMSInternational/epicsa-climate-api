@@ -225,7 +225,6 @@ def station_metadata(
             include_definitions_id=False,
         )
         data = __get_python_types(r_list_vector[0])
-
     return  data
 
 
@@ -269,7 +268,6 @@ def __get_list_vector_as_ordered_dict(r_list_vector: ListVector) -> OrderedDict:
     )
     return r_list_as_dict
 
-
 def __get_python_types(data):
     """Converts a collection of rpy2 R objects into Python objects.
 
@@ -306,14 +304,7 @@ def __get_python_types(data):
     elif (type(data) == sexp.NULLType):
         return None   
     else:
-        if hasattr(data, "rclass"):  # An unsupported r class
-            raise KeyError(
-                "Could not proceed, type {} is not defined "
-                "to add support for this type, just add it to the imports "
-                "and to the appropriate type list above".format(type(data))
-            )
-        else:
-            return data  # We reached the end of recursion
+        return data  # We reached the end of recursion
 
 
 def __get_r_params(params: Dict) -> Dict:
