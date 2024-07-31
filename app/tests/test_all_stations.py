@@ -95,6 +95,7 @@ def test_zm_stations():
     country = "zm"
     assert_all_function_for_country(country)
 
+@pytest.mark.skip(reason="2024-07-31 issues with bucket data")
 def test_zm_test_stations():
     country = "zm_test"
     assert_all_function_for_country(country)
@@ -111,6 +112,7 @@ def test_mw_test_stations():
     country = "mw_test"
     assert_all_function_for_country(country)
 
+@pytest.mark.skip(reason="2024-07-31 issues with bucket data")
 def test_mw_workshops_stations():
     country = "mw_workshops"
     assert_all_function_for_country(country)

@@ -1,14 +1,14 @@
 import pytest
 from fastapi.testclient import TestClient
+from urllib.parse import urlencode
+from collections import OrderedDict
 from app.main import app
 
 client = TestClient(app)
 
+
 def test_get_documents():
-    test_data = {
-        "prefix": "",
-        "delimiter": "",
-        "maxResults": 5
-    }
-    response = client.post("/v1/documents/", json=test_data)
+    country = 'mw'
+    query_string = urlencode(OrderedDict(match_glob="**evening**"))
+    response = client.get(f"/v1/documents/{country}?{query_string}")
     assert response.status_code == 200
