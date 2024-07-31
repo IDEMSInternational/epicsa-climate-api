@@ -1,44 +1,46 @@
 from fastapi import APIRouter, HTTPException
 from google.cloud import storage
-from .schema import  documentParamaters
 import os
+from app.definitions import country_code
 
 client = storage.Client.from_service_account_json('service-account.json')
 
 
-bucket_name = "zambia_pdf_forecasts"
+bucket_name = "epicsa-documents"
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "app/service-account.json"
 
 router = APIRouter()
 
-@router.post("/")
-def get_documents(params: documentParamaters):
-    try:
-        if params.maxResults > 0:
-            blobs = client.list_blobs(
-                bucket_name, 
-                prefix=params.prefix, 
-                delimiter=params.delimiter,
-                max_results=params.maxResults)
-        else:
-            blobs = client.list_blobs(
-                bucket_name, 
-                prefix=params.prefix, 
-                delimiter=params.delimiter)
 
+@router.get("/{country}")
+def get_documents(
+    country: country_code,
+    prefix='',
+    delimiter: str | None = None,
+    max_results: int | None = None,
+    match_glob: str | None = None
+):
+    try:
+        blobs = client.list_blobs(
+            bucket_name,
+            prefix=country + '/' + prefix,
+            delimiter=delimiter,
+            max_results=max_results,
+            match_glob=match_glob)
 
         files_info = [
             {
                 "name": blob.name,
-                "selfLink": blob.self_link,      
+                "selfLink": blob.self_link,
                 "mediaLink": blob.media_link,
                 "contentType": blob.content_type,
                 "size": blob.size,
                 "time_created": blob.time_created.isoformat(),
                 "updated": blob.updated.isoformat()
             }
-            for blob in blobs if not blob.name.endswith('/')  # Exclude directories
+            # Exclude directories
+            for blob in blobs if not blob.name.endswith('/')
         ]
         response = {
             "files": files_info
@@ -46,9 +48,3 @@ def get_documents(params: documentParamaters):
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-
-
-
-   
