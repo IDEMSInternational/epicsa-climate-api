@@ -24,7 +24,7 @@ def get_documents(
     try:
         blobs = client.list_blobs(
             bucket_name,
-            prefix=country + '/' + prefix,
+            prefix=f"{country}/{prefix}",
             delimiter=delimiter,
             max_results=max_results,
             match_glob=match_glob)
