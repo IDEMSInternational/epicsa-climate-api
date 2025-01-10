@@ -9,14 +9,14 @@ class DocumentsGetParameters(BaseModel):
     )
     max_results: int = Field(
         default=50,
-        description='Max 1000',
+        description='Maximum number of results to return. If more than 1000 results required use multiple queries',
         gt=0,
         # Limit results as greater would involve paginating the queries
         le=1000,
     )
     match_glob: str = Field(
         default='**[^/]' ,
-        description='Use expression for advanced pattern matching. Specify "[^/]" to omit folders',
+        description='Use expression for advanced pattern matching. To return only files and not folders end with "[^/]"',
     ) 
     
 
