@@ -11,7 +11,8 @@ class DocumentsGetParameters(BaseModel):
         default=50,
         description='Max 1000',
         gt=0,
-        lt=1000,
+        # Limit results as greater would involve paginating the queries
+        le=1000,
     )
     match_glob: str = Field(
         default='**[^/]' ,
