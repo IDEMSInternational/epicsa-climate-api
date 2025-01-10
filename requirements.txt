@@ -3,6 +3,7 @@ pydantic>=1.8.0,<2.0.0
 pytest
 requests
 pandas
+# Pinned to avoid windows issue: https://github.com/rpy2/rpy2/issues/1104
 rpy2==3.5.10
 pillow
 setuptools
