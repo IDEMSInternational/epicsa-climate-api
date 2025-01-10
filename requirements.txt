@@ -1,9 +1,11 @@
 fastapi
+httpx
 pydantic>=1.8.0,<2.0.0
 pytest
 requests
 pandas
-rpy2
+# Pinned to avoid windows issue: https://github.com/rpy2/rpy2/issues/1104
+rpy2==3.5.12
 pillow
 setuptools
 numpy
