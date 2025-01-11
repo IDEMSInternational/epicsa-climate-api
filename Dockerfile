@@ -30,7 +30,6 @@ COPY requirements.txt .
 RUN pip install --upgrade -r requirements.txt
 
 FROM python:3.11-slim-bookworm AS prod
-WORKDIR /app
 ENV PATH=/opt/idems/venv/bin:${PATH}
 ENV PIP_NO_CACHE_DIR=1
 ENV UVICORN_HOST=0.0.0.0
@@ -47,8 +46,7 @@ RUN apt update && \
   rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/lib/R/site-library /usr/local/lib/R/site-library
 COPY --from=builder /opt/idems/venv /opt/idems/venv
-COPY app app
-COPY entrypoint.sh .
+COPY ./app /app
+COPY ./entrypoint.sh /app/
 
-ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["uvicorn", "app.main:app"]
+CMD /app/entrypoint.sh; uvicorn app.main:app

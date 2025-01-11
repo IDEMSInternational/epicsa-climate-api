@@ -9,9 +9,17 @@ services:
     secrets:
       - service_account_key
     volumes:
-      - "./app:/app/app"
       - "./junit:/tmp/junit"
 
 secrets:
   service_account_key:
     file: ./service-account.json
+######################
+# Debugging
+######################
+
+# entrypoint: /bin/bash -l -c "tail -f /dev/null"
+# command: tail -f /dev/null
+# volumes:
+#    - "./app:/app"
+#    - "./service-account.json:/app/service-account.json"
