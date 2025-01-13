@@ -132,6 +132,17 @@ Simply repeat the steps above to install dependencies from `install_packages_pic
 
 Any other issues should be raised on GitHub
 
+**Docker container fails**
+This can happen for many reasons, check the logs for any specific errors raised.
+
+If troubleshooting the code in the container, it may be useful to bypass default entrypoint or commands so that the container can be kept running and inspected.
+Typically this can be done by overriding the `docker-compose.yml`, such as:
+
+```yml
+entrypoint: /bin/bash -l -c "tail -f /dev/null"
+command: tail -f /dev/null
+```
+
 ## License
 
 This project is licensed under the terms of the MIT license.
