@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field
-from app.definitions import country_code
 
 class DocumentsGetParameters(BaseModel):
-    country: country_code
     prefix: str = Field(
         default='',
         description='Specify folder path prefixes. Can be used to filter folders timestamped YYYYMMDD, E.g. "202405"',
