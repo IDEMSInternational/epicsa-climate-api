@@ -11,3 +11,4 @@ setuptools
 numpy
 pygeoapi
 google-cloud-storage
+uvicorn
