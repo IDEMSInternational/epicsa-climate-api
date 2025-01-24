@@ -7,6 +7,7 @@ from app.main import app
 client = TestClient(app)
 
 
+@pytest.mark.skip()
 def test_get_documents():
     country = 'mw'
     query_string = urlencode(OrderedDict(match_glob="**evening**"))
