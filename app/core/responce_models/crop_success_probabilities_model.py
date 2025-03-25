@@ -11,10 +11,11 @@ class CropSuccessProbabilitiesMetadata(BaseModel):
 
 class CropSuccessProbabilitiesdata(BaseModel):
     station: str
-    rain_total : int
+    total_rain : int
     plant_day : int
     plant_length : int
-    prop_success : float
+    prop_success_with_start : float
+    prop_success_no_start : float
 
 class CropSuccessProbabilitiesResponce(BaseModel):
     metadata: CropSuccessProbabilitiesMetadata

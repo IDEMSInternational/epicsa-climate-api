@@ -4,10 +4,7 @@ from app.definitions import country_code
 
 
 class CropSuccessProbabilitiesParameters(BaseModel):
-    country: country_code = "mw_test"
-    station_id: str = "Kasungu"
-    water_requirements: Optional[list[int]] | None = None#[100, 200, 300]
-    planting_length: Optional[list[int]] | None = None#[20]
-    planting_dates: Optional[list[int]] | None = None#[25, 50, 75]
+    country: country_code = "internal_tests"
+    station_id: str = "Tamale"
     start_before_season: Optional[bool] | None = None
     override: Optional[bool] = False
