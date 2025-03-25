@@ -77,9 +77,9 @@ class Temp(BaseModel):
     s_start_doy: Optional[int]
 
 class CropsSuccess(BaseModel):
-    water_requirements : Optional[Dict[str, int]] #val1, val2, valx
-    planting_dates: Optional[Dict[str, int]] #val1, val2, valx
-    planting_length: Optional[Dict[str, int]] #val1, val2, valx
+    water_requirements : Optional[int] 
+    planting_dates: Optional[int]
+    planting_length: Optional[int]
     start_check: Optional[bool]
 
 class SeasonStartProbabilities(BaseModel):
