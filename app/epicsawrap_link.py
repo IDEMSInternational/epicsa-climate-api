@@ -138,24 +138,14 @@ def annual_temperature_summaries(
 
 def crop_success_probabilities(
     country: str,
-    station_id: str,
-    override: bool, 
-    water_requirements: List[int] = None,
-    planting_length: List[int] = None,
-    planting_dates: List[int] = None,
-    start_before_season: bool = None,
+    station_id: str
 ) -> OrderedDict:
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
     print(r_params)
     r_list_vector: ListVector = r_epicsawrap.crop_success_probabilities(
         country=r_params["country"],
-        station_id=r_params["station_id"],
-        water_requirements=r_params["water_requirements"],
-        planting_length=r_params["planting_length"],
-        planting_dates=r_params["planting_dates"],
-        start_before_season=r_params["start_before_season"],
-        override= r_params["override"],
+        station_id=r_params["station_id"]
     )
     return __get_list_vector_as_ordered_dict(r_list_vector)
 

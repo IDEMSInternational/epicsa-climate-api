@@ -17,15 +17,11 @@ def get_crop_success_probabilities(
     params: CropSuccessProbabilitiesParameters,
     run_epicsa_function: RunEpicsaFunctionType = Depends(get_run_epicsa_function)
 ) -> OrderedDict:
-    if (params.override == None):
-        params.override = False    
     return handle_epicsa_request(
         crop_success_probabilities,
         response_model=CropSuccessProbabilitiesResponce,
         run_epicsa_function=run_epicsa_function,
         country=params.country,
-        station_id=params.station_id,
-        override=params.override,
-        start_before_season=params.start_before_season,
+        station_id=params.station_id
     )
 
