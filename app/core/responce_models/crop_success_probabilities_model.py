@@ -2,7 +2,7 @@ from datetime import date
 from pydantic import BaseModel
 from typing import List, Optional
 
-from app.core.responce_models.definitions_responce_model import CropsSuccess, EndRains, StartRains
+from app.core.responce_models.definitions_responce_model import CropsSuccess, EndRains, GridRange, StartRains
 
 class CropSuccessProbabilitiesMetadata(BaseModel):
     start_rains: Optional[StartRains]
@@ -18,5 +18,5 @@ class CropSuccessProbabilitiesdata(BaseModel):
     prop_success_no_start : float
 
 class CropSuccessProbabilitiesResponce(BaseModel):
-    metadata: CropSuccessProbabilitiesMetadata
+    metadata: CropSuccessProbabilitiesMetadata 
     data: list[CropSuccessProbabilitiesdata]

@@ -1,5 +1,5 @@
 from datetime import date
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, List, Optional
 
 class AnnualRain(BaseModel):
@@ -76,11 +76,15 @@ class Temp(BaseModel):
     na_prop: Optional[float]
     s_start_doy: Optional[int]
 
+class GridRange(BaseModel):
+    from_: Optional[int] = Field(alias="from")
+    to : Optional[int]
+    by : Optional[int]
+
 class CropsSuccess(BaseModel):
-    water_requirements : Optional[int] 
-    planting_dates: Optional[int]
-    planting_length: Optional[int]
-    start_check: Optional[bool]
+    water_requirements : Optional[str|Dict[str,int]]
+    planting_dates: Optional[str|Dict[str,int]]
+    planting_length: Optional[str|Dict[str,int]]
 
 class SeasonStartProbabilities(BaseModel):
     specified_day: Optional[list[int]|Dict[str,int]]
