@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 class DocumentsGetParameters(BaseModel):
@@ -26,5 +27,6 @@ class DocumentMetadata(BaseModel):
     size: int
     timeCreated: str
     updated:str
+    metadata: Optional[dict[str, str]] = None
     
     

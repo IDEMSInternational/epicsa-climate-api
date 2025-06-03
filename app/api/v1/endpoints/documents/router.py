@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from google.cloud import storage
 from google.api_core.page_iterator import HTTPIterator
@@ -17,10 +17,10 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "app/service-account.json"
 
 router = APIRouter() 
 
-@router.get("/{country}")
+@router.get("/{country}", response_model=list[DocumentMetadata])
 def get_documents(
     country: country_code,
-    params:Annotated[DocumentsGetParameters, Query()]
+    params:DocumentsGetParameters = Depends()
 ) -> list[DocumentMetadata] :
     try:
         # Retrieve list of availble blobs. Adapted from:
@@ -41,7 +41,8 @@ def get_documents(
                 contentType= blob.content_type,
                 size= blob.size,
                 timeCreated= blob.time_created.isoformat(),
-                updated= blob.updated.isoformat()
+                updated= blob.updated.isoformat(),
+                metadata=blob.metadata
             )
             entries.append(entry)           
         return entries
