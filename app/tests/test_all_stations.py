@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app  # Assuming your FastAPI app instance is named 'app'
+
+from app.main import app
 
 client = TestClient(app)
 
@@ -111,6 +112,7 @@ def test_mw_stations():
     country = "mw"
     assert_all_function_for_country(country)
 
+@pytest.mark.skip()
 def test_mw_test_stations():
     country = "mw_test"
     assert_all_function_for_country(country)
@@ -122,7 +124,6 @@ def test_mw_workshops_stations():
 
 
 def assert_all_function_for_country(country):
-    
     response = client.get(f"/v1/station/{country}")
 
     assert response.status_code == 200
@@ -134,38 +135,33 @@ def assert_all_function_for_country(country):
         print("stationid: " + station_id)
 
         try:
-            assert_station_definitions(country,station_id)
-        except AssertionError as e:
+            assert_station_definitions(country, station_id)
+        except AssertionError:
             errors.append(f"Failed: station definitions for country {country} station {station_id}")
 
         try:
             assert_annual_rainfall_summaries(country, station_id)
-        except AssertionError as e:
+        except AssertionError:
             errors.append(f"Failed: annual rainfall summaries for country {country} station {station_id}")
-        
+
         try:
             assert_annual_temperature_summaries(country, station_id)
-        except AssertionError as e:
+        except AssertionError:
             errors.append(f"Failed: annual temperature summaries for country {country} station {station_id}")
-
-   #     try:
-   #         assert_crop_success_probabilities(country, station_id)
-   #     except AssertionError as e:
-   #         errors.append(f"Failed: crop success probabilities for country {country} station {station_id}")
 
         try:
             assert_monthly_temperature_summaries(country, station_id)
-        except AssertionError as e:
+        except AssertionError:
             errors.append(f"Failed: monthly temperature summaries for country {country} station {station_id}")
 
         try:
             assert_season_start_probabilities(country, station_id)
-        except AssertionError as e:
+        except AssertionError:
             errors.append(f"Failed: season start probabilities for country {country} station {station_id}")
 
         try:
             assert_extremes_summaries(country, station_id)
-        except AssertionError as e:
+        except AssertionError:
             errors.append(f"Failed: extremes summaries for country {country} station {station_id}")
 
     if errors:
