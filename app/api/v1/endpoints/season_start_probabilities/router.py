@@ -29,7 +29,6 @@ def get_season_start_probabilities(
     if params.start_dates is not None:
         kwargs["start_dates"] = params.start_dates
     
-   # return run_epicsa_function_and_get_dataframe(**kwargs)
 
     return handle_epicsa_request(
         season_start_probabilities,
