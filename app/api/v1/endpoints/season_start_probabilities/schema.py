@@ -4,7 +4,15 @@ from app.definitions import country_code
 
 
 class SeasonStartProbabilitiesParameters(BaseModel):
-    country: country_code = "mw_test"
-    station_id: str = "Kasungu"
-    start_dates: list[int] | None = [200, 220, 250, 270, 300, 320]
-    override: Optional[bool] = False
+    country: country_code = "zm"
+    station_id: str = "CHIPATA MET"
+    start_dates: list[int] | None = None
+    override: Optional[bool] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "country": "zm",
+                "station_id": "CHIPATA MET"
+            }
+        }

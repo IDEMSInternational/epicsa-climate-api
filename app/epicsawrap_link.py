@@ -46,7 +46,7 @@ Each wrapper function:
 """
 import os
 from collections import OrderedDict
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import numpy
 from pandas import DataFrame
@@ -173,17 +173,21 @@ def monthly_temperature_summaries(
 def season_start_probabilities(
     country: str, 
     station_id: str, 
-    override: bool, 
+    override: Optional[bool] = None, 
     start_dates: List[int] = None
 ) -> OrderedDict:
     __init_data_env()
     r_params: Dict = __get_r_params(locals())
-    r_list_vector: ListVector = r_epicsawrap.season_start_probabilities(
-        country=r_params["country"],
-        station_id=r_params["station_id"],
-        start_dates=r_params["start_dates"],
-        override= r_params["override"],
-    )
+    r_call_args = {
+        "country": r_params["country"],
+        "station_id": r_params["station_id"],
+    }
+    if r_params.get("start_dates") is not r_NULL:
+        r_call_args["start_dates"] = r_params["start_dates"]
+    if r_params.get("override") is not r_NULL:
+        r_call_args["override"] = r_params["override"]
+
+    r_list_vector: ListVector = r_epicsawrap.season_start_probabilities(**r_call_args)
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
 def station_metadata(
