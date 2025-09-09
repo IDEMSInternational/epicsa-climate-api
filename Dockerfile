@@ -16,7 +16,6 @@ RUN apt update && \
     libxml2-dev \
     r-base \
     r-base-dev \
-    r-cran-devtools \
     software-properties-common \
     zlib1g-dev
 

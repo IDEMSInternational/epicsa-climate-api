@@ -5,6 +5,8 @@ if ("epicsawrap" %in% installed_packages) {
     remove.packages("epicsawrap")
 }
 
-devtools::install_github("IDEMSInternational/epicsawrap", ref = "607bb9c", force = TRUE)
+# Use pak to install packages instead of devtools to install more from pre-compiled binaries
+# and not build everything from source (devtools default setting)
+pak::pak("IDEMSInternational/epicsawrap@607bb9c")
 
 q()
