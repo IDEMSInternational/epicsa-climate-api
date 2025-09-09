@@ -8,6 +8,6 @@ if ("epicsawrap" %in% installed_packages) {
 # Use pak to install packages instead of devtools to install more from pre-compiled binaries
 # and not build everything from source (devtools default setting)
 install.packages('pak',repos = "https://cloud.r-project.org")
-pak::pak("IDEMSInternational/epicsawrap@f3c1988")
+pak::pak("IDEMSInternational/epicsawrap@1e3f5a9")
 
 q()
