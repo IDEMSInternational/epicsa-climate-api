@@ -55,10 +55,6 @@ COPY --from=builder /etc/apt/sources.list.d/cran40.list /etc/apt/sources.list.d/
 RUN apt-get update && apt-get install -y --no-install-recommends \
     mariadb-client-core \
     r-base \
-    r-cran-magrittr \
-    r-cran-memoise \
-    r-cran-pkgconfig \
-    r-cran-r6 \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
