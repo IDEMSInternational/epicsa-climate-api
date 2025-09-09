@@ -9,14 +9,12 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Add R repository key from keyserver
+# Add R repository key and repository
 RUN gpg --keyserver keyserver.ubuntu.com \
     --recv-key '95C0FAF38DB3CCAD0C080A7BDC78B2DDEABC47B7' \
     && gpg --armor --export '95C0FAF38DB3CCAD0C080A7BDC78B2DDEABC47B7' | \
-    gpg --dearmor -o /etc/apt/trusted.gpg.d/cran_debian_key.gpg
-
-# Add R repository
-RUN echo "deb https://cloud.r-project.org/bin/linux/debian bookworm-cran40/" > \
+    gpg --dearmor -o /etc/apt/trusted.gpg.d/cran_debian_key.gpg \
+    && echo "deb https://cloud.r-project.org/bin/linux/debian bookworm-cran40/" > \
     /etc/apt/sources.list.d/cran40.list
 
 # Install R
@@ -54,7 +52,7 @@ COPY --from=builder /etc/apt/trusted.gpg.d/cran_debian_key.gpg /etc/apt/trusted.
 COPY --from=builder /etc/apt/sources.list.d/cran40.list /etc/apt/sources.list.d/
 
 # Install only runtime R dependencies (no dev tools)
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     r-base \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
