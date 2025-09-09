@@ -4,7 +4,7 @@ FROM python:3.13-bookworm AS builder
 WORKDIR /work
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -18,7 +18,7 @@ RUN gpg --keyserver keyserver.ubuntu.com \
     /etc/apt/sources.list.d/cran40.list
 
 # Install R
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     r-base \
     r-base-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -53,7 +53,12 @@ COPY --from=builder /etc/apt/sources.list.d/cran40.list /etc/apt/sources.list.d/
 
 # Install only runtime R dependencies (no dev tools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    mariadb-client-core \
     r-base \
+    r-cran-magrittr \
+    r-cran-memoise \
+    r-cran-pkgconfig \
+    r-cran-r6 && \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
