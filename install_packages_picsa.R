@@ -5,6 +5,6 @@ if ("epicsawrap" %in% installed_packages) {
     remove.packages("epicsawrap")
 }
 
-devtools::install_github("IDEMSInternational/epicsawrap", ref = "607bb9c", force = TRUE)
+devtools::install_github("IDEMSInternational/epicsawrap", ref = "a165c55", force = TRUE)
 
 q()
