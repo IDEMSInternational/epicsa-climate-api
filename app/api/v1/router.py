@@ -21,6 +21,9 @@ from app.api.v1.endpoints.documents.router import (
 from app.api.v1.endpoints.extremes_summaries.router import (
     router as extremes_summaries_router,
 )
+from app.api.v1.endpoints.select_query.router import (
+    router as select_query_router,
+)
 
 from app.api.v1.endpoints.station.router import router as station_router
 from app.api.v1.endpoints.status.router import router as status_router
@@ -68,5 +71,10 @@ v1_router.include_router(
     documents,
     prefix="/documents",
     tags=["Documents"],
+)
+v1_router.include_router(
+    select_query_router,
+    prefix="/select_query",
+    tags=["Database"],
 )
 

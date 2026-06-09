@@ -13,3 +13,4 @@ numpy
 pygeoapi
 google-cloud-storage
 uvicorn
+psycopg2-binary

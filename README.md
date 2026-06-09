@@ -79,6 +79,23 @@ In order to run the package, you will need to add the following service account 
 service-account.json
 ```
 
+**Postgres Secret File**
+
+The generic postgres query endpoint reads database credentials from a separate JSON secret file. Add a local file at the path in `POSTGRES_SECRET_FILE` (default `./postgres-secret.json`):
+
+```json
+{
+  "host": "127.0.0.1",
+  "port": 5432,
+  "dbname": "your_database",
+  "user": "your_user",
+  "password": "your_password",
+  "sslmode": "prefer"
+}
+```
+
+The endpoint is available at `POST /v1/select_query/` and accepts only `SELECT` SQL with optional positional parameters.
+
 ## Running locally
 
 Once installed, subsequent server starts can skip installation steps

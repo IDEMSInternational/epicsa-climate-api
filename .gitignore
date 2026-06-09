@@ -149,4 +149,5 @@ working_data/
 
 # service account key
 service-account.json
+postgres-secret.json
 ENV_DIR/
