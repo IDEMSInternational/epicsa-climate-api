@@ -81,18 +81,23 @@ service-account.json
 
 **Postgres Secret File**
 
-The generic postgres query endpoint reads database credentials from a separate JSON secret file. Add a local file at the path in `POSTGRES_SECRET_FILE` (default `./postgres-secret.json`):
+The generic postgres query endpoint reads database credentials from a separate JSON secret file.
 
-```json
-{
-  "host": "127.0.0.1",
-  "port": 5432,
-  "dbname": "your_database",
-  "user": "your_user",
-  "password": "your_password",
-  "sslmode": "prefer"
-}
+Copy the example file and then update the placeholder values:
+
+Windows (powershell)
+
+```powershell
+Copy-Item postgres-secret-example.json postgres-secret.json
 ```
+
+Linux / Mac (bash)
+
+```bash
+cp postgres-secret-example.json postgres-secret.json
+```
+
+The file location is controlled by `POSTGRES_SECRET_FILE` (default `./postgres-secret.json`).
 
 The endpoint is available at `POST /v1/select_query/` and accepts only `SELECT` SQL with optional positional parameters.
 
@@ -127,6 +132,8 @@ docker compose up --build
 ## Deployment
 
 This repo contains example workflow to build as a docker image and deploy to google cloud run. See action yaml for details
+
+For cloud deploy, store the contents of `postgres-secret.json` as a base64 encoded GitHub secret named `POSTGRES_SECRET_JSON_B64`.
 
 ## Troubleshooting
 
