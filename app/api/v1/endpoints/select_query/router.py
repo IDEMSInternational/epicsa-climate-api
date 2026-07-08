@@ -50,9 +50,12 @@ def _is_read_only_sql(sql: str) -> bool:
     if ";" in normalized.rstrip(";"):
         return False
 
+    # Disallow Postgres' SELECT ... INTO <table> (creates a new table).
+    if re.search(r"\bselect\b[\s\S]*?\binto\b", normalized):
+        return False
+
     disallowed_pattern = r"\b(" + "|".join(_DISALLOWED_SQL_KEYWORDS) + r")\b"
     return re.search(disallowed_pattern, normalized) is None
-
 
 def _load_db_secret(secret_file_path: str) -> dict[str, Any]:
     secret_path = Path(secret_file_path)
