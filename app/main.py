@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from app.api.v1.router import v1_router
+from app.api.v1.endpoints.select_query.router import close_connection_pool
 from app.core.config import Settings
 
 
@@ -25,6 +26,7 @@ def get_application():
     )
     _app.add_middleware(GZipMiddleware)
     _app.include_router(v1_router, prefix="/v1")
+    _app.add_event_handler("shutdown", close_connection_pool)
 
     return _app
 
