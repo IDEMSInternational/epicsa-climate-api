@@ -102,6 +102,7 @@ def execute_select_query(
         dbname=secret["dbname"],
         user=secret["user"],
         password=secret["password"],
+        connect_timeout=10,
         sslmode=secret.get("sslmode", "prefer"),
     )
     try:

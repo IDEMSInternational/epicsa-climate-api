@@ -15,7 +15,7 @@ fi
 # This avoids baking DB credentials into the image while keeping file-based loading.
 if test -n "${POSTGRES_SECRET_JSON_B64}" -a ! -f "${POSTGRES_SECRET_FILE}"; then
     mkdir -p "$(dirname "${POSTGRES_SECRET_FILE}")"
-    echo "${POSTGRES_SECRET_JSON_B64}" | base64 -d > "${POSTGRES_SECRET_FILE}"
+    printf '%s' "${POSTGRES_SECRET_JSON_B64}" | base64 -d > "${POSTGRES_SECRET_FILE}"
     chmod 600 "${POSTGRES_SECRET_FILE}" || true
     echo "Postgres secret file created from POSTGRES_SECRET_JSON_B64"
 fi

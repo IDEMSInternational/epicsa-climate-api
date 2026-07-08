@@ -60,6 +60,15 @@ def test_select_query_rejects_multiple_statements():
     assert "Only SELECT SQL is allowed" in response.json()["detail"]
 
 
+def test_select_query_rejects_select_into():
+    response = client.post(
+        "/v1/select_query/",
+        json={"sql": "SELECT 1 INTO new_table", "params": [], "max_rows": 10},
+    )
+
+    assert response.status_code == 400
+    assert "Only SELECT SQL is allowed" in response.json()["detail"]
+
 def test_select_query_missing_secret_file(monkeypatch):
     class FakeSettings:
         POSTGRES_SECRET_FILE = "./does-not-exist.json"

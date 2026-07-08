@@ -97,9 +97,7 @@ Linux / Mac (bash)
 cp postgres-secret-example.json postgres-secret.json
 ```
 
-The file location is controlled by `POSTGRES_SECRET_FILE` (default `./postgres-secret.json`).
-
-The endpoint is available at `POST /v1/select_query/` and accepts only `SELECT` SQL with optional positional parameters.
+The file location is controlled by `POSTGRES_SECRET_FILE` (defaults to `./postgres-secret.json` when running locally; the container entrypoint defaults it to `/tmp/postgres-secret.json`).
 
 ## Running locally
 
