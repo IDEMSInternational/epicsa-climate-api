@@ -131,6 +131,6 @@ def run_select_query(payload: SelectQueryRequest) -> SelectQueryResponse:
             secret=secret,
         )
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Postgres query failed: {error}") from error
+        raise HTTPException(status_code=500, detail="Postgres query failed.") from error
 
     return SelectQueryResponse(columns=columns, row_count=len(rows), rows=rows)
