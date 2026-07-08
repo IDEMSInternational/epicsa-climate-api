@@ -8,14 +8,14 @@ Build with [FastAPI](https://fastapi.tiangolo.com/)
 
 The api requires Python and R runtimes installed. It has been tested with the versions listed below
 
-- Python (3.11)  
+- Python (3.13)  
   [https://www.python.org/downloads](https://www.python.org/downloads)
 
-- R and Rtools (4.2.3)
+- R and Rtools (4.4.3)
 
   Windows  
-  [https://cran.r-project.org/bin/windows/base/old/4.2.3/](https://cran.r-project.org/bin/windows/base/old/4.2.3/)  
-  [https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html](https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html)
+  [https://cloud.r-project.org/bin/windows/base/old/](https://cloud.r-project.org/bin/windows/base/old/)  
+  [https://cloud.r-project.org/bin/windows/Rtools/rtools44/rtools.html](https://cloud.r-project.org/bin/windows/Rtools/rtools44/rtools.html)
 
   Linux  
   https://cran.r-project.org/bin/linux/
