@@ -81,7 +81,7 @@ service-account.json
 
 **Postgres Secret File**
 
-The generic postgres query endpoint reads database credentials from a separate JSON secret file.
+The select query endpoint reads database credentials from a separate JSON secret file.
 
 Copy the example file and then update the placeholder values:
 
@@ -98,6 +98,44 @@ cp postgres-secret-example.json postgres-secret.json
 ```
 
 The file location is controlled by `POSTGRES_SECRET_FILE` (defaults to `./postgres-secret.json` when running locally; the container entrypoint defaults it to `/tmp/postgres-secret.json`).
+
+**Select Query Endpoint**
+
+The `/api/v1/select_query/` endpoint queries data from allowed tables using a structured request body. It is **not** a generic SQL endpoint — it builds parameterized queries from a whitelist of tables and columns.
+
+Request schema:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `table_name` | string | Yes | One of: `crop`, `definition`, `station`, `summary`, `summary_station_metadata` |
+| `station_id` | string | Yes | Station identifier to filter results by |
+| `columns` | list[string] | No | Columns to return. Omit to return all available columns for the table. |
+| `order_by` | string | No | Column to sort by. Must be an orderable column for the selected table. |
+| `order_direction` | `"asc"` or `"desc"` | No | Sort direction. Defaults to `"desc"`. |
+| `max_rows` | integer | No | Maximum rows to return (1–1000). Defaults to 100. |
+
+Example request body for the `crop` table:
+
+```json
+{
+  "table_name": "crop",
+  "station_id": "dodoma",
+  "columns": ["station_id", "year", "plant_day", "plant_length", "rain_total", "summary_type", "summary_element", "summary_value", "status", "time_stamp"],
+  "order_by": "time_stamp",
+  "order_direction": "desc",
+  "max_rows": 100
+}
+```
+
+Example request body for the `station` table:
+
+```json
+{
+  "table_name": "station",
+  "station_id": "dodoma",
+  "max_rows": 100
+}
+```
 
 ## Running locally
 
