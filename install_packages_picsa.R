@@ -5,6 +5,14 @@ if ("epicsawrap" %in% installed_packages) {
     remove.packages("epicsawrap")
 }
 
+if ("terra" %in% installed_packages) {
+    remove.packages("terra")
+}
+
+# Pin terra to a GDAL-compatible release for this base image.
+# (Replace with the exact known-good version for your environment.)
+pak::pak("terra@1.8-60")
+
 # Use pak to install packages instead of devtools to install more from pre-compiled binaries
 # and not build everything from source (devtools default setting)
 install.packages('pak',repos = "https://cloud.r-project.org")
