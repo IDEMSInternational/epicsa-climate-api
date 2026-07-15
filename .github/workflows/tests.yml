@@ -34,8 +34,14 @@ jobs:
         load: true
         tags: ${{ env.IMAGE_TAG }}
 
+    - name: Decode and prepare PostgreSQL secret
+      if: secrets.POSTGRES_SECRET_JSON_B64 != ''
+      run: |
+        echo "${{ secrets.POSTGRES_SECRET_JSON_B64 }}" | base64 -d > postgres-secret.json
+
     - name: Run tests
       env:
         SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        POSTGRES_SECRET_JSON_B64: ${{ secrets.POSTGRES_SECRET_JSON_B64 }}
       run: |
         docker compose -f docker-compose.yaml -f docker-compose.test.yaml run app pytest -v
