@@ -101,7 +101,7 @@ The file location is controlled by `POSTGRES_SECRET_FILE` (defaults to `./postgr
 
 **Select Query Endpoint**
 
-The `/api/v1/select_query/` endpoint queries data from allowed tables using a structured request body. It is **not** a generic SQL endpoint — it builds parameterized queries from a whitelist of tables and columns.
+The `/v1/select_query/` endpoint queries data from allowed tables using a structured request body. It is **not** a generic SQL endpoint — it builds parameterized queries from a whitelist of tables and columns.
 
 Request schema:
 
