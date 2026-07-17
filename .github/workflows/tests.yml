@@ -3,10 +3,11 @@ name: Run Pytest
 on:
   push:
     branches:
-      - main
+      - '**'
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   IMAGE_TAG: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT }}/${{ vars.GCP_CONTAINER_REPO }}/${{ vars.GCP_SERVICE }}:${{github.sha}}
