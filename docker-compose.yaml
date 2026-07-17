@@ -4,10 +4,13 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      POSTGRES_SECRET_FILE: /run/secrets/postgres_secret
     ports:
       - "8000:8000"
     secrets:
       - service_account_key
+      - postgres_secret
     volumes:
       - "./app:/app/app"
       - "./junit:/tmp/junit"
@@ -15,3 +18,5 @@ services:
 secrets:
   service_account_key:
     file: ./service-account.json
+  postgres_secret:
+    file: ./postgres-secret.json
