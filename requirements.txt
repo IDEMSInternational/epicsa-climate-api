@@ -10,3 +10,4 @@ rpy2==3.5.12
 numpy
 google-cloud-storage
 uvicorn
+psycopg2-binary

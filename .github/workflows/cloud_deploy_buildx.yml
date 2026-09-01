@@ -65,6 +65,9 @@ jobs:
           project_id: ${{ vars.GCP_PROJECT }}
           labels: |
             commit-sha=${{github.sha}}
+          env_vars: |
+            POSTGRES_SECRET_FILE=/tmp/postgres-secret.json
+            POSTGRES_SECRET_JSON_B64=${{ secrets.POSTGRES_SECRET_JSON_B64 }}
           secrets: |
             /run/secrets/service_account_key=${{ vars.GCP_SECRET_SERVICE_ACCOUNT_KEY }}
 
@@ -83,6 +86,7 @@ jobs:
 # GCP_SA_KEY_B64 - base64 encoded service account with sufficient permissions for deploying (see note below)
 # EPICSA_DATA_SA_KEY_B64 - base64 encoded service account with permission to access project data storage (i.e. GCS)
 # EPICSA_DATA_AUTH_TOKEN - (DEPRECATED) auth token for access to e-picsa data (same as in local .env file)
+# POSTGRES_SECRET_JSON_B64 - base64 encoded contents of postgres-secret.json (stored as a GitHub secret)
 
 # Additionally the relevant Artifact Registry must be manually created before use (tbc?)
 # Additionally first run may need owner permission on Service account to ensure relevant APIs enabled (tbc?)

@@ -3,10 +3,11 @@ name: Run Pytest
 on:
   push:
     branches:
-      - main
+      - '**'
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   IMAGE_TAG: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT }}/${{ vars.GCP_CONTAINER_REPO }}/${{ vars.GCP_SERVICE }}:${{github.sha}}
@@ -37,5 +38,6 @@ jobs:
     - name: Run tests
       env:
         SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        POSTGRES_SECRET_JSON: ${{ secrets.POSTGRES_SECRET_JSON }}
       run: |
         docker compose -f docker-compose.yaml -f docker-compose.test.yaml run app pytest -v

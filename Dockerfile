@@ -53,6 +53,7 @@ COPY --from=builder /etc/apt/sources.list.d/cran40.list /etc/apt/sources.list.d/
 
 # Install only runtime R dependencies (no dev tools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    libuv1 \
     mariadb-client-core \
     r-base \
     && rm -rf /var/lib/apt/lists/* \
