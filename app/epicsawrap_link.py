@@ -50,6 +50,7 @@ from typing import Dict, List
 
 import numpy
 from pandas import DataFrame
+from pandas.api.types import is_integer_dtype
 from rpy2.robjects import NULL as r_NULL
 from rpy2.robjects import (
     conversion,
@@ -237,11 +238,9 @@ def __get_data_frame(r_data_frame: RDataFrame) -> DataFrame:
     # The converter above converts missing integers to the smallest possible signed 32-bit
     #   integer (-2147483648). Convert these values to `None` instead
     for col in data_frame.columns:
-        # If this column has a category type, then the next if statement will raise an exception.
-        #    So in this case, continue to next column.
-        if data_frame[col].dtype.name == "category":
-            continue
-        if numpy.issubdtype(data_frame[col].dtype, numpy.integer):
+        # Use pandas' dtype check rather than numpy.issubdtype, which raises for pandas
+        #   extension dtypes (e.g. category, and the default StringDtype in pandas >= 3)
+        if is_integer_dtype(data_frame[col].dtype):
             data_frame[col] = data_frame[col].replace(
                 numpy.iinfo(numpy.int32).min, None
             )
