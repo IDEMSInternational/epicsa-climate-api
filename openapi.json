@@ -1,0 +1,2281 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "E-PICSA Climate API",
+    "version": "1.7.2"
+  },
+  "paths": {
+    "/v1/status/": {
+      "get": {
+        "tags": [
+          "Testing"
+        ],
+        "summary": "Get Status",
+        "description": "Check server up",
+        "operationId": "get_status_v1_status__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/annual_rainfall_summaries/": {
+      "post": {
+        "tags": [
+          "Climate"
+        ],
+        "summary": "Get Annual Rainfall Summaries",
+        "operationId": "get_annual_rainfall_summaries_v1_annual_rainfall_summaries__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnualRainfallSummariesParameters"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnualRainfallSummariesResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/annual_temperature_summaries/": {
+      "post": {
+        "tags": [
+          "Climate"
+        ],
+        "summary": "Get Annual Temperature Summaries",
+        "operationId": "get_annual_temperature_summaries_v1_annual_temperature_summaries__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnualTemperatureSummariesParameters"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnualTemperatureSummariesResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/crop_success_probabilities/": {
+      "post": {
+        "tags": [
+          "Climate"
+        ],
+        "summary": "Get Crop Success Probabilities",
+        "operationId": "get_crop_success_probabilities_v1_crop_success_probabilities__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CropSuccessProbabilitiesParameters"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CropSuccessProbabilitiesResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/monthly_temperature_summaries/": {
+      "post": {
+        "tags": [
+          "Climate"
+        ],
+        "summary": "Get Monthly Temperature Summaries",
+        "operationId": "get_monthly_temperature_summaries_v1_monthly_temperature_summaries__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonthlyTemperatureSummariesParameters"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthlyTemperatureSummariesResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/season_start_probabilities/": {
+      "post": {
+        "tags": [
+          "Climate"
+        ],
+        "summary": "Get Season Start Probabilities",
+        "operationId": "get_season_start_probabilities_v1_season_start_probabilities__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeasonStartProbabilitiesParameters"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonStartProbabilitiesResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/extremes_summaries/": {
+      "post": {
+        "tags": [
+          "Climate"
+        ],
+        "summary": "Get Extremes Summaries",
+        "operationId": "get_extremes_summaries_v1_extremes_summaries__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtremesSummariesParameters"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Get Extremes Summaries V1 Extremes Summaries  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/station/{country}": {
+      "get": {
+        "tags": [
+          "Metadata"
+        ],
+        "summary": "Read Stations",
+        "operationId": "read_stations_v1_station__country__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zm",
+                "mw",
+                "zw",
+                "zm_test",
+                "mw_test",
+                "zw_test",
+                "zm_workshops",
+                "mw_workshops",
+                "zw_workshops",
+                "internal_tests"
+              ],
+              "title": "Country"
+            },
+            "name": "country",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StationListResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/station/{country}/{station_id}": {
+      "get": {
+        "tags": [
+          "Metadata"
+        ],
+        "summary": "Read Stations",
+        "operationId": "read_stations_v1_station__country___station_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zm",
+                "mw",
+                "zw",
+                "zm_test",
+                "mw_test",
+                "zw_test",
+                "zm_workshops",
+                "mw_workshops",
+                "zw_workshops",
+                "internal_tests"
+              ],
+              "title": "Country"
+            },
+            "name": "country",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Station Id"
+            },
+            "name": "station_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StationAndDefintionResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/documents/{country}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Get Documents",
+        "operationId": "get_documents_v1_documents__country__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zm",
+                "mw",
+                "zw",
+                "zm_test",
+                "mw_test",
+                "zw_test",
+                "zm_workshops",
+                "mw_workshops",
+                "zw_workshops",
+                "internal_tests"
+              ],
+              "title": "Country"
+            },
+            "name": "country",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Prefix",
+              "default": ""
+            },
+            "name": "prefix",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000.0,
+              "exclusiveMinimum": 0.0,
+              "title": "Max Results",
+              "default": 50
+            },
+            "name": "max_results",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Match Glob",
+              "default": "**[^/]"
+            },
+            "name": "match_glob",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentMetadata"
+                  },
+                  "type": "array",
+                  "title": "Response Get Documents V1 Documents  Country  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/documents/{country}/{filepath}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Download Document",
+        "description": "Download a specific document",
+        "operationId": "download_document_v1_documents__country___filepath__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zm",
+                "mw",
+                "zw",
+                "zm_test",
+                "mw_test",
+                "zw_test",
+                "zm_workshops",
+                "mw_workshops",
+                "zw_workshops",
+                "internal_tests"
+              ],
+              "title": "Country"
+            },
+            "name": "country",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filepath"
+            },
+            "name": "filepath",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentMetadata"
+                  },
+                  "type": "array",
+                  "title": "Response Download Document V1 Documents  Country   Filepath  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/select_query/": {
+      "post": {
+        "tags": [
+          "Database"
+        ],
+        "summary": "Run Select Query",
+        "operationId": "run_select_query_v1_select_query__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectQueryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelectQueryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnnualRain": {
+        "properties": {
+          "annual_rain": {
+            "type": "boolean",
+            "title": "Annual Rain"
+          },
+          "n_rain": {
+            "type": "boolean",
+            "title": "N Rain"
+          },
+          "rain_day": {
+            "type": "integer",
+            "title": "Rain Day"
+          },
+          "na_rm": {
+            "type": "boolean",
+            "title": "Na Rm"
+          },
+          "na_n": {
+            "type": "integer",
+            "title": "Na N"
+          },
+          "na_n_non": {
+            "type": "integer",
+            "title": "Na N Non"
+          },
+          "na_consec": {
+            "type": "integer",
+            "title": "Na Consec"
+          },
+          "na_prop": {
+            "type": "number",
+            "title": "Na Prop"
+          },
+          "s_start_doy": {
+            "type": "number",
+            "title": "S Start Doy"
+          }
+        },
+        "type": "object",
+        "title": "AnnualRain"
+      },
+      "AnnualRainfallSummariesMetadata": {
+        "properties": {
+          "annual_rain": {
+            "$ref": "#/components/schemas/AnnualRain"
+          },
+          "start_rains": {
+            "$ref": "#/components/schemas/StartRains"
+          },
+          "end_rains": {
+            "$ref": "#/components/schemas/EndRains"
+          },
+          "end_season": {
+            "$ref": "#/components/schemas/EndSeason"
+          },
+          "seasonal_rain": {
+            "$ref": "#/components/schemas/SeasonalRain"
+          },
+          "seasonal_length": {
+            "$ref": "#/components/schemas/SeasonalLength"
+          }
+        },
+        "type": "object",
+        "title": "AnnualRainfallSummariesMetadata"
+      },
+      "AnnualRainfallSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "annual_rain",
+                "start_rains",
+                "end_rains",
+                "end_season",
+                "seasonal_rain",
+                "seasonal_length"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "annual_rain",
+              "start_rains",
+              "end_rains",
+              "end_season",
+              "seasonal_rain",
+              "seasonal_length"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "AnnualRainfallSummariesParameters"
+      },
+      "AnnualRainfallSummariesResponce": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/AnnualRainfallSummariesMetadata"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AnnualRainfallSummariesdata"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metadata",
+          "data"
+        ],
+        "title": "AnnualRainfallSummariesResponce"
+      },
+      "AnnualRainfallSummariesdata": {
+        "properties": {
+          "station": {
+            "type": "string",
+            "title": "Station"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "annual_rain": {
+            "type": "number",
+            "title": "Annual Rain"
+          },
+          "n_rain": {
+            "type": "integer",
+            "title": "N Rain"
+          },
+          "start_rains_doy": {
+            "type": "integer",
+            "title": "Start Rains Doy"
+          },
+          "start_rains_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {}
+            ],
+            "title": "Start Rains Date"
+          },
+          "start_rains_status": {
+            "type": "boolean",
+            "title": "Start Rains Status"
+          },
+          "end_rains_doy": {
+            "type": "integer",
+            "title": "End Rains Doy"
+          },
+          "end_rains_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {}
+            ],
+            "title": "End Rains Date"
+          },
+          "end_rains_status": {
+            "type": "boolean",
+            "title": "End Rains Status"
+          },
+          "seasonal_rain": {
+            "type": "integer",
+            "title": "Seasonal Rain"
+          },
+          "n_seasonal_rain": {
+            "type": "integer",
+            "title": "N Seasonal Rain"
+          },
+          "season_length": {
+            "type": "number",
+            "title": "Season Length"
+          },
+          "end_season_doy": {
+            "type": "integer",
+            "title": "End Season Doy"
+          },
+          "end_season_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {}
+            ],
+            "title": "End Season Date"
+          },
+          "end_season_status": {
+            "type": "boolean",
+            "title": "End Season Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station",
+          "year"
+        ],
+        "title": "AnnualRainfallSummariesdata"
+      },
+      "AnnualTempartureSummariesdata": {
+        "properties": {
+          "station": {
+            "type": "string",
+            "title": "Station"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "mean_tmin": {
+            "type": "number",
+            "title": "Mean Tmin"
+          },
+          "mean_tmax": {
+            "type": "number",
+            "title": "Mean Tmax"
+          },
+          "min_tmin": {
+            "type": "number",
+            "title": "Min Tmin"
+          },
+          "min_tmax": {
+            "type": "number",
+            "title": "Min Tmax"
+          },
+          "max_tmin": {
+            "type": "number",
+            "title": "Max Tmin"
+          },
+          "max_tmax": {
+            "type": "number",
+            "title": "Max Tmax"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station",
+          "year"
+        ],
+        "title": "AnnualTempartureSummariesdata"
+      },
+      "AnnualTemperatureSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "mean_tmin",
+                "mean_tmax",
+                "min_tmin",
+                "min_tmax",
+                "max_tmin",
+                "max_tmax"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "mean_tmin",
+              "mean_tmax",
+              "min_tmin",
+              "min_tmax",
+              "max_tmin",
+              "max_tmax"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "AnnualTemperatureSummariesParameters"
+      },
+      "AnnualTemperatureSummariesResponce": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/TemperatureSummariesMetadata"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AnnualTempartureSummariesdata"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metadata",
+          "data"
+        ],
+        "title": "AnnualTemperatureSummariesResponce"
+      },
+      "CropSuccessProbabilitiesMetadata": {
+        "properties": {
+          "start_rains": {
+            "$ref": "#/components/schemas/StartRains"
+          },
+          "end_rains": {
+            "$ref": "#/components/schemas/EndRains"
+          },
+          "crops_success": {
+            "$ref": "#/components/schemas/CropsSuccess"
+          }
+        },
+        "type": "object",
+        "title": "CropSuccessProbabilitiesMetadata"
+      },
+      "CropSuccessProbabilitiesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "internal_tests"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Tamale"
+          }
+        },
+        "type": "object",
+        "title": "CropSuccessProbabilitiesParameters"
+      },
+      "CropSuccessProbabilitiesResponce": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/CropSuccessProbabilitiesMetadata"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/CropSuccessProbabilitiesdata"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metadata",
+          "data"
+        ],
+        "title": "CropSuccessProbabilitiesResponce"
+      },
+      "CropSuccessProbabilitiesdata": {
+        "properties": {
+          "station": {
+            "type": "string",
+            "title": "Station"
+          },
+          "total_rain": {
+            "type": "integer",
+            "title": "Total Rain"
+          },
+          "plant_day": {
+            "type": "integer",
+            "title": "Plant Day"
+          },
+          "plant_length": {
+            "type": "integer",
+            "title": "Plant Length"
+          },
+          "prop_success_with_start": {
+            "type": "number",
+            "title": "Prop Success With Start"
+          },
+          "prop_success_no_start": {
+            "type": "number",
+            "title": "Prop Success No Start"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station",
+          "total_rain",
+          "plant_day",
+          "plant_length",
+          "prop_success_with_start",
+          "prop_success_no_start"
+        ],
+        "title": "CropSuccessProbabilitiesdata"
+      },
+      "CropsSuccess": {
+        "properties": {
+          "water_requirements": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              }
+            ],
+            "title": "Water Requirements"
+          },
+          "planting_dates": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              }
+            ],
+            "title": "Planting Dates"
+          },
+          "planting_length": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              }
+            ],
+            "title": "Planting Length"
+          }
+        },
+        "type": "object",
+        "title": "CropsSuccess"
+      },
+      "DocumentMetadata": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "contentType": {
+            "type": "string",
+            "title": "Contenttype"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "timeCreated": {
+            "type": "string",
+            "title": "Timecreated"
+          },
+          "updated": {
+            "type": "string",
+            "title": "Updated"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "contentType",
+          "size",
+          "timeCreated",
+          "updated"
+        ],
+        "title": "DocumentMetadata"
+      },
+      "EndRains": {
+        "properties": {
+          "start_day": {
+            "type": "integer",
+            "title": "Start Day"
+          },
+          "end_day": {
+            "type": "integer",
+            "title": "End Day"
+          },
+          "output": {
+            "type": "string",
+            "title": "Output"
+          },
+          "min_rainfall": {
+            "type": "integer",
+            "title": "Min Rainfall"
+          },
+          "interval_length": {
+            "type": "integer",
+            "title": "Interval Length"
+          },
+          "s_start_doy": {
+            "type": "integer",
+            "title": "S Start Doy"
+          }
+        },
+        "type": "object",
+        "title": "EndRains"
+      },
+      "EndSeason": {
+        "properties": {
+          "start_day": {
+            "type": "integer",
+            "title": "Start Day"
+          },
+          "end_day": {
+            "type": "integer",
+            "title": "End Day"
+          },
+          "water_balance_max": {
+            "type": "integer",
+            "title": "Water Balance Max"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "evaporation": {
+            "type": "string",
+            "title": "Evaporation"
+          },
+          "evaporation_value": {
+            "type": "integer",
+            "title": "Evaporation Value"
+          },
+          "s_start_doy": {
+            "type": "integer",
+            "title": "S Start Doy"
+          }
+        },
+        "type": "object",
+        "title": "EndSeason"
+      },
+      "ExtremesSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "extremes_rain",
+                "extremes_tmin",
+                "extremes_tmax"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "extremes_rain",
+              "extremes_tmin",
+              "extremes_tmax"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "ExtremesSummariesParameters"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MonthlyTempartureSummariesdata": {
+        "properties": {
+          "station": {
+            "type": "string",
+            "title": "Station"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "mean_tmin": {
+            "type": "number",
+            "title": "Mean Tmin"
+          },
+          "mean_tmax": {
+            "type": "number",
+            "title": "Mean Tmax"
+          },
+          "min_tmin": {
+            "type": "number",
+            "title": "Min Tmin"
+          },
+          "min_tmax": {
+            "type": "number",
+            "title": "Min Tmax"
+          },
+          "max_tmin": {
+            "type": "number",
+            "title": "Max Tmin"
+          },
+          "max_tmax": {
+            "type": "number",
+            "title": "Max Tmax"
+          },
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station",
+          "year",
+          "month"
+        ],
+        "title": "MonthlyTempartureSummariesdata"
+      },
+      "MonthlyTemperatureSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "mean_tmin",
+                "mean_tmax",
+                "min_tmin",
+                "min_tmax",
+                "max_tmin",
+                "max_tmax"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "mean_tmin",
+              "mean_tmax",
+              "min_tmin",
+              "min_tmax",
+              "max_tmin",
+              "max_tmax"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "MonthlyTemperatureSummariesParameters"
+      },
+      "MonthlyTemperatureSummariesResponce": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/TemperatureSummariesMetadata"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MonthlyTempartureSummariesdata"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metadata",
+          "data"
+        ],
+        "title": "MonthlyTemperatureSummariesResponce"
+      },
+      "SeasonStartProbabilities": {
+        "properties": {
+          "specified_day": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              }
+            ],
+            "title": "Specified Day"
+          }
+        },
+        "type": "object",
+        "title": "SeasonStartProbabilities"
+      },
+      "SeasonStartProbabilitiesMetadata": {
+        "properties": {
+          "start_rains": {
+            "$ref": "#/components/schemas/StartRains"
+          },
+          "season_start_probabilities": {
+            "$ref": "#/components/schemas/SeasonStartProbabilities"
+          }
+        },
+        "type": "object",
+        "title": "SeasonStartProbabilitiesMetadata"
+      },
+      "SeasonStartProbabilitiesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "start_dates": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Start Dates",
+            "default": [
+              200,
+              220,
+              250,
+              270,
+              300,
+              320
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "SeasonStartProbabilitiesParameters"
+      },
+      "SeasonStartProbabilitiesResponce": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/SeasonStartProbabilitiesMetadata"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SeasonStartProbabilitiesdata"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metadata",
+          "data"
+        ],
+        "title": "SeasonStartProbabilitiesResponce"
+      },
+      "SeasonStartProbabilitiesdata": {
+        "properties": {
+          "station": {
+            "type": "string",
+            "title": "Station"
+          },
+          "day": {
+            "type": "integer",
+            "title": "Day"
+          },
+          "proportion": {
+            "type": "number",
+            "title": "Proportion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station",
+          "day",
+          "proportion"
+        ],
+        "title": "SeasonStartProbabilitiesdata"
+      },
+      "SeasonalLength": {
+        "properties": {
+          "end_type": {
+            "type": "string",
+            "title": "End Type"
+          }
+        },
+        "type": "object",
+        "title": "SeasonalLength"
+      },
+      "SeasonalRain": {
+        "properties": {
+          "total_rain": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "title": "Total Rain"
+          },
+          "n_rain": {
+            "type": "boolean",
+            "title": "N Rain"
+          },
+          "rain_day": {
+            "type": "number",
+            "title": "Rain Day"
+          },
+          "na_rm": {
+            "type": "boolean",
+            "title": "Na Rm"
+          },
+          "na_n": {
+            "type": "integer",
+            "title": "Na N"
+          },
+          "na_n_non": {
+            "type": "integer",
+            "title": "Na N Non"
+          },
+          "na_consec": {
+            "type": "integer",
+            "title": "Na Consec"
+          },
+          "na_prop": {
+            "type": "number",
+            "title": "Na Prop"
+          }
+        },
+        "type": "object",
+        "title": "SeasonalRain"
+      },
+      "SeasonalTotalRainfall": {
+        "properties": {
+          "na_prop": {
+            "type": "number",
+            "title": "Na Prop"
+          }
+        },
+        "type": "object",
+        "title": "SeasonalTotalRainfall"
+      },
+      "SelectQueryRequest": {
+        "properties": {
+          "table_name": {
+            "type": "string",
+            "enum": [
+              "crop",
+              "definition",
+              "station",
+              "summary",
+              "summary_station_metadata"
+            ],
+            "title": "Table Name"
+          },
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Columns",
+            "description": "Optional list of allowed columns. Empty means all allowed columns."
+          },
+          "station_id": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Station Id"
+          },
+          "order_by": {
+            "type": "string",
+            "title": "Order By",
+            "description": "Optional sort column. Must be allowed for the selected table."
+          },
+          "order_direction": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "title": "Order Direction",
+            "default": "desc"
+          },
+          "max_rows": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Max Rows",
+            "default": 100
+          }
+        },
+        "type": "object",
+        "required": [
+          "table_name",
+          "station_id"
+        ],
+        "title": "SelectQueryRequest"
+      },
+      "SelectQueryResponse": {
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Columns"
+          },
+          "row_count": {
+            "type": "integer",
+            "title": "Row Count"
+          },
+          "rows": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "columns",
+          "row_count",
+          "rows"
+        ],
+        "title": "SelectQueryResponse"
+      },
+      "StartRains": {
+        "properties": {
+          "start_day": {
+            "type": "integer",
+            "title": "Start Day"
+          },
+          "end_day": {
+            "type": "integer",
+            "title": "End Day"
+          },
+          "threshold": {
+            "type": "integer",
+            "title": "Threshold"
+          },
+          "total_rainfall": {
+            "type": "boolean",
+            "title": "Total Rainfall"
+          },
+          "over_days": {
+            "type": "integer",
+            "title": "Over Days"
+          },
+          "amount_rain": {
+            "type": "integer",
+            "title": "Amount Rain"
+          },
+          "proportion": {
+            "type": "boolean",
+            "title": "Proportion"
+          },
+          "prob_rain_day": {
+            "type": "number",
+            "title": "Prob Rain Day"
+          },
+          "dry_spell": {
+            "type": "boolean",
+            "title": "Dry Spell"
+          },
+          "spell_max_dry_days": {
+            "type": "integer",
+            "title": "Spell Max Dry Days"
+          },
+          "spell_interval": {
+            "type": "integer",
+            "title": "Spell Interval"
+          },
+          "dry_period": {
+            "type": "boolean",
+            "title": "Dry Period"
+          },
+          "max_rain": {
+            "type": "integer",
+            "title": "Max Rain"
+          },
+          "period_interval": {
+            "type": "integer",
+            "title": "Period Interval"
+          },
+          "period_max_dry_days": {
+            "type": "integer",
+            "title": "Period Max Dry Days"
+          },
+          "s_start_doy": {
+            "type": "integer",
+            "title": "S Start Doy"
+          },
+          "number_rain_days": {
+            "type": "boolean",
+            "title": "Number Rain Days"
+          },
+          "min_rain_days": {
+            "type": "integer",
+            "title": "Min Rain Days"
+          },
+          "rain_day_interval": {
+            "type": "integer",
+            "title": "Rain Day Interval"
+          }
+        },
+        "type": "object",
+        "title": "StartRains"
+      },
+      "StationAndDefintionResponce": {
+        "properties": {
+          "station_id": {
+            "type": "string",
+            "title": "Station Id"
+          },
+          "station_name": {
+            "type": "string",
+            "title": "Station Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "elevation": {
+            "type": "number",
+            "title": "Elevation"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "country_code": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country Code"
+          },
+          "definitions_id": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {}
+              ]
+            },
+            "type": "array",
+            "title": "Definitions Id"
+          },
+          "climsoft_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Climsoft List"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StationDefinitionDataResponce"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station_id",
+          "station_name",
+          "country_code",
+          "definitions_id",
+          "data"
+        ],
+        "title": "StationAndDefintionResponce"
+      },
+      "StationDataResponce": {
+        "properties": {
+          "station_id": {
+            "type": "string",
+            "title": "Station Id"
+          },
+          "station_name": {
+            "type": "string",
+            "title": "Station Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "elevation": {
+            "type": "number",
+            "title": "Elevation"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "country_code": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station_id",
+          "station_name",
+          "country_code"
+        ],
+        "title": "StationDataResponce"
+      },
+      "StationDefinitionDataResponce": {
+        "properties": {
+          "start_rains": {
+            "$ref": "#/components/schemas/StartRains"
+          },
+          "end_rains": {
+            "$ref": "#/components/schemas/EndRains"
+          },
+          "end_season": {
+            "$ref": "#/components/schemas/EndSeason"
+          },
+          "seasonal_length": {
+            "$ref": "#/components/schemas/SeasonalLength"
+          },
+          "annual_rain": {
+            "$ref": "#/components/schemas/AnnualRain"
+          },
+          "seasonal_rain": {
+            "$ref": "#/components/schemas/SeasonalRain"
+          },
+          "min_tmin": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "max_tmin": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "mean_tmin": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "min_tmax": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "max_tmax": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "mean_tmax": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "crops_success": {
+            "$ref": "#/components/schemas/CropsSuccess"
+          },
+          "season_start_probabilities": {
+            "$ref": "#/components/schemas/SeasonStartProbabilities"
+          },
+          "seasonal_total_rainfall": {
+            "$ref": "#/components/schemas/SeasonalTotalRainfall"
+          }
+        },
+        "type": "object",
+        "title": "StationDefinitionDataResponce"
+      },
+      "StationListResponce": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/StationDataResponce"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "StationListResponce"
+      },
+      "Temp": {
+        "properties": {
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "title": "To"
+          },
+          "na_rm": {
+            "type": "boolean",
+            "title": "Na Rm"
+          },
+          "na_n": {
+            "type": "integer",
+            "title": "Na N"
+          },
+          "na_n_non": {
+            "type": "integer",
+            "title": "Na N Non"
+          },
+          "na_consec": {
+            "type": "integer",
+            "title": "Na Consec"
+          },
+          "na_prop": {
+            "type": "number",
+            "title": "Na Prop"
+          },
+          "s_start_doy": {
+            "type": "integer",
+            "title": "S Start Doy"
+          }
+        },
+        "type": "object",
+        "title": "Temp"
+      },
+      "TemperatureSummariesMetadata": {
+        "properties": {
+          "mean_tmin": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "mean_tmax": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "min_tmin": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "min_tmax": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "max_tmin": {
+            "$ref": "#/components/schemas/Temp"
+          },
+          "max_tmax": {
+            "$ref": "#/components/schemas/Temp"
+          }
+        },
+        "type": "object",
+        "title": "TemperatureSummariesMetadata"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "CropRecord": {
+        "title": "CropRecord",
+        "description": "Schema representing a record in the 'crop' table.\nContains agricultural crop success and rainfall metrics for a station and season.",
+        "type": "object",
+        "properties": {
+          "station_id": {
+            "title": "Station Id",
+            "description": "Station identifier",
+            "type": "string"
+          },
+          "year": {
+            "title": "Year",
+            "description": "Year or agricultural season identifier",
+            "type": "string"
+          },
+          "plant_day": {
+            "title": "Plant Day",
+            "description": "Planting day of year (day number)",
+            "type": "number"
+          },
+          "plant_length": {
+            "title": "Plant Length",
+            "description": "Length of crop growing period in days",
+            "type": "number"
+          },
+          "rain_total": {
+            "title": "Rain Total",
+            "description": "Total rainfall during crop growing period (mm)",
+            "type": "number"
+          },
+          "include_start_condition": {
+            "title": "Include Start Condition",
+            "description": "Whether start-of-season conditions were applied",
+            "type": "boolean"
+          },
+          "summary_type": {
+            "title": "Summary Type",
+            "description": "Type of summary (e.g. crop_success)",
+            "type": "string"
+          },
+          "summary_element": {
+            "title": "Summary Element",
+            "description": "Climate element summarized",
+            "type": "string"
+          },
+          "summary_value": {
+            "title": "Summary Value",
+            "description": "Statistical summary result value",
+            "type": "string"
+          },
+          "definition_id": {
+            "title": "Definition Id",
+            "description": "Associated statistical definition ID",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "description": "Record validation or processing status",
+            "type": "string"
+          },
+          "time_stamp": {
+            "title": "Time Stamp",
+            "description": "Timestamp of record creation or last update",
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DefinitionRecord": {
+        "title": "DefinitionRecord",
+        "description": "Schema representing a record in the 'definition' table.\nDefines statistical criteria, parameters, and metadata for climate summaries.",
+        "type": "object",
+        "properties": {
+          "definition_id": {
+            "title": "Definition Id",
+            "description": "Unique definition identifier (NOT NULL in DB)",
+            "type": "string"
+          },
+          "time_stamp": {
+            "title": "Time Stamp",
+            "description": "Timestamp of definition creation/update (NOT NULL in DB)",
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary_element": {
+            "title": "Summary Element",
+            "description": "Summarized element (e.g. rainfall, temperature)",
+            "type": "string"
+          },
+          "summary_type": {
+            "title": "Summary Type",
+            "description": "Type of statistical summary",
+            "type": "string"
+          },
+          "definition_value": {
+            "title": "Definition Value",
+            "description": "JSON object containing definition parameters and thresholds",
+            "type": "object"
+          },
+          "accreditation": {
+            "title": "Accreditation",
+            "description": "Authoritative source or accreditation body",
+            "type": "string"
+          }
+        }
+      },
+      "StationRecord": {
+        "title": "StationRecord",
+        "description": "Schema representing a record in the 'station' table.\nContains geospatial metadata and status for meteorological stations.",
+        "type": "object",
+        "properties": {
+          "station_id": {
+            "title": "Station Id",
+            "description": "Unique meteorological station identifier (NOT NULL in DB)",
+            "type": "string"
+          },
+          "station_name": {
+            "title": "Station Name",
+            "description": "Human-readable station name",
+            "type": "string"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "description": "Geographic latitude in decimal degrees",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "description": "Geographic longitude in decimal degrees",
+            "type": "number"
+          },
+          "elevation": {
+            "title": "Elevation",
+            "description": "Station elevation above sea level in meters",
+            "type": "number"
+          },
+          "district": {
+            "title": "District",
+            "description": "Administrative district name",
+            "type": "string"
+          },
+          "country_code": {
+            "title": "Country Code",
+            "description": "Country code (e.g. zm, mw, zw)",
+            "type": "string"
+          },
+          "time_stamp": {
+            "title": "Time Stamp",
+            "description": "Timestamp of record creation or update",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "title": "Status",
+            "description": "Operational status of the station",
+            "type": "string"
+          }
+        }
+      },
+      "SummaryRecord": {
+        "title": "SummaryRecord",
+        "description": "Schema representing a record in the 'summary' table.\nContains precomputed climate and weather statistics across time dimensions.",
+        "type": "object",
+        "properties": {
+          "station_id": {
+            "title": "Station Id",
+            "description": "Station identifier (NOT NULL in DB)",
+            "type": "string"
+          },
+          "definition_id": {
+            "title": "Definition Id",
+            "description": "Definition identifier (NOT NULL in DB)",
+            "type": "string"
+          },
+          "time_type": {
+            "title": "Time Type",
+            "description": "Time dimension type (e.g. annual, monthly)",
+            "type": "string"
+          },
+          "time_value": {
+            "title": "Time Value",
+            "description": "Time dimension value (e.g. year '2024')",
+            "type": "string"
+          },
+          "summary_type": {
+            "title": "Summary Type",
+            "description": "Summary calculation type",
+            "type": "string"
+          },
+          "summary_element": {
+            "title": "Summary Element",
+            "description": "Climate element (e.g. rain, temp)",
+            "type": "string"
+          },
+          "summary_name": {
+            "title": "Summary Name",
+            "description": "Name of specific summary metric",
+            "type": "string"
+          },
+          "summary_value": {
+            "title": "Summary Value",
+            "description": "Calculated summary metric value",
+            "type": "string"
+          },
+          "time_stamp": {
+            "title": "Time Stamp",
+            "description": "Timestamp of calculation (NOT NULL in DB)",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "title": "Status",
+            "description": "Processing status (NOT NULL in DB)",
+            "type": "string"
+          }
+        }
+      },
+      "SummaryStationMetadataRecord": {
+        "title": "SummaryStationMetadataRecord",
+        "description": "Schema representing a record in the 'summary_station_metadata' table.\nIndexes which summary types and definitions are available for a given station.",
+        "type": "object",
+        "properties": {
+          "station_id": {
+            "title": "Station Id",
+            "description": "Station identifier (NOT NULL in DB)",
+            "type": "string"
+          },
+          "summary_type": {
+            "title": "Summary Type",
+            "description": "Summary type available for this station",
+            "type": "string"
+          },
+          "definition_id": {
+            "title": "Definition Id",
+            "description": "Definition identifier",
+            "type": "string"
+          },
+          "time_stamp": {
+            "title": "Time Stamp",
+            "description": "Record timestamp (NOT NULL in DB)",
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

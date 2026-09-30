@@ -1,0 +1,480 @@
+{
+  "tables": {
+    "crop": {
+      "primary_key": [],
+      "columns": [
+        {
+          "name": "station_id",
+          "position": 1,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "year",
+          "position": 2,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "plant_day",
+          "position": 3,
+          "data_type": "numeric",
+          "udt_name": "numeric",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "plant_length",
+          "position": 4,
+          "data_type": "numeric",
+          "udt_name": "numeric",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "rain_total",
+          "position": 5,
+          "data_type": "numeric",
+          "udt_name": "numeric",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "include_start_condition",
+          "position": 6,
+          "data_type": "boolean",
+          "udt_name": "bool",
+          "nullable": false,
+          "default": "false",
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_type",
+          "position": 7,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_element",
+          "position": 8,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_value",
+          "position": 9,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "definition_id",
+          "position": 10,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "status",
+          "position": 12,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 10,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "time_stamp",
+          "position": 13,
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        }
+      ]
+    },
+    "definition": {
+      "primary_key": [],
+      "columns": [
+        {
+          "name": "definition_id",
+          "position": 1,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": false,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "time_stamp",
+          "position": 2,
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_element",
+          "position": 3,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_type",
+          "position": 4,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "definition_value",
+          "position": 5,
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "accreditation",
+          "position": 6,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        }
+      ]
+    },
+    "station": {
+      "primary_key": [],
+      "columns": [
+        {
+          "name": "station_id",
+          "position": 1,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": false,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "station_name",
+          "position": 2,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "latitude",
+          "position": 3,
+          "data_type": "numeric",
+          "udt_name": "numeric",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "longitude",
+          "position": 4,
+          "data_type": "numeric",
+          "udt_name": "numeric",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "elevation",
+          "position": 5,
+          "data_type": "numeric",
+          "udt_name": "numeric",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "district",
+          "position": 6,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "country_code",
+          "position": 7,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 10,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "time_stamp",
+          "position": 8,
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "nullable": true,
+          "default": null,
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "status",
+          "position": 9,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 10,
+          "numeric_precision": null,
+          "numeric_scale": null
+        }
+      ]
+    },
+    "summary": {
+      "primary_key": [],
+      "columns": [
+        {
+          "name": "station_id",
+          "position": 1,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": false,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "definition_id",
+          "position": 2,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": false,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "time_type",
+          "position": 3,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "time_value",
+          "position": 4,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_type",
+          "position": 5,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_element",
+          "position": 6,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_name",
+          "position": 7,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_value",
+          "position": 8,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "time_stamp",
+          "position": 9,
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "status",
+          "position": 10,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": false,
+          "default": null,
+          "char_max_length": 10,
+          "numeric_precision": null,
+          "numeric_scale": null
+        }
+      ]
+    },
+    "summary_station_metadata": {
+      "primary_key": [],
+      "columns": [
+        {
+          "name": "station_id",
+          "position": 1,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": false,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "summary_type",
+          "position": 2,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "definition_id",
+          "position": 3,
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "nullable": true,
+          "default": null,
+          "char_max_length": 255,
+          "numeric_precision": null,
+          "numeric_scale": null
+        },
+        {
+          "name": "time_stamp",
+          "position": 4,
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "char_max_length": null,
+          "numeric_precision": null,
+          "numeric_scale": null
+        }
+      ]
+    }
+  }
+}
