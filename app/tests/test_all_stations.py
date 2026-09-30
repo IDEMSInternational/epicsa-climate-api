@@ -122,6 +122,22 @@ def test_mw_workshops_stations():
     country = "mw_workshops"
     assert_all_function_for_country(country)
 
+@pytest.mark.skip()
+def test_zw_stations():
+    country = "zw"
+    assert_all_function_for_country(country)
+
+@pytest.mark.skip()
+def test_zw_test_stations():
+    country = "zw_test"
+    assert_all_function_for_country(country)
+
+@pytest.mark.skip()
+def test_zw_workshops_stations():
+    country = "zw_workshops"
+    assert_all_function_for_country(country)
+
+
 
 def assert_all_function_for_country(country):
     response = client.get(f"/v1/station/{country}")
