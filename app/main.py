@@ -16,7 +16,7 @@ def get_settings():
 
 def get_application():
     settings = get_settings()
-    _app = FastAPI(title="E-PICSA Climate API", version="1.7.0", docs_url="/")
+    _app = FastAPI(title="E-PICSA Climate API", version="1.7.1", docs_url="/")
     _app.add_middleware(
         CORSMiddleware,
         allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
