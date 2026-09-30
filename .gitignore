@@ -151,3 +151,5 @@ working_data/
 service-account.json
 postgres-secret.json
 ENV_DIR/
+
+data_snapshot
