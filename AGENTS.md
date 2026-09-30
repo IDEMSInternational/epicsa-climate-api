@@ -239,6 +239,12 @@ Per project rules:
 - **NEVER** run `git add`, `git commit`, or `git push` via shell tools.
 - The user handles all staging, commits, and branch management manually.
 
+### ⚠️ Gotcha 8: Always Bump Version on Code Changes
+Whenever proposing code changes, always bump the API version string in `app/main.py`:
+```python
+_app = FastAPI(title="E-PICSA Climate API", version="x.y.z", docs_url="/")
+```
+
 ---
 
 ## 6. Dependency Injection & Testing Patterns
