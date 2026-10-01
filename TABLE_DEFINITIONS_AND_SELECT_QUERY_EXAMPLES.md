@@ -2,6 +2,16 @@
 
 This document lists the current table definitions and provides a pasteable JSON payload example for the `select_query` endpoint for each table.
 
+Related schema resources:
+- **Pydantic models**: [`app/schemas/database.py`](app/schemas/database.py)
+- **Machine-readable database schema**: [`db_schema.json`](db_schema.json)
+- **OpenAPI specification**: [`openapi.json`](openapi.json)
+
+Regenerate schemas via Docker:
+- `docker compose exec app python -m app.scripts.introspect_schema --stdout > db_schema.json`
+- `docker compose exec app python -m app.scripts.export_openapi --stdout > openapi.json`
+- `docker compose exec app python -m app.scripts.introspect_schema --verify`
+
 Constraints used in all examples:
 - Uses `"station_id": "dodoma"`.
 - Uses `"max_rows": 100`.

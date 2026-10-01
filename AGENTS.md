@@ -42,10 +42,13 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
 ├── entrypoint.sh                         # Container startup script (decodes base64 secrets, symlinks keys)
 ├── install_packages.R                    # Installs CRAN packages (rlang)
 ├── install_packages_picsa.R              # Installs pak, pins terra, installs epicsawrap from GitHub
+├── db_schema.json                        # Auto-generated database schema metadata for AI agents and tooling
+├── openapi.json                          # Exported OpenAPI 3.1 schema for agents and type generation
 ├── postgres-secret-example.json          # Template for PostgreSQL credentials
 ├── pytest.ini                            # Pytest configuration, env files, testpaths
 ├── requirements.txt                      # Production Python dependencies (includes pydantic v1 pin)
 ├── requirements_dev.txt                  # Pinned Python dependencies for reproducible dev setup
+├── scripts/                              # Host CLI script wrappers (export_openapi, introspect_schema)
 ├── TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md # Schema documentation for select_query endpoint
 ├── test.sh                               # Helper script running pytest with coverage
 │
@@ -56,6 +59,15 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
     ├── conftest.py                       # Pytest module-scoped TestClient fixture
     ├── definitions.py                    # Shared literal types (country_code, language_code)
     ├── epicsawrap_link.py                # Python wrapper invoking R functions via rpy2
+    │
+    ├── schemas/                          # High-level Pydantic models for DB tables and shared schemas
+    │   ├── __init__.py
+    │   └── database.py                   # CropRecord, DefinitionRecord, StationRecord, SummaryRecord, etc.
+    │
+    ├── scripts/                          # Container-compatible maintenance and export scripts
+    │   ├── __init__.py
+    │   ├── export_openapi.py             # Dumps OpenAPI schema to openapi.json
+    │   └── introspect_schema.py          # Introspects live DB into db_schema.json and verifies models
     │
     ├── core/
     │   ├── __init__.py
@@ -165,6 +177,20 @@ Defined in `app/core/config.py`:
 - `EPICSA_DATA_AUTH_TOKEN`: String auth token (legacy).
 - `POSTGRES_SECRET_FILE`: Path to JSON file with DB credentials (`host`, `port`, `dbname`, `user`, `password`, `sslmode`). Defaults to `./postgres-secret.json`.
 - `BACKEND_CORS_ORIGINS`: Allowed CORS origins. A Pydantic validator parses comma-separated strings or JSON arrays.
+
+### Subsystem E: Database Schemas, Introspection & OpenAPI Export
+Located in `app/schemas/`, `app/scripts/`, `scripts/`, `openapi.json`, and `db_schema.json`.
+- **Pydantic Database Models (`app/schemas/database.py`)**:
+  - Defines typed models for PostgreSQL tables: `CropRecord`, `DefinitionRecord`, `StationRecord`, `SummaryRecord`, `SummaryStationMetadataRecord`.
+  - Reusable across any endpoint or module (e.g. `select_query` or future dedicated table endpoints).
+  - Automatically registered into OpenAPI `components.schemas` via `custom_openapi()` in `app/main.py`.
+- **Database Introspection (`app/scripts/introspect_schema.py`)**:
+  - Introspects live PostgreSQL database tables and columns using `psycopg2` and `postgres-secret.json`.
+  - Dumps machine-readable schema metadata to `db_schema.json` for AI agents and local tools.
+  - Verifies live database columns against Pydantic models via `--verify`.
+- **OpenAPI Schema Export (`app/scripts/export_openapi.py`)**:
+  - Exports the current FastAPI OpenAPI 3.1 specification to `openapi.json` at the repo root.
+  - Used by AI agents for offline context and by client generators (e.g. TypeScript `openapi-typescript` + `openapi-fetch`).
 
 ---
 
@@ -324,6 +350,16 @@ def test_select_query_success(monkeypatch):
 4. In `app/api/v1/endpoints/select_query/test_router.py`:
    - Add unit test coverage verifying column filtering, ordering, and validation errors.
 
+### Recipe 3: Introspecting Database Schema & Exporting OpenAPI
+1. **Introspect & update `db_schema.json`**:
+   - Host: `python -m app.scripts.introspect_schema`
+   - Docker: `docker compose exec app python -m app.scripts.introspect_schema --stdout > db_schema.json`
+2. **Verify live database columns against Pydantic models**:
+   - Docker: `docker compose exec app python -m app.scripts.introspect_schema --verify`
+3. **Export OpenAPI specification (`openapi.json`)**:
+   - Host: `python -m app.scripts.export_openapi`
+   - Docker: `docker compose exec app python -m app.scripts.export_openapi --stdout > openapi.json`
+
 ---
 
 ## 8. Local Setup & Execution Commands
@@ -372,6 +408,23 @@ docker compose -f docker-compose.yaml -f docker-compose.test.yaml run app pytest
 pytest
 # Or with coverage
 ./test.sh
+```
+
+### Schema Management & OpenAPI Export Commands
+```bash
+# Export OpenAPI specification to openapi.json
+docker compose exec app python -m app.scripts.export_openapi --stdout > openapi.json
+# (Local alternative: python -m app.scripts.export_openapi)
+
+# Introspect PostgreSQL database into db_schema.json
+docker compose exec app python -m app.scripts.introspect_schema --stdout > db_schema.json
+# (Local alternative: python -m app.scripts.introspect_schema)
+
+# Verify live DB schema against Pydantic models in app/schemas/database.py
+docker compose exec app python -m app.scripts.introspect_schema --verify
+
+# Generate TypeScript types for frontend / client applications
+npx openapi-typescript openapi.json -o api-types.ts
 ```
 
 ---

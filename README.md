@@ -165,6 +165,66 @@ pytest
 docker compose up --build
 ```
 
+## Database Schema & OpenAPI Tooling
+
+This repository provides built-in CLI scripts for database schema introspection, Pydantic model verification, and OpenAPI specification export.
+
+### 1. Export OpenAPI Schema (`openapi.json`)
+Exports the complete OpenAPI 3.1 specification (including database record schemas) to disk for AI agents or client SDK generators:
+
+```bash
+# Via Docker (recommended):
+docker compose exec app python -m app.scripts.export_openapi --stdout > openapi.json
+
+# Local Python environment:
+python -m app.scripts.export_openapi
+# or
+python scripts/export_openapi.py
+```
+
+### 2. Introspect Database Schema (`db_schema.json`)
+Connects to PostgreSQL using `postgres-secret.json` and dumps complete table metadata, column data types, nullability, defaults, and keys to a machine-readable JSON file:
+
+```bash
+# Via Docker (recommended):
+docker compose exec app python -m app.scripts.introspect_schema --stdout > db_schema.json
+
+# Local Python environment:
+python -m app.scripts.introspect_schema
+# or
+python scripts/introspect_schema.py
+```
+
+### 3. Verify Database Schema against Pydantic Models
+Checks for schema drift between the live PostgreSQL database and the models defined in `app/schemas/database.py`:
+
+```bash
+# Via Docker (recommended):
+docker compose exec app python -m app.scripts.introspect_schema --verify
+
+# Local Python environment:
+python -m app.scripts.introspect_schema --verify
+```
+
+### 4. Generate Markdown Schema Documentation
+Outputs formatted Markdown tables describing tables and columns:
+
+```bash
+# Via Docker:
+docker compose exec app python -m app.scripts.introspect_schema --format markdown
+
+# Local Python environment:
+python -m app.scripts.introspect_schema --format markdown
+```
+
+### 5. Generate TypeScript Types (for `openapi-fetch`)
+To generate fully typed TypeScript definitions for frontend/client consumption from `openapi.json`:
+
+```bash
+npx openapi-typescript openapi.json -o api-types.ts
+```
+
+
 ## Deployment
 
 This repo contains example workflow to build as a docker image and deploy to google cloud run. See action yaml for details
