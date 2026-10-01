@@ -28,6 +28,10 @@ TAGS_METADATA = [
         "description": "Parameterized SQL queries against the analytical PostgreSQL database.",
     },
     {
+        "name": "v2: Documents",
+        "description": "PDF and HTML documents streamed from Google Cloud Storage.",
+    },
+    {
         "name": "v2: Testing",
         "description": "System health and status checks for v2.",
     },

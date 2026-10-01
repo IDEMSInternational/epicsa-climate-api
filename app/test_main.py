@@ -62,6 +62,8 @@ def test_openapi_v2_spec(client):
     paths = data.get("paths", {})
     assert all(p.startswith("/v2") for p in paths)
     assert "/v2/annual_rainfall_summaries/" in paths
+    assert "/v2/documents/{country}" in paths
+    assert "/v2/documents/{country}/{filepath}" in paths
 
 
 def test_openapi_v1_spec(client):

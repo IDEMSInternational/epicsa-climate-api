@@ -16,6 +16,6 @@ install.packages('pak',repos = "https://cloud.r-project.org")
 # Pin terra to a GDAL-compatible release for this base image.
 # (Replace with the exact known-good version for your environment.)
 pak::pak("terra@1.8-60")
-pak::pak("IDEMSInternational/epicsawrap@8ee95d4")
+pak::pak("IDEMSInternational/epicsawrap@732821a")
 
 q()

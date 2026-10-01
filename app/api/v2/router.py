@@ -18,6 +18,9 @@ from app.api.v2.endpoints.season_start_probabilities.router import (
 from app.api.v2.endpoints.select_query.router import (
     router as select_query_router,
 )
+from app.api.v2.endpoints.documents.router import (
+    router as documents_router,
+)
 from app.api.v2.endpoints.station.router import router as station_router
 from app.api.v2.endpoints.status.router import router as status_router
 
@@ -58,4 +61,9 @@ v2_router.include_router(
     select_query_router,
     prefix="/select_query",
     tags=["v2: Database"],
+)
+v2_router.include_router(
+    documents_router,
+    prefix="/documents",
+    tags=["v2: Documents"],
 )

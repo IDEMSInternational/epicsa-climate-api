@@ -981,6 +981,164 @@
           }
         }
       }
+    },
+    "/v2/documents/{country}": {
+      "get": {
+        "tags": [
+          "v2: Documents"
+        ],
+        "summary": "Get Documents",
+        "operationId": "get_documents_v2_documents__country__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zm",
+                "mw",
+                "zw",
+                "zm_test",
+                "mw_test",
+                "zw_test",
+                "zm_workshops",
+                "mw_workshops",
+                "zw_workshops",
+                "internal_tests"
+              ],
+              "title": "Country"
+            },
+            "name": "country",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Prefix",
+              "default": ""
+            },
+            "name": "prefix",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000.0,
+              "exclusiveMinimum": 0.0,
+              "title": "Max Results",
+              "default": 50
+            },
+            "name": "max_results",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Match Glob",
+              "default": "**[^/]"
+            },
+            "name": "match_glob",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentMetadata"
+                  },
+                  "type": "array",
+                  "title": "Response Get Documents V2 Documents  Country  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/documents/{country}/{filepath}": {
+      "get": {
+        "tags": [
+          "v2: Documents"
+        ],
+        "summary": "Download Document",
+        "description": "Download a specific document",
+        "operationId": "download_document_v2_documents__country___filepath__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zm",
+                "mw",
+                "zw",
+                "zm_test",
+                "mw_test",
+                "zw_test",
+                "zm_workshops",
+                "mw_workshops",
+                "zw_workshops",
+                "internal_tests"
+              ],
+              "title": "Country"
+            },
+            "name": "country",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filepath"
+            },
+            "name": "filepath",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentMetadata"
+                  },
+                  "type": "array",
+                  "title": "Response Download Document V2 Documents  Country   Filepath  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2964,6 +3122,10 @@
     {
       "name": "v2: Database",
       "description": "Parameterized SQL queries against the analytical PostgreSQL database."
+    },
+    {
+      "name": "v2: Documents",
+      "description": "PDF and HTML documents streamed from Google Cloud Storage."
     },
     {
       "name": "v2: Testing",
