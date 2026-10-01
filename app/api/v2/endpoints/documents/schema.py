@@ -28,5 +28,3 @@ class DocumentMetadata(BaseModel):
     timeCreated: str
     updated:str
     metadata: Optional[dict[str, str]] = None
-    
-    

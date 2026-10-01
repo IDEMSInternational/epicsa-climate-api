@@ -11,5 +11,5 @@ client = TestClient(app)
 def test_get_documents():
     country = 'mw'
     query_string = urlencode(OrderedDict(match_glob="**evening**"))
-    response = client.get(f"/v1/documents/{country}?{query_string}")
+    response = client.get(f"/v2/documents/{country}?{query_string}")
     assert response.status_code == 200

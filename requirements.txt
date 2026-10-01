@@ -5,8 +5,6 @@ python-dotenv
 pytest
 requests
 pandas
-# Pinned to avoid windows issue: https://github.com/rpy2/rpy2/issues/1104
-rpy2==3.5.12
 numpy
 google-cloud-storage
 uvicorn
