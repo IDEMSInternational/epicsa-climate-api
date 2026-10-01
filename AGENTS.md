@@ -396,12 +396,17 @@ Swagger UI will be accessible at: `http://localhost:8000/`
 
 ### Running with Docker Compose
 ```bash
-# Run application
+# Initial run or after updating dependencies/Dockerfile (builds image)
 docker compose up --build
+
+# Day-to-day development (uses mounted ./app with Uvicorn --reload)
+docker compose up
 
 # Run tests in Docker container (recommended if local R is not installed)
 docker compose -f docker-compose.yaml -f docker-compose.test.yaml run app pytest -v
 ```
+*Note: `./app` is live-mounted into `/app/app` and Uvicorn runs with `--reload` in `docker-compose.yaml`. Python edits take effect immediately without rebuilding.*
+
 
 ### Running Tests Locally
 ```bash

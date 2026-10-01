@@ -46,29 +46,42 @@ Each wrapper function:
 """
 import os
 from collections import OrderedDict
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import numpy
 from pandas import DataFrame
 from pandas.api.types import is_integer_dtype
-from rpy2.robjects import NULL as r_NULL
-from rpy2.robjects import (
-    conversion,
-    default_converter,
-    packages,
-    pandas2ri,
-)
-from rpy2.robjects.vectors import DataFrame as RDataFrame
-from rpy2.robjects.vectors import (
-    BoolVector,
-    FloatVector,
-    IntVector,
-    ListVector,
-    StrVector,
-)
-from rpy2.rinterface_lib import sexp
-
-r_epicsawrap = packages.importr("epicsawrap")
+try:
+    from rpy2.robjects import NULL as r_NULL
+    from rpy2.robjects import (
+        conversion,
+        default_converter,
+        packages,
+        pandas2ri,
+    )
+    from rpy2.robjects.vectors import DataFrame as RDataFrame
+    from rpy2.robjects.vectors import (
+        BoolVector,
+        FloatVector,
+        IntVector,
+        ListVector,
+        StrVector,
+    )
+    from rpy2.rinterface_lib import sexp
+    try:
+        r_epicsawrap = packages.importr("epicsawrap")
+    except Exception:
+        r_epicsawrap = None
+except ImportError:
+    r_NULL = None
+    r_epicsawrap = None
+    RDataFrame = Any
+    ListVector = Any
+    BoolVector = Any
+    FloatVector = Any
+    IntVector = Any
+    StrVector = Any
+    sexp = None
 
 def extremes_summaries(
     country: str,

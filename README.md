@@ -161,9 +161,23 @@ pytest
 
 ## Running locally (docker)
 
+### Initial Run / Dependency Updates
+Build the container image and start the service:
+
 ```sh
 docker compose up --build
 ```
+
+### Day-to-Day Development
+For subsequent runs, simply start the container:
+
+```sh
+docker compose up
+```
+
+- **Live Hot-Reloading**: The `./app` directory is bind-mounted directly into the container and Uvicorn runs with `--reload`. Any changes made to Python files in `./app/` take effect immediately without needing to restart the container or rebuild the image.
+- **When is `--build` needed?**: You only need to run `docker compose up --build` if you change dependencies (`requirements.txt`), R scripts (`install_packages_picsa.R`, `install_packages.R`), or container configurations (`Dockerfile`, `entrypoint.sh`).
+
 
 ## Database Schema & OpenAPI Tooling
 

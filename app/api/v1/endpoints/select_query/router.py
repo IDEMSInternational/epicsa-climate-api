@@ -162,87 +162,11 @@ def _build_select_query(payload: SelectQueryRequest) -> tuple[str, list[Any]]:
     )
     return sql, [payload.station_id, payload.max_rows]
 
-def _load_db_secret(secret_file_path: str) -> dict[str, Any]:
-    secret_path = Path(secret_file_path)
-    if not secret_path.exists():
-        raise HTTPException(
-            status_code=500,
-            detail=(
-                f"Postgres secret file not found at '{secret_file_path}'. "
-                "Set POSTGRES_SECRET_FILE to a valid file path."
-            ),
-        )
-
-    try:
-        secret = json.loads(secret_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as error:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Postgres secret file is not valid JSON: {error}",
-        ) from error
-
-    required_keys = ["host", "port", "dbname", "user", "password"]
-    missing_keys = [key for key in required_keys if key not in secret]
-    if missing_keys:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Postgres secret file missing required keys: {', '.join(missing_keys)}",
-        )
-
-    return secret
-
-
-def _pool_key_from_secret(secret: dict[str, Any]) -> tuple[Any, ...]:
-    return (
-        secret["host"],
-        secret["port"],
-        secret["dbname"],
-        secret["user"],
-        secret["password"],
-        secret.get("sslmode", "prefer"),
-    )
-
-
-def _get_connection_pool(secret: dict[str, Any]):
-    global _CONNECTION_POOL
-    global _CONNECTION_POOL_KEY
-
-    if psycopg2_pool is None:
-        raise RuntimeError("psycopg2 is not installed. Add psycopg2-binary to requirements.")
-
-    pool_key = _pool_key_from_secret(secret)
-    with _POOL_LOCK:
-        if _CONNECTION_POOL is not None and _CONNECTION_POOL_KEY != pool_key:
-            _CONNECTION_POOL.closeall()
-            _CONNECTION_POOL = None
-            _CONNECTION_POOL_KEY = None
-
-        if _CONNECTION_POOL is None:
-            _CONNECTION_POOL = psycopg2_pool.ThreadedConnectionPool(
-                minconn=_POOL_MIN_CONNECTIONS,
-                maxconn=_POOL_MAX_CONNECTIONS,
-                host=secret["host"],
-                port=secret["port"],
-                dbname=secret["dbname"],
-                user=secret["user"],
-                password=secret["password"],
-                connect_timeout=10,
-                sslmode=secret.get("sslmode", "prefer"),
-            )
-            _CONNECTION_POOL_KEY = pool_key
-
-        return _CONNECTION_POOL
-
-
-def close_connection_pool() -> None:
-    global _CONNECTION_POOL
-    global _CONNECTION_POOL_KEY
-
-    with _POOL_LOCK:
-        if _CONNECTION_POOL is not None:
-            _CONNECTION_POOL.closeall()
-            _CONNECTION_POOL = None
-            _CONNECTION_POOL_KEY = None
+from app.core.database import (
+    load_db_secret as _load_db_secret,
+    close_connection_pool,
+    execute_query,
+)
 
 
 def execute_select_query(
@@ -250,31 +174,8 @@ def execute_select_query(
     params: list[Any],
     secret: dict[str, Any],
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    if psycopg2 is None or RealDictCursor is None:
-        raise RuntimeError("psycopg2 is not installed. Add psycopg2-binary to requirements.")
+    return execute_query(sql=sql, params=params, secret=secret)
 
-    pool = _get_connection_pool(secret)
-    connection = None
-    try:
-        connection = pool.getconn()
-        connection.set_session(readonly=True, autocommit=False)
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute("SET LOCAL statement_timeout = %s", (_STATEMENT_TIMEOUT_MS,))
-            cursor.execute(sql, tuple(params))
-            rows = [dict(row) for row in cursor.fetchall()]
-            columns = [column.name for column in cursor.description] if cursor.description else []
-            connection.rollback()
-            return columns, rows
-    except Exception:
-        if connection is not None:
-            try:
-                connection.rollback()
-            except Exception:
-                pass
-        raise
-    finally:
-        if connection is not None:
-            pool.putconn(connection)
 
 
 @router.post("/", response_model=SelectQueryResponse)

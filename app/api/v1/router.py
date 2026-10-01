@@ -30,51 +30,51 @@ from app.api.v1.endpoints.status.router import router as status_router
 
 v1_router = APIRouter()
 
-v1_router.include_router(status_router, prefix="/status", tags=["Testing"])
+v1_router.include_router(status_router, prefix="/status", tags=["v1 (Legacy): Testing"])
 
 v1_router.include_router(
     annual_rainfall_summaries_router,
     prefix="/annual_rainfall_summaries",
-    tags=["Climate"],
+    tags=["v1 (Legacy): Climate"],
 )
 v1_router.include_router(
     annual_temperature_summaries_router,
     prefix="/annual_temperature_summaries",
-    tags=["Climate"],
+    tags=["v1 (Legacy): Climate"],
 )
 v1_router.include_router(
     crop_success_probabilities_router,
     prefix="/crop_success_probabilities",
-    tags=["Climate"],
+    tags=["v1 (Legacy): Climate"],
 )
 v1_router.include_router(
     monthly_temperature_summaries_router,
     prefix="/monthly_temperature_summaries",
-    tags=["Climate"],
+    tags=["v1 (Legacy): Climate"],
 )
 v1_router.include_router(
     season_start_probabilities_router,
     prefix="/season_start_probabilities",
-    tags=["Climate"],
+    tags=["v1 (Legacy): Climate"],
 )
 v1_router.include_router(
     extremes_summaries_router,
     prefix="/extremes_summaries",
-    tags=["Climate"],
+    tags=["v1 (Legacy): Climate"],
 )
 v1_router.include_router(
     station_router, 
     prefix="/station", 
-    tags=["Metadata"],
+    tags=["v1 (Legacy): Metadata"],
 )
 v1_router.include_router(
     documents,
     prefix="/documents",
-    tags=["Documents"],
+    tags=["v1 (Legacy): Documents"],
 )
 v1_router.include_router(
     select_query_router,
     prefix="/select_query",
-    tags=["Database"],
+    tags=["v1 (Legacy): Database"],
 )
 
