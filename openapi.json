@@ -2,593 +2,10 @@
   "openapi": "3.1.0",
   "info": {
     "title": "E-PICSA Climate API",
-    "description": "\n### E-PICSA Climate API Documentation\n\n* **v2 Endpoints**: High-performance endpoints querying PostgreSQL directly. [View v2 Docs Only](/v2/docs)\n* **v1 Endpoints (Legacy)**: Legacy endpoints using R (`epicsawrap`) and Cloud Storage. [View v1 Docs Only](/v1/docs)\n",
-    "version": "2.0.0"
+    "description": "\n### E-PICSA Climate API Documentation\n\nHigh-performance climate statistics, metadata, and document streaming API querying PostgreSQL and Google Cloud Storage directly.\n",
+    "version": "2.1.0"
   },
   "paths": {
-    "/v1/status/": {
-      "get": {
-        "tags": [
-          "v1 (Legacy): Testing"
-        ],
-        "summary": "Get Status",
-        "description": "Check server up",
-        "operationId": "get_status_v1_status__get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/annual_rainfall_summaries/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Climate"
-        ],
-        "summary": "Get Annual Rainfall Summaries",
-        "operationId": "get_annual_rainfall_summaries_v1_annual_rainfall_summaries__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__api__v1__endpoints__annual_rainfall_summaries__schema__AnnualRainfallSummariesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnnualRainfallSummariesResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/annual_temperature_summaries/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Climate"
-        ],
-        "summary": "Get Annual Temperature Summaries",
-        "operationId": "get_annual_temperature_summaries_v1_annual_temperature_summaries__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__api__v1__endpoints__annual_temperature_summaries__schema__AnnualTemperatureSummariesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnnualTemperatureSummariesResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/crop_success_probabilities/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Climate"
-        ],
-        "summary": "Get Crop Success Probabilities",
-        "operationId": "get_crop_success_probabilities_v1_crop_success_probabilities__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__api__v1__endpoints__crop_success_probabilities__schema__CropSuccessProbabilitiesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CropSuccessProbabilitiesResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/monthly_temperature_summaries/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Climate"
-        ],
-        "summary": "Get Monthly Temperature Summaries",
-        "operationId": "get_monthly_temperature_summaries_v1_monthly_temperature_summaries__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__api__v1__endpoints__monthly_temperature_summaries__schema__MonthlyTemperatureSummariesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MonthlyTemperatureSummariesResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/season_start_probabilities/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Climate"
-        ],
-        "summary": "Get Season Start Probabilities",
-        "operationId": "get_season_start_probabilities_v1_season_start_probabilities__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__api__v1__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeasonStartProbabilitiesResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/extremes_summaries/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Climate"
-        ],
-        "summary": "Get Extremes Summaries",
-        "operationId": "get_extremes_summaries_v1_extremes_summaries__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExtremesSummariesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "title": "Response Get Extremes Summaries V1 Extremes Summaries  Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/station/{country}": {
-      "get": {
-        "tags": [
-          "v1 (Legacy): Metadata"
-        ],
-        "summary": "Read Stations",
-        "operationId": "read_stations_v1_station__country__get",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "zm",
-                "mw",
-                "zw",
-                "zm_test",
-                "mw_test",
-                "zw_test",
-                "zm_workshops",
-                "mw_workshops",
-                "zw_workshops",
-                "internal_tests"
-              ],
-              "title": "Country"
-            },
-            "name": "country",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StationListResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/station/{country}/{station_id}": {
-      "get": {
-        "tags": [
-          "v1 (Legacy): Metadata"
-        ],
-        "summary": "Read Stations",
-        "operationId": "read_stations_v1_station__country___station_id__get",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "zm",
-                "mw",
-                "zw",
-                "zm_test",
-                "mw_test",
-                "zw_test",
-                "zm_workshops",
-                "mw_workshops",
-                "zw_workshops",
-                "internal_tests"
-              ],
-              "title": "Country"
-            },
-            "name": "country",
-            "in": "path"
-          },
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Station Id"
-            },
-            "name": "station_id",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StationAndDefintionResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/documents/{country}": {
-      "get": {
-        "tags": [
-          "v1 (Legacy): Documents"
-        ],
-        "summary": "Get Documents",
-        "operationId": "get_documents_v1_documents__country__get",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "zm",
-                "mw",
-                "zw",
-                "zm_test",
-                "mw_test",
-                "zw_test",
-                "zm_workshops",
-                "mw_workshops",
-                "zw_workshops",
-                "internal_tests"
-              ],
-              "title": "Country"
-            },
-            "name": "country",
-            "in": "path"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "string",
-              "title": "Prefix",
-              "default": ""
-            },
-            "name": "prefix",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 1000.0,
-              "exclusiveMinimum": 0.0,
-              "title": "Max Results",
-              "default": 50
-            },
-            "name": "max_results",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "string",
-              "title": "Match Glob",
-              "default": "**[^/]"
-            },
-            "name": "match_glob",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/DocumentMetadata"
-                  },
-                  "type": "array",
-                  "title": "Response Get Documents V1 Documents  Country  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/documents/{country}/{filepath}": {
-      "get": {
-        "tags": [
-          "v1 (Legacy): Documents"
-        ],
-        "summary": "Download Document",
-        "description": "Download a specific document",
-        "operationId": "download_document_v1_documents__country___filepath__get",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "zm",
-                "mw",
-                "zw",
-                "zm_test",
-                "mw_test",
-                "zw_test",
-                "zm_workshops",
-                "mw_workshops",
-                "zw_workshops",
-                "internal_tests"
-              ],
-              "title": "Country"
-            },
-            "name": "country",
-            "in": "path"
-          },
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Filepath"
-            },
-            "name": "filepath",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/DocumentMetadata"
-                  },
-                  "type": "array",
-                  "title": "Response Download Document V1 Documents  Country   Filepath  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/select_query/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Database"
-        ],
-        "summary": "Run Select Query",
-        "operationId": "run_select_query_v1_select_query__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SelectQueryRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SelectQueryResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v2/status/": {
       "get": {
         "tags": [
@@ -624,7 +41,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__api__v2__endpoints__annual_rainfall_summaries__schema__AnnualRainfallSummariesParameters"
+                "$ref": "#/components/schemas/AnnualRainfallSummariesParameters"
               }
             }
           },
@@ -666,7 +83,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__api__v2__endpoints__annual_temperature_summaries__schema__AnnualTemperatureSummariesParameters"
+                "$ref": "#/components/schemas/AnnualTemperatureSummariesParameters"
               }
             }
           },
@@ -708,7 +125,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__api__v2__endpoints__crop_success_probabilities__schema__CropSuccessProbabilitiesParameters"
+                "$ref": "#/components/schemas/CropSuccessProbabilitiesParameters"
               }
             }
           },
@@ -750,7 +167,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__api__v2__endpoints__monthly_temperature_summaries__schema__MonthlyTemperatureSummariesParameters"
+                "$ref": "#/components/schemas/MonthlyTemperatureSummariesParameters"
               }
             }
           },
@@ -792,7 +209,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__api__v2__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters"
+                "$ref": "#/components/schemas/SeasonStartProbabilitiesParameters"
               }
             }
           },
@@ -1117,13 +534,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/DocumentMetadata"
-                  },
-                  "type": "array",
-                  "title": "Response Download Document V2 Documents  Country   Filepath  Get"
-                }
+                "schema": {}
               }
             }
           },
@@ -1208,6 +619,62 @@
         },
         "type": "object",
         "title": "AnnualRainfallSummariesMetadata"
+      },
+      "AnnualRainfallSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "annual_rain",
+                "start_rains",
+                "end_rains",
+                "end_season",
+                "seasonal_rain",
+                "seasonal_length"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "annual_rain",
+              "start_rains",
+              "end_rains",
+              "end_season",
+              "seasonal_rain",
+              "seasonal_length"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "AnnualRainfallSummariesParameters"
       },
       "AnnualRainfallSummariesResponce": {
         "properties": {
@@ -1360,6 +827,62 @@
         ],
         "title": "AnnualTempartureSummariesdata"
       },
+      "AnnualTemperatureSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "mean_tmin",
+                "mean_tmax",
+                "min_tmin",
+                "min_tmax",
+                "max_tmin",
+                "max_tmax"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "mean_tmin",
+              "mean_tmax",
+              "min_tmin",
+              "min_tmax",
+              "max_tmin",
+              "max_tmax"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "AnnualTemperatureSummariesParameters"
+      },
       "AnnualTemperatureSummariesResponce": {
         "properties": {
           "metadata": {
@@ -1394,6 +917,60 @@
         },
         "type": "object",
         "title": "CropSuccessProbabilitiesMetadata"
+      },
+      "CropSuccessProbabilitiesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "water_requirements": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Water Requirements"
+          },
+          "planting_length": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Planting Length"
+          },
+          "planting_dates": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Planting Dates"
+          },
+          "start_before_season": {
+            "type": "boolean",
+            "title": "Start Before Season",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "CropSuccessProbabilitiesParameters"
       },
       "CropSuccessProbabilitiesResponce": {
         "properties": {
@@ -1615,56 +1192,6 @@
         "type": "object",
         "title": "EndSeason"
       },
-      "ExtremesSummariesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "summaries": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "extremes_rain",
-                "extremes_tmin",
-                "extremes_tmax"
-              ]
-            },
-            "type": "array",
-            "title": "Summaries",
-            "default": [
-              "extremes_rain",
-              "extremes_tmin",
-              "extremes_tmax"
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "ExtremesSummariesParameters"
-      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1725,6 +1252,62 @@
         ],
         "title": "MonthlyTempartureSummariesdata"
       },
+      "MonthlyTemperatureSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "mean_tmin",
+                "mean_tmax",
+                "min_tmin",
+                "min_tmax",
+                "max_tmin",
+                "max_tmax"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "mean_tmin",
+              "mean_tmax",
+              "min_tmin",
+              "min_tmax",
+              "max_tmin",
+              "max_tmax"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "MonthlyTemperatureSummariesParameters"
+      },
       "MonthlyTemperatureSummariesResponce": {
         "properties": {
           "metadata": {
@@ -1779,6 +1362,54 @@
         },
         "type": "object",
         "title": "SeasonStartProbabilitiesMetadata"
+      },
+      "SeasonStartProbabilitiesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "mw_test"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "Kasungu"
+          },
+          "start_dates": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Start Dates",
+            "default": [
+              200,
+              220,
+              250,
+              270,
+              300,
+              320
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "SeasonStartProbabilitiesParameters"
       },
       "SeasonStartProbabilitiesResponce": {
         "properties": {
@@ -2349,520 +1980,6 @@
         ],
         "title": "ValidationError"
       },
-      "app__api__v1__endpoints__annual_rainfall_summaries__schema__AnnualRainfallSummariesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "summaries": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "annual_rain",
-                "start_rains",
-                "end_rains",
-                "end_season",
-                "seasonal_rain",
-                "seasonal_length"
-              ]
-            },
-            "type": "array",
-            "title": "Summaries",
-            "default": [
-              "annual_rain",
-              "start_rains",
-              "end_rains",
-              "end_season",
-              "seasonal_rain",
-              "seasonal_length"
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "AnnualRainfallSummariesParameters"
-      },
-      "app__api__v1__endpoints__annual_temperature_summaries__schema__AnnualTemperatureSummariesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "summaries": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "mean_tmin",
-                "mean_tmax",
-                "min_tmin",
-                "min_tmax",
-                "max_tmin",
-                "max_tmax"
-              ]
-            },
-            "type": "array",
-            "title": "Summaries",
-            "default": [
-              "mean_tmin",
-              "mean_tmax",
-              "min_tmin",
-              "min_tmax",
-              "max_tmin",
-              "max_tmax"
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "AnnualTemperatureSummariesParameters"
-      },
-      "app__api__v1__endpoints__crop_success_probabilities__schema__CropSuccessProbabilitiesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "internal_tests"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Tamale"
-          }
-        },
-        "type": "object",
-        "title": "CropSuccessProbabilitiesParameters"
-      },
-      "app__api__v1__endpoints__monthly_temperature_summaries__schema__MonthlyTemperatureSummariesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "summaries": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "mean_tmin",
-                "mean_tmax",
-                "min_tmin",
-                "min_tmax",
-                "max_tmin",
-                "max_tmax"
-              ]
-            },
-            "type": "array",
-            "title": "Summaries",
-            "default": [
-              "mean_tmin",
-              "mean_tmax",
-              "min_tmin",
-              "min_tmax",
-              "max_tmin",
-              "max_tmax"
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "MonthlyTemperatureSummariesParameters"
-      },
-      "app__api__v1__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "start_dates": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Start Dates",
-            "default": [
-              200,
-              220,
-              250,
-              270,
-              300,
-              320
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "SeasonStartProbabilitiesParameters"
-      },
-      "app__api__v2__endpoints__annual_rainfall_summaries__schema__AnnualRainfallSummariesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "summaries": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "annual_rain",
-                "start_rains",
-                "end_rains",
-                "end_season",
-                "seasonal_rain",
-                "seasonal_length"
-              ]
-            },
-            "type": "array",
-            "title": "Summaries",
-            "default": [
-              "annual_rain",
-              "start_rains",
-              "end_rains",
-              "end_season",
-              "seasonal_rain",
-              "seasonal_length"
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "AnnualRainfallSummariesParameters"
-      },
-      "app__api__v2__endpoints__annual_temperature_summaries__schema__AnnualTemperatureSummariesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "summaries": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "mean_tmin",
-                "mean_tmax",
-                "min_tmin",
-                "min_tmax",
-                "max_tmin",
-                "max_tmax"
-              ]
-            },
-            "type": "array",
-            "title": "Summaries",
-            "default": [
-              "mean_tmin",
-              "mean_tmax",
-              "min_tmin",
-              "min_tmax",
-              "max_tmin",
-              "max_tmax"
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "AnnualTemperatureSummariesParameters"
-      },
-      "app__api__v2__endpoints__crop_success_probabilities__schema__CropSuccessProbabilitiesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "water_requirements": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Water Requirements"
-          },
-          "planting_length": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Planting Length"
-          },
-          "planting_dates": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Planting Dates"
-          },
-          "start_before_season": {
-            "type": "boolean",
-            "title": "Start Before Season",
-            "default": true
-          }
-        },
-        "type": "object",
-        "title": "CropSuccessProbabilitiesParameters"
-      },
-      "app__api__v2__endpoints__monthly_temperature_summaries__schema__MonthlyTemperatureSummariesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "summaries": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "mean_tmin",
-                "mean_tmax",
-                "min_tmin",
-                "min_tmax",
-                "max_tmin",
-                "max_tmax"
-              ]
-            },
-            "type": "array",
-            "title": "Summaries",
-            "default": [
-              "mean_tmin",
-              "mean_tmax",
-              "min_tmin",
-              "min_tmax",
-              "max_tmin",
-              "max_tmax"
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "MonthlyTemperatureSummariesParameters"
-      },
-      "app__api__v2__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "start_dates": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Start Dates",
-            "default": [
-              200,
-              220,
-              250,
-              270,
-              300,
-              320
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "SeasonStartProbabilitiesParameters"
-      },
       "CropRecord": {
         "title": "CropRecord",
         "description": "Schema representing a record in the 'crop' table.\nContains agricultural crop success and rainfall metrics for a station and season.",
@@ -3130,26 +2247,6 @@
     {
       "name": "v2: Testing",
       "description": "System health and status checks for v2."
-    },
-    {
-      "name": "v1 (Legacy): Climate",
-      "description": "Legacy climate statistics calculated using R epicsawrap and Cloud Storage."
-    },
-    {
-      "name": "v1 (Legacy): Metadata",
-      "description": "Legacy station metadata."
-    },
-    {
-      "name": "v1 (Legacy): Database",
-      "description": "Legacy database select query endpoint."
-    },
-    {
-      "name": "v1 (Legacy): Documents",
-      "description": "PDF and HTML documents streamed from Google Cloud Storage."
-    },
-    {
-      "name": "v1 (Legacy): Testing",
-      "description": "Legacy status health check."
     }
   ]
 }

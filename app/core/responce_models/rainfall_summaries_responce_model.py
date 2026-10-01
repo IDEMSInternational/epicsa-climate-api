@@ -18,16 +18,16 @@ class AnnualRainfallSummariesdata(BaseModel):
     annual_rain: Optional[float] 
     n_rain: Optional[int]
     start_rains_doy: Optional[int] 
-    start_rains_date: Optional[str] | object #rpy2 has issue with no recognising null strings
+    start_rains_date: Optional[str] | object
     start_rains_status: Optional[bool]
     end_rains_doy: Optional[int] 
-    end_rains_date: Optional[str] | object #rpy2 has issue with no recognising null strings
+    end_rains_date: Optional[str] | object
     end_rains_status: Optional[bool]
     seasonal_rain:Optional[int] 
     n_seasonal_rain: Optional[int] 
     season_length: Optional[float]   
     end_season_doy:Optional[int] 
-    end_season_date:Optional[str] | object #rpy2 has issue with no recognising null strings  
+    end_season_date:Optional[str] | object
     end_season_status: Optional[bool]
     
 

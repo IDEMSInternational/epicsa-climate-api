@@ -6,24 +6,10 @@ Build with [FastAPI](https://fastapi.tiangolo.com/)
 
 ## Pre-Requisites
 
-The api requires Python and R runtimes installed. It has been tested with the versions listed below
+The api requires Python 3.13.
 
 - Python (3.13)  
   [https://www.python.org/downloads](https://www.python.org/downloads)
-
-- R and Rtools (4.4.3)
-
-  Windows  
-  [https://cloud.r-project.org/bin/windows/base/old/](https://cloud.r-project.org/bin/windows/base/old/)  
-  [https://cloud.r-project.org/bin/windows/Rtools/rtools44/rtools.html](https://cloud.r-project.org/bin/windows/Rtools/rtools44/rtools.html)
-
-  Linux  
-  https://cran.r-project.org/bin/linux/
-
-  Mac (untested)  
-  https://cran.r-project.org/bin/macosx/
-
-Relevant documentation should also be followed to ensure runtimes can be executed from PATH environment variable.
 
 ## Configuration
 
@@ -37,7 +23,7 @@ cp .env.sample .env
 
 **Python**
 
-The scripts below will create a python [virtual environment](https://docs.python.org/3/library/venv.html), activate, install required python and R dependencies and start local server
+The scripts below will create a python [virtual environment](https://docs.python.org/3/library/venv.html), activate, install required python dependencies and start local server
 
 === "Windows (powershell)"
 
@@ -52,24 +38,6 @@ The scripts below will create a python [virtual environment](https://docs.python
     source .venv/bin/activate
     pip install --upgrade -r requirements.txt
     uvicorn app.main:app --reload
-
-**R**
-
-Once installed you will need to call R from an elevated shell to install dependencies
-
-Windows
-
-```
-Rscript install_packages.R
-Rscript install_packages_picsa.R
-```
-
-Linux
-
-```
-sudo Rscript install_packages.R
-sudo Rscript install_packages_picsa.R
-```
 
 **Authorization File**
 
@@ -101,7 +69,7 @@ The file location is controlled by `POSTGRES_SECRET_FILE` (defaults to `./postgr
 
 **Select Query Endpoint**
 
-The `/v1/select_query/` endpoint queries data from allowed tables using a structured request body. It is **not** a generic SQL endpoint — it builds parameterized queries from a whitelist of tables and columns.
+The `/v2/select_query/` endpoint queries data from allowed tables using a structured request body. It is **not** a generic SQL endpoint — it builds parameterized queries from a whitelist of tables and columns.
 
 Request schema:
 
@@ -176,7 +144,7 @@ docker compose up
 ```
 
 - **Live Hot-Reloading**: The `./app` directory is bind-mounted directly into the container and Uvicorn runs with `--reload`. Any changes made to Python files in `./app/` take effect immediately without needing to restart the container or rebuild the image.
-- **When is `--build` needed?**: You only need to run `docker compose up --build` if you change dependencies (`requirements.txt`), R scripts (`install_packages_picsa.R`, `install_packages.R`), or container configurations (`Dockerfile`, `entrypoint.sh`).
+- **When is `--build` needed?**: You only need to run `docker compose up --build` if you change dependencies (`requirements.txt`) or container configurations (`Dockerfile`, `entrypoint.sh`).
 
 
 ## Database Schema & OpenAPI Tooling
@@ -248,23 +216,13 @@ For cloud deploy, store the contents of `postgres-secret.json` as a base64 encod
 ## Troubleshooting
 
 **Pip won't install dependencies**
-Depending on local versions of R and python (as well as operating system) there may be issues when installing certain packages. Recommend attempting install using the `requirements_dev.txt` file which pins exact versions of packages shown to be compatible with each other, i.e.
+Depending on local versions of python (as well as operating system) there may be issues when installing certain packages. Recommend attempting install using the `requirements_dev.txt` file which pins exact versions of packages shown to be compatible with each other, i.e.
 
 ```sh
 pip install --upgrade -r requirements_dev.txt
 ```
 
-**R Dependency incompatibility**
-Ensure R installed a per prerequisites, verify version via `rscript --version`.
-
-If facing issues with a specific package it may help to download [RStudio](https://posit.co/download/rstudio-desktop/), and using the `packages` tab to check what version of packages are installed and update any indicated within error logs.
-
-**Called endpoint method does not exist**
-The library calls methods from various other git repos where code is hosted both in python and R. These are installed during initial setup, but will need reinstallation whenever new versions of the external repos exist.
-
-Simply repeat the steps above to install dependencies from `install_packages_picsa.R`
-
-Any other issues should be raised on GitHub
+Any issues should be raised on GitHub
 
 ## License
 

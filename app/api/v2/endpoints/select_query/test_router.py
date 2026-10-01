@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from app.api.v1.endpoints.select_query import router as select_router
+from app.api.v2.endpoints.select_query import router as select_router
 from app.main import app
 
 
@@ -34,7 +34,7 @@ def test_select_query_success(monkeypatch):
     )
 
     response = client.post(
-        "/v1/select_query/",
+        "/v2/select_query/",
         json={
             "table_name": "summary",
             "columns": ["station_id", "time_value"],
@@ -56,11 +56,13 @@ def test_select_query_success(monkeypatch):
 
 def test_select_query_rejects_invalid_column():
     response = client.post(
-        "/v1/select_query/",
+        "/v2/select_query/",
         json={
             "table_name": "summary",
-            "columns": ["station_id", "invalid_column"],
+            "columns": ["invalid_column"],
             "station_id": "dodoma",
+            "order_by": "time_value",
+            "order_direction": "desc",
             "max_rows": 10,
         },
     )
@@ -71,11 +73,13 @@ def test_select_query_rejects_invalid_column():
 
 def test_select_query_rejects_invalid_order_by():
     response = client.post(
-        "/v1/select_query/",
+        "/v2/select_query/",
         json={
-            "table_name": "station",
+            "table_name": "summary",
+            "columns": ["station_id"],
             "station_id": "dodoma",
-            "order_by": "time_value",
+            "order_by": "not_allowed_order_column",
+            "order_direction": "desc",
             "max_rows": 10,
         },
     )
@@ -84,32 +88,55 @@ def test_select_query_rejects_invalid_order_by():
     assert "Unsupported order_by" in response.json()["detail"]
 
 
-def test_select_query_rejects_unknown_table_name():
+def test_select_query_rejects_invalid_table_name():
     response = client.post(
-        "/v1/select_query/",
+        "/v2/select_query/",
         json={
-            "table_name": "unknown_table",
+            "table_name": "invalid_table_name",
+            "columns": ["station_id"],
             "station_id": "dodoma",
+            "order_by": "time_value",
+            "order_direction": "desc",
             "max_rows": 10,
         },
     )
 
     assert response.status_code == 422
 
-def test_select_query_missing_secret_file(monkeypatch):
-    class FakeSettings:
-        POSTGRES_SECRET_FILE = "./does-not-exist.json"
 
-    monkeypatch.setattr(select_router, "Settings", lambda: FakeSettings())
+def test_select_query_returns_500_on_database_error(monkeypatch):
+    monkeypatch.setattr(
+        select_router,
+        "_load_db_secret",
+        lambda _: {
+            "host": "localhost",
+            "port": 5432,
+            "dbname": "example",
+            "user": "example",
+            "password": "example",
+        },
+    )
+
+    def fake_execute_select_query_fail(sql, params, secret):
+        raise RuntimeError("database exploded")
+
+    monkeypatch.setattr(
+        select_router,
+        "execute_select_query",
+        fake_execute_select_query_fail,
+    )
 
     response = client.post(
-        "/v1/select_query/",
+        "/v2/select_query/",
         json={
             "table_name": "summary",
+            "columns": ["station_id", "time_value"],
             "station_id": "dodoma",
+            "order_by": "time_value",
+            "order_direction": "desc",
             "max_rows": 10,
         },
     )
 
     assert response.status_code == 500
-    assert "Postgres secret file not found" in response.json()["detail"]
+    assert response.json()["detail"] == "Postgres query failed."
