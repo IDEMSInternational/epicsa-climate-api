@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: prod-deploy
+  cancel-in-progress: true
+
 env:
   IMAGE_TAG: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT }}/${{ vars.GCP_CONTAINER_REPO }}/${{ vars.GCP_SERVICE }}:${{github.sha}}
 
