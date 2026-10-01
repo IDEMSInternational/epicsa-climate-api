@@ -37,7 +37,7 @@ class StartRains(BaseModel):
 class EndRains(BaseModel):
     start_day: Optional[int]
     end_day: Optional[int]
-    output: Optional[str]
+    output: Optional[str] | Optional[List[str]]
     min_rainfall: Optional[int]
     interval_length: Optional[int]    
     s_start_doy: Optional[int]

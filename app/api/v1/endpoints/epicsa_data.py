@@ -8,7 +8,10 @@ from pydantic import BaseModel, ValidationError
 
 from app.utils.response import get_dataframe_response
 
-from rpy2.rinterface_lib.callbacks import logger as rpy2_logger
+try:
+    from rpy2.rinterface_lib.callbacks import logger as rpy2_logger
+except ImportError:
+    rpy2_logger = logging.getLogger("rpy2")
 
 # ---- Global lock (module-level, shared across all requests in this process)
 _r_lock = threading.Lock()
