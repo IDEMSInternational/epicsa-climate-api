@@ -12,7 +12,7 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
 ### Core Architectural Pillars
 1. **Python API Layer**: Built on **FastAPI** running under **Uvicorn**, utilizing **Pydantic v1** (`<2.0.0`) for request/response validation and settings management.
 2. **R Computation Engine**: Integrates with the custom R package [`IDEMSInternational/epicsawrap`](https://github.com/IDEMSInternational/epicsawrap) (and `terra`, `rlang`) via **`rpy2`** to perform domain-specific statistical climate computations.
-3. **Database Query Engine**: A parameterized, whitelist-driven SQL engine using **`psycopg2`** connection pooling to execute read-only queries against PostgreSQL climate tables.
+3. **Database Query Engine**: A parameterized, whitelist-driven SQL engine using **`psycopg` (v3)** and **`psycopg-pool`** connection pooling to execute read-only queries against PostgreSQL climate tables.
 4. **Cloud Storage**: Google Cloud Storage (`google-cloud-storage`) integration for document listing and streamed file delivery (e.g. PDF/HTML reports).
 5. **Containerized Deployment**: Multi-stage Docker build running under Google Cloud Run with secret decoding and mounting handled via `entrypoint.sh`.
 
@@ -22,7 +22,7 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
 - **FastAPI**: `~0.100+`
 - **Pydantic**: `>=1.8.0, <2.0.0` (**Strict v1!** See Gotchas section)
 - **rpy2**: `==3.5.12` (Pinned specifically to prevent Windows C-extension issues)
-- **PostgreSQL Driver**: `psycopg2-binary`
+- **PostgreSQL Driver**: `psycopg[binary]`, `psycopg-pool`
 - **Container Base**: `python:3.13-bookworm` (builder), `python:3.13-slim-bookworm` (prod)
 
 ---
@@ -159,7 +159,7 @@ Located in `app/api/v1/endpoints/select_query/`.
   - Orderable column whitelisting and direction (`asc` / `desc`).
   - Row limiting (1–1000, default 100).
   - Parameterized statement execution using `%s` placeholders.
-  - Connection pooling via `psycopg2.pool.ThreadedConnectionPool` (1–10 connections).
+  - Connection pooling via `psycopg_pool.ConnectionPool` (1–10 connections, with caller queuing and pre-ping health checks).
   - Read-only transaction enforcement (`connection.set_session(readonly=True, autocommit=False)`).
   - Statement timeout enforced per query (`SET LOCAL statement_timeout = 5000` ms).
   - Explicit rollback and connection return in `finally` blocks.
@@ -185,7 +185,7 @@ Located in `app/schemas/`, `app/scripts/`, `scripts/`, `openapi.json`, and `db_s
   - Reusable across any endpoint or module (e.g. `select_query` or future dedicated table endpoints).
   - Automatically registered into OpenAPI `components.schemas` via `custom_openapi()` in `app/main.py`.
 - **Database Introspection (`app/scripts/introspect_schema.py`)**:
-  - Introspects live PostgreSQL database tables and columns using `psycopg2` and `postgres-secret.json`.
+  - Introspects live PostgreSQL database tables and columns using `psycopg` and `postgres-secret.json`.
   - Dumps machine-readable schema metadata to `db_schema.json` for AI agents and local tools.
   - Verifies live database columns against Pydantic models via `--verify`.
 - **OpenAPI Schema Export (`app/scripts/export_openapi.py`)**:

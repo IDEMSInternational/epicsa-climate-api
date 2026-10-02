@@ -24,11 +24,11 @@ import sys
 from typing import Any, Dict, List, Optional
 
 try:
-    import psycopg2
-    from psycopg2.extras import RealDictCursor
+    import psycopg
+    from psycopg.rows import dict_row
 except ImportError:
-    psycopg2 = None
-    RealDictCursor = None
+    psycopg = None
+    dict_row = None
 
 from app.schemas.database import DATABASE_TABLE_MODELS
 
@@ -56,9 +56,9 @@ def load_secret(secret_path: Path) -> Dict[str, Any]:
 
 
 def get_db_connection(secret: Dict[str, Any]):
-    if psycopg2 is None:
-        raise RuntimeError("psycopg2 is not installed. Please run inside the container or install psycopg2-binary.")
-    return psycopg2.connect(
+    if psycopg is None:
+        raise RuntimeError("psycopg is not installed. Please run inside the container or install psycopg[binary].")
+    return psycopg.connect(
         host=secret["host"],
         port=secret.get("port", 5432),
         dbname=secret["dbname"],
@@ -76,7 +76,7 @@ def introspect_schema(secret: Dict[str, Any]) -> Dict[str, Any]:
     }
 
     try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor(row_factory=dict_row) as cur:
             # 1. Get all public tables
             cur.execute("""
                 SELECT table_name
