@@ -107,7 +107,7 @@ def get_application():
     settings = get_settings()
     _app = FastAPI(
         title="E-PICSA Climate API",
-        version="2.0.1",
+        version="2.1.0",
         description=API_DESCRIPTION,
         docs_url="/",
         openapi_tags=TAGS_METADATA,
@@ -209,7 +209,7 @@ def get_application():
         ]
         schema = get_openapi(
             title="E-PICSA Climate API (v2)",
-            version="2.0.1",
+            version=_app.version,
             description="PostgreSQL-backed high-performance climate statistics and metadata endpoints.",
             routes=routes_v2,
             tags=v2_tags,

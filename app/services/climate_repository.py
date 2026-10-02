@@ -5,6 +5,7 @@ from fastapi import HTTPException
 
 from app.core.database import execute_query
 from app.definitions import country_code
+from app.utils.data import trim_empty_records
 from app.core.responce_models.station_responce_model import (
     StationDataResponce,
     StationAndDefintionResponce,
@@ -225,6 +226,8 @@ class ClimateRepository:
         country: str,
         station_id: str,
         summaries: Optional[List[str]] = None,
+        trim_start: bool = True,
+        trim_end: bool = True,
     ) -> AnnualRainfallSummariesResponce:
         """Query and pivot annual rainfall summaries from summary table."""
         # 1. Fetch metadata definitions
@@ -301,7 +304,9 @@ class ClimateRepository:
             elif elem == "season_length" or name in ("length_rains", "length_season", "season_length"):
                 entry["season_length"] = _safe_float(val)
 
-        records = [AnnualRainfallSummariesdata.parse_obj(data) for yr, data in sorted(year_map.items())]
+        raw_data = [data for yr, data in sorted(year_map.items())]
+        trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
+        records = [AnnualRainfallSummariesdata.parse_obj(data) for data in trimmed_data]
         return AnnualRainfallSummariesResponce(metadata=metadata, data=records)
 
     def get_annual_temperature_summaries(
@@ -309,6 +314,8 @@ class ClimateRepository:
         country: str,
         station_id: str,
         summaries: Optional[List[str]] = None,
+        trim_start: bool = True,
+        trim_end: bool = True,
     ) -> AnnualTemperatureSummariesResponce:
         """Query and pivot annual temperature summaries."""
         # Metadata
@@ -364,7 +371,9 @@ class ClimateRepository:
             elif name in ("max_TMPMAX", "max_tmax") or elem == "tmax_max":
                 entry["max_tmax"] = val
 
-        records = [AnnualTempartureSummariesdata.parse_obj(data) for yr, data in sorted(year_map.items())]
+        raw_data = [data for yr, data in sorted(year_map.items())]
+        trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
+        records = [AnnualTempartureSummariesdata.parse_obj(data) for data in trimmed_data]
         return AnnualTemperatureSummariesResponce(metadata=metadata, data=records)
 
     def get_monthly_temperature_summaries(
@@ -372,6 +381,8 @@ class ClimateRepository:
         country: str,
         station_id: str,
         summaries: Optional[List[str]] = None,
+        trim_start: bool = True,
+        trim_end: bool = True,
     ) -> MonthlyTemperatureSummariesResponce:
         """Query and pivot monthly temperature summaries."""
         # Metadata
@@ -437,7 +448,9 @@ class ClimateRepository:
             elif name in ("max_TMPMAX", "max_tmax") or elem == "tmax_max":
                 entry["max_tmax"] = val
 
-        records = [MonthlyTempartureSummariesdata.parse_obj(data) for k, data in sorted(month_map.items())]
+        raw_data = [data for k, data in sorted(month_map.items())]
+        trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
+        records = [MonthlyTempartureSummariesdata.parse_obj(data) for data in trimmed_data]
         return MonthlyTemperatureSummariesResponce(metadata=metadata, data=records)
 
     def get_crop_success_probabilities(

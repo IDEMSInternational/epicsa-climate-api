@@ -71,7 +71,7 @@ def test_v2_station_detail_not_found():
 
 
 def test_v2_annual_rainfall_summaries():
-    """Verify annual rainfall summaries endpoint."""
+    """Verify annual rainfall summaries endpoint trims pre-commissioning null grid years."""
     payload = {
         "country": "zw",
         "station_id": "BEITBRIDGE (MET)",
@@ -83,14 +83,21 @@ def test_v2_annual_rainfall_summaries():
     assert "data" in body
     assert len(body["data"]) > 0
 
+    # 1909 is an empty padding year and must be trimmed.
+    # In test_epicsa.sql observations start in 1950; in full snapshot in 1922.
+    years = [r["year"] for r in body["data"]]
+    assert 1909 not in years
+    assert years[0] in (1922, 1950)
+    assert all(yr >= years[0] for yr in years)
+
     first_row = body["data"][0]
-    assert "year" in first_row
-    assert "station" in first_row
+    assert first_row["year"] == years[0]
     assert first_row["station"] == "BEITBRIDGE (MET)"
+    assert first_row["annual_rain"] is not None
 
 
 def test_v2_annual_temperature_summaries():
-    """Verify annual temperature summaries endpoint."""
+    """Verify annual temperature summaries endpoint trims pre-observation null years."""
     payload = {
         "country": "zw",
         "station_id": "BEITBRIDGE (MET)",
@@ -102,6 +109,12 @@ def test_v2_annual_temperature_summaries():
     assert "data" in body
     assert len(body["data"]) > 0
 
+    # 1922..1951 are empty padding years, 1952 is first year with temperature data
+    years = [r["year"] for r in body["data"]]
+    assert 1922 not in years or years[0] == 1952
+    assert years[0] == 1952
+    assert all(yr >= 1952 for yr in years)
+
     # Verify a year with known temperature data
     row_1952 = next((r for r in body["data"] if r["year"] == 1952), None)
     assert row_1952 is not None
@@ -110,7 +123,7 @@ def test_v2_annual_temperature_summaries():
 
 
 def test_v2_monthly_temperature_summaries():
-    """Verify monthly temperature summaries endpoint."""
+    """Verify monthly temperature summaries endpoint trims pre-observation null months."""
     payload = {
         "country": "zw",
         "station_id": "BEITBRIDGE (MET)",
@@ -125,7 +138,34 @@ def test_v2_monthly_temperature_summaries():
     first_row = body["data"][0]
     assert "year" in first_row
     assert "month" in first_row
+    # Observations start in 1951 (full snapshot) or 1952 (test_epicsa.sql)
+    assert first_row["year"] in (1951, 1952)
     assert 1 <= first_row["month"] <= 12
+    # Verify unobserved pre-1950 months are trimmed
+    assert not any(r["year"] < 1950 for r in body["data"])
+
+
+def test_climate_repository_internal_trim_parameters():
+    """Verify ClimateRepository methods support internal trim_start and trim_end parameters."""
+    from app.services.climate_repository import get_climate_repository
+
+    repo = get_climate_repository()
+
+    # Annual rainfall: untrimmed starts at 1909, trimmed excludes 1909
+    res_trimmed = repo.get_annual_rainfall_summaries("zw", "BEITBRIDGE (MET)", trim_start=True)
+    assert 1909 not in [r.year for r in res_trimmed.data]
+    assert res_trimmed.data[0].year in (1922, 1950)
+    res_untrimmed = repo.get_annual_rainfall_summaries("zw", "BEITBRIDGE (MET)", trim_start=False)
+    assert res_untrimmed.data[0].year == 1909
+
+    # Annual temperature: trimmed starts at 1952
+    res_temp_trimmed = repo.get_annual_temperature_summaries("zw", "BEITBRIDGE (MET)", trim_start=True)
+    assert res_temp_trimmed.data[0].year == 1952
+
+    # Monthly temperature: trimmed starts in 1951 or 1952, pre-1950 is trimmed
+    res_m_trimmed = repo.get_monthly_temperature_summaries("zw", "BEITBRIDGE (MET)", trim_start=True)
+    assert res_m_trimmed.data[0].year in (1951, 1952)
+    assert not any(r.year < 1950 for r in res_m_trimmed.data)
 
 
 def test_v2_crop_success_probabilities():
