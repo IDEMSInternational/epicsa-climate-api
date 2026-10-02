@@ -25,11 +25,11 @@ import sys
 from typing import Any, Dict, List, Optional
 
 try:
-    import psycopg2
-    from psycopg2.extras import RealDictCursor
+    import psycopg
+    from psycopg.rows import dict_row
 except ImportError:
-    psycopg2 = None
-    RealDictCursor = None
+    psycopg = None
+    dict_row = None
 
 from app.scripts.introspect_schema import find_secret_file, get_db_connection, load_secret
 
@@ -60,7 +60,7 @@ def get_table_counts(conn) -> Dict[str, int]:
 
 def get_schema_summary(conn) -> Dict[str, Any]:
     summary_info: Dict[str, Any] = {}
-    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+    with conn.cursor(row_factory=dict_row) as cur:
         # 1. Distinct countries and station counts
         cur.execute("""
             SELECT country_code, COUNT(*) as station_count
@@ -120,7 +120,7 @@ def get_schema_summary(conn) -> Dict[str, Any]:
 
 def dump_station_data(conn, station_id: str, max_rows: int = 500) -> Dict[str, Any]:
     station_dump: Dict[str, Any] = {"station_id": station_id}
-    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+    with conn.cursor(row_factory=dict_row) as cur:
         # Station info
         cur.execute("SELECT * FROM station WHERE station_id = %s;", [station_id])
         station_dump["station"] = cur.fetchall()
@@ -175,7 +175,7 @@ def dump_to_sqlite(conn, sqlite_path: Path, max_rows_per_table: Optional[int] = 
     sconn = sqlite3.connect(str(sqlite_path))
     tables = ["station", "definition", "summary_station_metadata", "summary", "crop"]
 
-    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+    with conn.cursor(row_factory=dict_row) as cur:
         for table in tables:
             print(f"Exporting table '{table}' to SQLite...")
             query = f"SELECT * FROM {table}"

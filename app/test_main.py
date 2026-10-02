@@ -58,7 +58,7 @@ def test_openapi_v2_spec(client):
     response: Response = client.get("/v2/openapi.json")
     assert response.status_code == 200
     data = response.json()
-    assert data["info"]["version"] == "2.0.0"
+    assert data["info"]["version"] == app.version
     paths = data.get("paths", {})
     assert all(p.startswith("/v2") for p in paths)
     assert "/v2/annual_rainfall_summaries/" in paths

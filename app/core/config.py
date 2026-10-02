@@ -7,6 +7,9 @@ from pydantic import BaseSettings,  validator
 class Settings(BaseSettings):
     EPICSA_DATA_AUTH_TOKEN: str = ''
     POSTGRES_SECRET_FILE: str = "./postgres-secret.json"
+    POSTGRES_POOL_MIN_CONNECTIONS: int = 1
+    POSTGRES_POOL_MAX_CONNECTIONS: int = 10
+    POSTGRES_POOL_TIMEOUT_SECONDS: float = 15.0
     # Allow cross-origin requests
     # Non-specific URLs to support various dev applications on localhost, and prod domains (*.picsa.app, *.vercel.app)
     BACKEND_CORS_ORIGINS: list[str] = ["*"]

@@ -1,11 +1,24 @@
 from functools import lru_cache
+import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.exception_handlers import http_exception_handler
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
+
+try:
+    import psycopg
+except ImportError:
+    psycopg = None
+
+try:
+    from psycopg_pool import PoolTimeout
+except ImportError:
+    PoolTimeout = None
 
 from app.api.v1.router import v1_router
 from app.api.v2.router import v2_router
@@ -94,7 +107,7 @@ def get_application():
     settings = get_settings()
     _app = FastAPI(
         title="E-PICSA Climate API",
-        version="2.0.0",
+        version="2.0.1",
         description=API_DESCRIPTION,
         docs_url="/",
         openapi_tags=TAGS_METADATA,
@@ -114,6 +127,55 @@ def get_application():
     _app.include_router(v1_router, prefix="/v1")
     _app.include_router(v2_router, prefix="/v2")
     _app.add_event_handler("shutdown", close_connection_pool)
+
+    if PoolTimeout is not None:
+        @_app.exception_handler(PoolTimeout)
+        async def pool_timeout_handler(request: Request, exc: PoolTimeout):
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                headers={"Retry-After": "2"},
+                content={
+                    "error": {
+                        "code": "DATABASE_BUSY",
+                        "message": "Database connection pool is busy due to high concurrency. Please retry shortly.",
+                        "retryable": True,
+                    }
+                },
+            )
+
+    if psycopg is not None:
+        @_app.exception_handler(psycopg.Error)
+        async def psycopg_error_handler(request: Request, exc: psycopg.Error):
+            err_str = str(exc).lower()
+            is_timeout = "statement timeout" in err_str or "canceling statement due to statement timeout" in err_str
+            status_code = status.HTTP_504_GATEWAY_TIMEOUT if is_timeout else status.HTTP_500_INTERNAL_SERVER_ERROR
+            return JSONResponse(
+                status_code=status_code,
+                content={
+                    "error": {
+                        "code": "QUERY_TIMEOUT" if is_timeout else "DATABASE_ERROR",
+                        "message": "Database query timed out." if is_timeout else "Database query failed.",
+                        "retryable": is_timeout,
+                    }
+                },
+            )
+
+    logger = logging.getLogger("app.main")
+
+    @_app.exception_handler(Exception)
+    async def unhandled_exception_handler(request: Request, exc: Exception):
+        if isinstance(exc, HTTPException):
+            return await http_exception_handler(request, exc)
+        logger.exception("Unhandled server error processing %s: %s", request.url.path, exc)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": "INTERNAL_SERVER_ERROR",
+                    "message": "An unexpected error occurred processing your request.",
+                }
+            },
+        )
 
     @_app.get("/v2/docs", include_in_schema=False)
     def v2_docs():
@@ -147,7 +209,7 @@ def get_application():
         ]
         schema = get_openapi(
             title="E-PICSA Climate API (v2)",
-            version="2.0.0",
+            version="2.0.1",
             description="PostgreSQL-backed high-performance climate statistics and metadata endpoints.",
             routes=routes_v2,
             tags=v2_tags,

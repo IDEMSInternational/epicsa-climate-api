@@ -1,31 +1,17 @@
-import json
-from pathlib import Path
-from threading import Lock
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
 from app.core.config import Settings
+from app.core.database import (
+    load_db_secret as _load_db_secret,
+    close_connection_pool,
+    execute_query,
+)
 
 from .schema import SelectQueryRequest, SelectQueryResponse
 
-try:
-    import psycopg2
-    from psycopg2.extras import RealDictCursor
-    from psycopg2 import pool as psycopg2_pool
-except Exception:  # pragma: no cover - covered by runtime behavior
-    psycopg2 = None
-    RealDictCursor = None
-    psycopg2_pool = None
-
-
 router = APIRouter()
-_STATEMENT_TIMEOUT_MS = 5000
-_POOL_MIN_CONNECTIONS = 1
-_POOL_MAX_CONNECTIONS = 10
-_POOL_LOCK = Lock()
-_CONNECTION_POOL = None
-_CONNECTION_POOL_KEY: tuple[Any, ...] | None = None
 
 _TABLE_CONFIG: dict[str, dict[str, Any]] = {
     "crop": {
@@ -161,12 +147,6 @@ def _build_select_query(payload: SelectQueryRequest) -> tuple[str, list[Any]]:
         "LIMIT %s"
     )
     return sql, [payload.station_id, payload.max_rows]
-
-from app.core.database import (
-    load_db_secret as _load_db_secret,
-    close_connection_pool,
-    execute_query,
-)
 
 
 def execute_select_query(

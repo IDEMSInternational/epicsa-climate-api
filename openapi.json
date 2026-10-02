@@ -3,7 +3,7 @@
   "info": {
     "title": "E-PICSA Climate API",
     "description": "\n### E-PICSA Climate API Documentation\n\n* **v2 Endpoints**: High-performance endpoints querying PostgreSQL directly. [View v2 Docs Only](/v2/docs)\n* **v1 Endpoints (Legacy)**: Legacy endpoints using R (`epicsawrap`) and Cloud Storage. [View v1 Docs Only](/v1/docs)\n",
-    "version": "2.0.0"
+    "version": "2.0.1"
   },
   "paths": {
     "/v1/status/": {
