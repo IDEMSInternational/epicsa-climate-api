@@ -20,7 +20,7 @@ except ImportError:  # pragma: no cover
     ConnectionPool = None
     PoolTimeout = None
 
-_STATEMENT_TIMEOUT_MS = 5000
+_STATEMENT_TIMEOUT_MS = 15000
 _POOL_LOCK = Lock()
 _CONNECTION_POOL: Optional[Any] = None
 _CONNECTION_POOL_KEY: Optional[Tuple[Any, ...]] = None
@@ -159,6 +159,7 @@ def execute_query(
         connection.autocommit = False
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(f"SET LOCAL statement_timeout = {int(_STATEMENT_TIMEOUT_MS)}")
+            cursor.execute("SET LOCAL random_page_cost = 1.1")
             cursor.execute(sql, tuple(params))
             rows = [dict(row) for row in cursor.fetchall()] if cursor.description else []
             columns = [column.name for column in cursor.description] if cursor.description else []

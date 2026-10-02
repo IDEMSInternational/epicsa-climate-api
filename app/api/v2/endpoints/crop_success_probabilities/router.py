@@ -14,7 +14,7 @@ def get_crop_success_probabilities(
     params: CropSuccessProbabilitiesParameters,
     repo: ClimateRepository = Depends(get_climate_repository),
 ) -> CropSuccessProbabilitiesResponce:
-    """Retrieve crop success probabilities from PostgreSQL."""
+    """Retrieve full crop success probabilities lookup table from PostgreSQL."""
     return repo.get_crop_success_probabilities(
         country=params.country,
         station_id=params.station_id,

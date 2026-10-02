@@ -149,10 +149,22 @@ class ClimateRepository:
         """
         _, rows = execute_query(sql, db_codes)
 
-        stations: List[StationDataResponce] = []
+        # Deduplicate stations by station_name, prioritizing name-based station_ids
+        seen_names: Dict[str, Dict[str, Any]] = {}
         for r in rows:
             stn_id = str(r["station_id"])
             stn_name = r.get("station_name") or stn_id
+            if stn_name not in seen_names:
+                seen_names[stn_name] = r
+            else:
+                # Prefer name ID over numeric ID (e.g. 'BEITBRIDGE (MET)' over '67991020')
+                current_id = str(seen_names[stn_name]["station_id"])
+                if current_id != stn_name and stn_id == stn_name:
+                    seen_names[stn_name] = r
+
+        stations: List[StationDataResponce] = []
+        for stn_name, r in sorted(seen_names.items(), key=lambda x: x[0]):
+            stn_id = str(r["station_id"])
             api_country = self.map_to_api_country_code(r.get("country_code"))
             stations.append(
                 StationDataResponce(
@@ -458,7 +470,7 @@ class ClimateRepository:
         country: str,
         station_id: str,
     ) -> CropSuccessProbabilitiesResponce:
-        """Query and aggregate crop success probabilities from crop table."""
+        """Query and aggregate full crop success probabilities lookup table from crop table using SQL aggregation."""
         # Metadata
         sql_defs = """
             SELECT d.summary_element, d.definition_value
@@ -478,53 +490,42 @@ class ClimateRepository:
                     meta_dict[k] = val[k]
         metadata = CropSuccessProbabilitiesMetadata.parse_obj(meta_dict)
 
-        # Aggregated query across years
+        # Full lookup table aggregation query
         sql_crop = """
             SELECT
-              CAST(rain_total AS NUMERIC) AS total_rain,
-              CAST(plant_day AS NUMERIC) AS plant_day,
-              CAST(plant_length AS NUMERIC) AS plant_length,
-              include_start_condition,
-              summary_value
+              CAST(rain_total AS INTEGER) AS total_rain,
+              CAST(plant_day AS INTEGER) AS plant_day,
+              CAST(plant_length AS INTEGER) AS plant_length,
+              SUM(CASE WHEN include_start_condition IS TRUE THEN 1 ELSE 0 END) AS with_start_total,
+              SUM(CASE WHEN include_start_condition IS TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS with_start_success,
+              SUM(CASE WHEN include_start_condition IS NOT TRUE THEN 1 ELSE 0 END) AS no_start_total,
+              SUM(CASE WHEN include_start_condition IS NOT TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS no_start_success
             FROM crop
             WHERE station_id = %s
+              AND rain_total IS NOT NULL
+              AND plant_day IS NOT NULL
+              AND plant_length IS NOT NULL
+            GROUP BY plant_day, plant_length, rain_total
             ORDER BY plant_day, plant_length, rain_total;
         """
         _, rows = execute_query(sql_crop, [station_id])
 
-        # Group by (total_rain, plant_day, plant_length)
-        grouped = defaultdict(lambda: {"with_start_total": 0, "with_start_success": 0,
-                                       "no_start_total": 0, "no_start_success": 0})
-        for r in rows:
-            r_tot = _safe_int(r["total_rain"])
-            p_day = _safe_int(r["plant_day"])
-            p_len = _safe_int(r["plant_length"])
-            if r_tot is None or p_day is None or p_len is None:
-                continue
-
-            with_start = _safe_bool(r["include_start_condition"])
-            success = str(r.get("summary_value") or "").strip().upper() in ("TRUE", "1")
-
-            k = (r_tot, p_day, p_len)
-            if with_start:
-                grouped[k]["with_start_total"] += 1
-                if success:
-                    grouped[k]["with_start_success"] += 1
-            else:
-                grouped[k]["no_start_total"] += 1
-                if success:
-                    grouped[k]["no_start_success"] += 1
-
         records: List[CropSuccessProbabilitiesdata] = []
-        for (r_tot, p_day, p_len), counts in sorted(grouped.items(), key=lambda x: (x[0][1], x[0][2], x[0][0])):
-            p_with = (counts["with_start_success"] / counts["with_start_total"]) if counts["with_start_total"] > 0 else 0.0
-            p_no = (counts["no_start_success"] / counts["no_start_total"]) if counts["no_start_total"] > 0 else 0.0
+        for r in rows:
+            w_tot = _safe_int(r["with_start_total"]) or 0
+            w_suc = _safe_int(r["with_start_success"]) or 0
+            n_tot = _safe_int(r["no_start_total"]) or 0
+            n_suc = _safe_int(r["no_start_success"]) or 0
+
+            p_with = (w_suc / w_tot) if w_tot > 0 else 0.0
+            p_no = (n_suc / n_tot) if n_tot > 0 else 0.0
+
             records.append(
                 CropSuccessProbabilitiesdata(
                     station=station_id,
-                    total_rain=r_tot,
-                    plant_day=p_day,
-                    plant_length=p_len,
+                    total_rain=_safe_int(r["total_rain"]),
+                    plant_day=_safe_int(r["plant_day"]),
+                    plant_length=_safe_int(r["plant_length"]),
                     prop_success_with_start=round(p_with, 4),
                     prop_success_no_start=round(p_no, 4),
                 )
