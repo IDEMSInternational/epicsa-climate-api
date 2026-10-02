@@ -50,6 +50,10 @@ def test_v2_station_list():
     data_zw = res_zw.json()["data"]
     assert len(data_zw) > 0
     assert any("BEITBRIDGE" in s["station_id"] for s in data_zw)
+    zw_ids = [s["station_id"] for s in data_zw]
+    # Ensure numeric IDs (e.g. 67991020) are filtered out and list is unique
+    assert not any(sid.isdigit() for sid in zw_ids)
+    assert len(zw_ids) == len(set(zw_ids))
 
 
 def test_v2_station_detail():
@@ -169,7 +173,13 @@ def test_climate_repository_internal_trim_parameters():
 
 
 def test_v2_crop_success_probabilities():
-    """Verify crop success probabilities endpoint."""
+    """Verify crop success probabilities endpoint returns the full lookup table and has no extra filter options."""
+    from app.api.v2.endpoints.crop_success_probabilities.schema import CropSuccessProbabilitiesParameters
+
+    # Verify schema ONLY gives country and station_id
+    assert set(CropSuccessProbabilitiesParameters.__fields__.keys()) == {"country", "station_id"}
+
+    # 1. Test CHISENGU (MET) returns full lookup table
     payload = {
         "country": "zw",
         "station_id": "CHISENGU (MET)",
@@ -179,7 +189,7 @@ def test_v2_crop_success_probabilities():
     body = res.json()
     assert "metadata" in body
     assert "data" in body
-    assert len(body["data"]) > 0
+    assert len(body["data"]) == 819
 
     first_row = body["data"][0]
     assert "total_rain" in first_row
@@ -187,6 +197,16 @@ def test_v2_crop_success_probabilities():
     assert "plant_length" in first_row
     assert 0.0 <= first_row["prop_success_with_start"] <= 1.0
     assert 0.0 <= first_row["prop_success_no_start"] <= 1.0
+
+    # 2. Test BEITBRIDGE (MET) returns full lookup table
+    payload_bb = {
+        "country": "zw",
+        "station_id": "BEITBRIDGE (MET)",
+    }
+    res_bb = client.post("/v2/crop_success_probabilities/", json=payload_bb)
+    assert res_bb.status_code == 200
+    body_bb = res_bb.json()
+    assert len(body_bb["data"]) == 819
 
 
 def test_v2_season_start_probabilities():
