@@ -5,6 +5,7 @@ from fastapi import HTTPException
 
 from app.core.database import execute_query
 from app.definitions import country_code
+from app.services.variable_mappings import map_annual_rain_field
 from app.utils.data import trim_empty_records
 from app.core.responce_models.station_responce_model import (
     StationDataResponce,
@@ -279,42 +280,18 @@ class ClimateRepository:
             yr = _safe_int(row["time_value"])
             if yr is None:
                 continue
-            name = (row.get("summary_name") or "").strip()
-            elem = (row.get("summary_element") or "").strip()
+            name = row.get("summary_name")
+            elem = row.get("summary_element")
             val = row.get("summary_value")
 
             entry = year_map[yr]
             entry["station"] = station_id
             entry["year"] = yr
 
-            if elem == "total_rain" or name in ("annual_rain", "total_rain", "Oct_Apr_PRECIP", "seasonal_PRECIP"):
-                entry["annual_rain"] = _safe_float(val)
-            elif elem == "rain_day" or name in ("n_rain", "Oct_Apr_rainday", "annual_rainday"):
-                entry["n_rain"] = _safe_int(val)
-            elif elem == "start_rain" or name in ("start_rains", "start"):
-                entry["start_rains_doy"] = _safe_int(val)
-            elif elem == "start_rain_date" or name in ("start_rains_date", "start_d"):
-                entry["start_rains_date"] = str(val) if val else None
-            elif elem == "start_rain_status" or name in ("start_rains_status", "start_s"):
-                entry["start_rains_status"] = _safe_bool(val)
-            elif elem == "end_rain" or name == "end_rains":
-                entry["end_rains_doy"] = _safe_int(val)
-            elif elem == "end_rain_date" or name == "end_rains_date":
-                entry["end_rains_date"] = str(val) if val else None
-            elif elem == "end_rain_status" or name == "end_rains_status":
-                entry["end_rains_status"] = _safe_bool(val)
-            elif elem == "end_season" or name == "end_season":
-                entry["end_season_doy"] = _safe_int(val)
-            elif elem == "end_season_date" or name == "end_season_date":
-                entry["end_season_date"] = str(val) if val else None
-            elif elem == "end_season_status" or name == "end_season_status":
-                entry["end_season_status"] = _safe_bool(val)
-            elif elem == "seasonal_total_rain" or name in ("seasonal_PRECIP", "seasonal_rain"):
-                entry["seasonal_rain"] = _safe_int(val)
-            elif elem == "seasonal_rain_day" or name in ("seasonal_rainday", "n_seasonal_rain"):
-                entry["n_seasonal_rain"] = _safe_int(val)
-            elif elem == "season_length" or name in ("length_rains", "length_season", "season_length"):
-                entry["season_length"] = _safe_float(val)
+            field_mapping = map_annual_rain_field(elem, name, val)
+            if field_mapping:
+                canonical_field, parsed_val = field_mapping
+                entry[canonical_field] = parsed_val
 
         raw_data = [data for yr, data in sorted(year_map.items())]
         trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
