@@ -159,9 +159,15 @@ Stored under `summary_element = 'rain_day'`:
 * `[rain_day] "Seasonal_Raindays"` (159 rows, 3 stations)
 
 ### F. Start of Rains (25 variants · 247,465 rows)
-* **DOY (`start_rain`)**: `start` (40k), `start_dry` (18k), `start_rains` (11k), `start_season` (11k), `start_Dry` (8k), `start_dryspell`, `start_drySpell`, `DrySpell`.
-* **Date (`start_rain_date`)**: `start_d` (40k), `start_dry_d` (18k), `start_rains_date` (11k), `start_season_date` (11k), `start_Dry_d` (8k), `star_dry_d` (*typo*), `start_d_dryspell`, `start_d_drySpell`, `DrySpell_d`.
-* **Status (`start_rain_status`)**: `start_dry_s` (18k), `start_rains_status` (11k), `start_season_status` (11k), `start_s` (10k), `start_Dry_s` (8k), `start_s_dryspell`, `start_s_drySpell`, `DrySpell_s`.
+* **Standard Start of Rains**:
+  * **DOY (`start_rain`)**: `start` (40k), `start_rains` (11k), `start_season` (11k).
+  * **Date (`start_rain_date`)**: `start_d` (40k), `start_rains_date` (11k), `start_season_date` (11k).
+  * **Status (`start_rain_status`)**: `start_rains_status` (11k), `start_season_status` (11k), `start_s` (10k).
+* **Start of Rains with Dry Spell Criteria (Auxiliary / Reserved)**:
+  * **DOY**: `start_dry` (18k), `start_Dry` (8k), `start_dryspell`, `start_drySpell`, `DrySpell`.
+  * **Date**: `start_dry_d` (18k), `start_Dry_d` (8k), `star_dry_d` (*typo*), `start_d_dryspell`, `start_d_drySpell`, `DrySpell_d`.
+  * **Status**: `start_dry_s` (18k), `start_Dry_s` (8k), `start_s_dryspell`, `start_s_drySpell`, `DrySpell_s`.
+  * *Architectural Note*: These represent planting dates conditioned on subsequent dry spell thresholds. Because they measure a distinct agronomic metric from standard start of rains, they are tracked in `ANNUAL_RAIN_AUXILIARY_SET` to avoid overwriting or polluting canonical `start_rains_*` fields.
 
 ### G. End of Rains, End of Season, Season Length, & Dry Spells
 * **End of Rains** (3 variants · 137k rows): `end_rains`, `end_rains_date`, `end_rains_status`.
@@ -174,10 +180,11 @@ Stored under `summary_element = 'rain_day'`:
 ## 5. API Anti-Corruption Layer Architecture
 
 To isolate downstream consumers from this database mess:
-1. **Module**: [`app/services/variable_mappings.py`](app/services/variable_mappings.py) defines a centralized `ANNUAL_RAIN_EXACT_MAP` dictionary.
-2. **Precedence Rules**:
+1. **Module**: [`app/services/variable_mappings.py`](app/services/variable_mappings.py) defines a centralized `ANNUAL_RAIN_EXACT_MAP` dictionary and `ANNUAL_RAIN_AUXILIARY_SET`.
+2. **Precedence & Isolation Rules**:
    - Seasonal totals are matched **before** generic `total_rain`.
    - Sub-seasonal 3-month blocks (`ond_`, `djf_`, `jfm_`, `fma_`, `ndj_`) are explicitly excluded so they never overwrite full-year annual totals.
+   - Start of rains with dry spell criteria (`start_dry*`, `dryspell*`) are explicitly categorized as auxiliary so they never overwrite standard start of rains.
    - Seasonal rain days are matched **before** generic `rain_day`.
 3. **Clean Consumption**:
    In [`app/services/climate_repository.py`](app/services/climate_repository.py), the pivoting loop delegates directly to:

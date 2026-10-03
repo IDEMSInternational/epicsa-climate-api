@@ -99,6 +99,14 @@ def test_v2_annual_rainfall_summaries():
     assert first_row["station"] == "BEITBRIDGE (MET)"
     assert first_row["annual_rain"] is not None
 
+    # Verify 1950 correctly separates annual rain (Oct_Apr_PRECIP) and seasonal rain (seasonal_PRECIP)
+    row_1950 = next((r for r in body["data"] if r["year"] == 1950), None)
+    assert row_1950 is not None
+    assert row_1950["annual_rain"] == 295.7
+    assert row_1950["seasonal_rain"] == 236.2
+    assert row_1950["n_rain"] == 24
+    assert row_1950["n_seasonal_rain"] == 14
+
 
 def test_v2_annual_temperature_summaries():
     """Verify annual temperature summaries endpoint trims pre-observation null years."""
@@ -231,3 +239,238 @@ def test_v2_select_query():
     body = res.json()
     assert "rows" in body
     assert body["row_count"] >= 1
+
+
+def test_climate_repository_annual_rainfall_summaries_subseasonal_and_seasonal_mapping(monkeypatch):
+    """Verify that OND_rainfall does not overwrite Annual_rainfall and that Seasonal_Rain maps correctly."""
+    from app.services import climate_repository as cr_mod
+
+    # Mock Magoye-like rows: Annual_rainfall (613.7) and OND_rainfall (123.9) both under total_rain
+    magoye_rows = [
+        {"time_value": "1981", "summary_element": "total_rain", "summary_name": "Annual_rainfall", "summary_value": "613.7"},
+        {"time_value": "1981", "summary_element": "total_rain", "summary_name": "OND_rainfall", "summary_value": "123.9"},
+        {"time_value": "1981", "summary_element": "rain_day", "summary_name": "No_of_raindays", "summary_value": "50"},
+        {"time_value": "1981", "summary_element": "start_rain", "summary_name": "start", "summary_value": "173"},
+        {"time_value": "1981", "summary_element": "start_rain_date", "summary_name": "start_d", "summary_value": "1981-12-20"},
+        {"time_value": "1981", "summary_element": "start_rain_status", "summary_name": "start_s", "summary_value": "TRUE"},
+        {"time_value": "1981", "summary_element": "end_season", "summary_name": "end_season", "summary_value": "259"},
+        {"time_value": "1981", "summary_element": "end_season_date", "summary_name": "end_season_date", "summary_value": "1982-03-15"},
+        {"time_value": "1981", "summary_element": "end_season_status", "summary_name": "end_season_status", "summary_value": "TRUE"},
+        {"time_value": "1981", "summary_element": "season_length", "summary_name": "length", "summary_value": "86"},
+    ]
+
+    def mock_execute_query(sql, params=None):
+        if "FROM summary_station_metadata" in sql:
+            return [], []
+        if "FROM summary" in sql:
+            return [], magoye_rows
+        return [], []
+
+    monkeypatch.setattr(cr_mod, "execute_query", mock_execute_query)
+    repo = cr_mod.ClimateRepository()
+    res = repo.get_annual_rainfall_summaries("zm", "MAGOYE AGROMET", trim_start=False, trim_end=False)
+    assert len(res.data) == 1
+    row = res.data[0]
+    assert row.year == 1981
+    assert row.annual_rain == 613.7  # NOT 123.9
+    assert row.seasonal_rain is None
+    assert row.n_rain == 50
+    assert row.season_length == 86.0
+    assert row.end_season_doy == 259
+
+    # Mock Chinsali-like rows: Seasonal_Rain (577.2) and Seasonal_Raindays (33)
+    chinsali_rows = [
+        {"time_value": "2016", "summary_element": "total_rain", "summary_name": "Annual_Rain", "summary_value": "577.2"},
+        {"time_value": "2016", "summary_element": "total_rain", "summary_name": "Seasonal_Rain", "summary_value": "577.2"},
+        {"time_value": "2016", "summary_element": "total_rain", "summary_name": "OND_rainfall", "summary_value": "318.7"},
+        {"time_value": "2016", "summary_element": "rain_day", "summary_name": "Annual_Raindays", "summary_value": "33"},
+        {"time_value": "2016", "summary_element": "rain_day", "summary_name": "Seasonal_Raindays", "summary_value": "33"},
+        {"time_value": "2016", "summary_element": "season_length", "summary_name": "length", "summary_value": "89"},
+    ]
+
+    monkeypatch.setattr(cr_mod, "execute_query", lambda sql, params=None: ([], [] if "metadata" in sql else chinsali_rows))
+    res_ch = repo.get_annual_rainfall_summaries("zm", "CHINSALI FTC", trim_start=False, trim_end=False)
+    assert len(res_ch.data) == 1
+    row_ch = res_ch.data[0]
+    assert row_ch.annual_rain == 577.2
+    assert row_ch.seasonal_rain == 577.2
+    assert row_ch.n_rain == 33
+    assert row_ch.n_seasonal_rain == 33
+
+
+def test_variable_mappings_exact_matches():
+    from app.services.variable_mappings import map_annual_rain_field
+
+    # Exact annual rainfall metrics
+    assert map_annual_rain_field("total_rain", "Annual_Rain", "613.7") == ("annual_rain", 613.7)
+    assert map_annual_rain_field("total_rain", "annual_rain", "613.7") == ("annual_rain", 613.7)
+    assert map_annual_rain_field("total_rain", "total_rain", "613.7") == ("annual_rain", 613.7)
+    assert map_annual_rain_field("total_rain", "Annual_rainfall", "613.7") == ("annual_rain", 613.7)
+
+    # Exact seasonal rainfall metrics
+    assert map_annual_rain_field("total_rain", "Seasonal_Rain", "577.2") == ("seasonal_rain", 577.2)
+    assert map_annual_rain_field("seasonal_rain", "seasonal_rain", "577.2") == ("seasonal_rain", 577.2)
+    assert map_annual_rain_field("seasonal_precip", "seasonal_precip", "577.2") == ("seasonal_rain", 577.2)
+
+    # Rain day counts
+    assert map_annual_rain_field("rain_day", "Annual_Raindays", "50") == ("n_rain", 50)
+    assert map_annual_rain_field("rain_day", "No_of_raindays", "50") == ("n_rain", 50)
+    assert map_annual_rain_field("rain_day", "Seasonal_Raindays", "33") == ("n_seasonal_rain", 33)
+
+    # Dates and statuses
+    assert map_annual_rain_field("start_rain", "start", "173") == ("start_rains_doy", 173)
+    assert map_annual_rain_field("start_rain_date", "start_d", "1981-12-20") == ("start_rains_date", "1981-12-20")
+    assert map_annual_rain_field("start_rain_status", "start_s", "TRUE") == ("start_rains_status", True)
+    assert map_annual_rain_field("end_season", "end_season", "259") == ("end_season_doy", 259)
+    assert map_annual_rain_field("end_season_date", "end_season_date", "1982-03-15") == ("end_season_date", "1982-03-15")
+    assert map_annual_rain_field("end_season_status", "end_season_status", "FALSE") == ("end_season_status", False)
+    assert map_annual_rain_field("season_length", "length", "86") == ("season_length", 86.0)
+
+
+def test_variable_mappings_subseasonal_and_auxiliary_exclusion():
+    from app.services.variable_mappings import map_annual_rain_field
+
+    # 3-month sub-seasonal blocks must never map to annual_rain
+    assert map_annual_rain_field("total_rain", "OND_rainfall", "123.9") is None
+    assert map_annual_rain_field("total_rain", "djf_rainfall", "200.0") is None
+    assert map_annual_rain_field("total_rain", "mam_rainfall", "150.0") is None
+    assert map_annual_rain_field("total_rain", "jja_rainfall", "10.0") is None
+    assert map_annual_rain_field("total_rain", "son_rainfall", "50.0") is None
+
+    # Dry spells must not map to annual_rain
+    assert map_annual_rain_field("total_rain", "max_dry_spell", "15") is None
+    assert map_annual_rain_field("total_rain", "longest_dry_spell", "20") is None
+
+    # Start of rains with dry spell criteria must not map to standard start of rains
+    assert map_annual_rain_field("start_rain", "start_dry", "180") is None
+    assert map_annual_rain_field("start_rain", "start_dryspell", "180") is None
+    assert map_annual_rain_field("start_rain", "dryspell", "180") is None
+    assert map_annual_rain_field("start_rain_date", "start_dry_d", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_date", "star_dry_d", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_date", "start_d_dryspell", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_date", "dryspell_d", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_status", "start_dry_s", "TRUE") is None
+    assert map_annual_rain_field("start_rain_status", "start_s_dryspell", "TRUE") is None
+    assert map_annual_rain_field("start_rain_status", "dryspell_s", "1") is None
+
+
+def test_variable_mappings_safe_converters():
+    from app.services.variable_mappings import (
+        _safe_float,
+        _safe_int,
+        _safe_bool,
+        _safe_str,
+    )
+
+    # Float converter
+    assert _safe_float("123.45") == 123.45
+    assert _safe_float("123") == 123.0
+    assert _safe_float(None) is None
+    assert _safe_float("") is None
+    assert _safe_float("NA") is None
+    assert _safe_float("invalid") is None
+
+    # Int converter
+    assert _safe_int("42") == 42
+    assert _safe_int("42.0") == 42
+    assert _safe_int("42.8") == 42
+    assert _safe_int(None) is None
+    assert _safe_int("") is None
+    assert _safe_int("NA") is None
+
+    # Bool converter
+    assert _safe_bool("TRUE") is True
+    assert _safe_bool("true") is True
+    assert _safe_bool("t") is True
+    assert _safe_bool("1") is True
+    assert _safe_bool(True) is True
+    assert _safe_bool("FALSE") is False
+    assert _safe_bool("false") is False
+    assert _safe_bool("0") is False
+    assert _safe_bool(None) is None
+    assert _safe_bool("NA") is None
+
+    # Str converter
+    assert _safe_str("1981-12-20") == "1981-12-20"
+    assert _safe_str(None) is None
+    assert _safe_str("NA") is None
+    assert _safe_str("null") is None
+    assert _safe_str("") is None
+
+
+def test_audit_variables_logic(monkeypatch):
+    from app.scripts import audit_variables as audit_mod
+
+    mock_rows = [
+        {"summary_type": "Annual Rain", "summary_element": "total_rain", "summary_name": "Annual_Rain", "row_count": 50, "station_count": 1},
+        {"summary_type": "Annual Rain", "summary_element": "total_rain", "summary_name": "OND_rainfall", "row_count": 50, "station_count": 1},
+        {"summary_type": "Annual Rain", "summary_element": "unknown_elem", "summary_name": "mystery_var", "row_count": 10, "station_count": 1},
+        {"summary_type": "Annual Temperature", "summary_element": "tmax_max", "summary_name": "max_tmax", "row_count": 30, "station_count": 1},
+        {"summary_type": "Crop", "summary_element": "plant_date", "summary_name": "plant", "row_count": 100, "station_count": 1},
+    ]
+
+    monkeypatch.setattr(audit_mod, "execute_query", lambda sql, params=None: ([], mock_rows))
+
+    report = audit_mod.audit_summary_variables()
+    assert report["summary"]["total_pairs"] == 5
+    assert report["summary"]["total_rows"] == 240
+    assert report["summary"]["mapped_pairs"] == 2  # Annual_Rain, tmax_max
+    assert report["summary"]["auxiliary_pairs"] == 2  # OND_rainfall, Crop
+    assert report["summary"]["unmapped_pairs"] == 1  # mystery_var
+
+    unmapped = report["unmapped"][0]
+    assert unmapped["summary_element"] == "unknown_elem"
+    assert unmapped["summary_name"] == "mystery_var"
+
+
+def test_audit_stations_logic(monkeypatch):
+    from app.scripts import audit_stations as st_audit_mod
+
+    def mock_execute_query(sql, params=None):
+        if "WITH annual_stations AS" in sql:
+            # 5. Seasonal gaps
+            return [], [
+                {"station_id": "MAGOYE AGROMET", "station_name": "MAGOYE AGROMET", "country_code": "zm"}
+            ]
+        if "GROUP BY station_id, station_name, country_code" in sql:
+            # 1. Duplicates
+            return [], [
+                {"station_id": "CHIPAT01", "station_name": "CHIPATA MET", "country_code": "zm", "count": 6},
+                {"station_id": "67991020", "station_name": "BEITBRIDGE (MET)", "country_code": "zim", "count": 2},
+            ]
+        if "WHERE country_code IS NULL OR country_code NOT IN" in sql:
+            # 2. Inconsistent countries
+            return [], [
+                {"station_id": "CHIPAT01", "station_name": "CHIPATA MET", "country_code": None},
+                {"station_id": "BEITBRIDGE (MET)", "station_name": "BEITBRIDGE (MET)", "country_code": "zim"},
+            ]
+        if "SELECT DISTINCT station_id, station_name, country_code" in sql:
+            # 3. All stations for dual-identity
+            return [], [
+                {"station_id": "BEITBRIDGE (MET)", "station_name": "BEITBRIDGE (MET)", "country_code": "zim"},
+                {"station_id": "67991020", "station_name": "BEITBRIDGE (MET)", "country_code": "zim"},
+                {"station_id": "CHIPATA MET", "station_name": "CHIPATA MET", "country_code": "zm"},
+                {"station_id": "CHIPAT01", "station_name": "CHIPATA MET", "country_code": "zm"},
+            ]
+        if "GROUP BY station_id, summary_type" in sql:
+            # 4. Multi-batch
+            return [], [
+                {"station_id": "BEITBRIDGE (MET)", "summary_type": "Annual Rain", "batch_count": 26, "row_count": 48222}
+            ]
+        return [], []
+
+    monkeypatch.setattr(st_audit_mod, "execute_query", mock_execute_query)
+    results = st_audit_mod.audit_station_integrity()
+    assert results["summary"]["duplicate_row_groups"] == 2
+    assert results["summary"]["inconsistent_country_codes"] == 2
+    assert results["summary"]["dual_identity_stations"] == 2
+    assert results["summary"]["multi_batch_stations"] == 1
+    assert results["summary"]["stations_missing_seasonal_rain"] == 1
+
+    # Verify Beitbridge dual identity
+    beitbridge = next(s for s in results["dual_identity_stations"] if "BEITBRIDGE" in s["station_name"])
+    assert "BEITBRIDGE (MET)" in beitbridge["text_ids"]
+    assert "67991020" in beitbridge["numeric_ids"]
+
+
+
