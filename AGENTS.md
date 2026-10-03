@@ -48,8 +48,12 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
 ├── pytest.ini                            # Pytest configuration, env files, testpaths
 ├── requirements.txt                      # Production Python dependencies (includes pydantic v1 pin)
 ├── requirements_dev.txt                  # Pinned Python dependencies for reproducible dev setup
-├── scripts/                              # Host CLI script wrappers (export_openapi, introspect_schema)
-├── TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md # Schema documentation for select_query endpoint
+├── docs/                                 # Centralized project documentation
+│   ├── README.md                         # Documentation index & guide overview
+│   ├── AUDITING_AND_DRIFT_DETECTION.md   # Guide for running & acting on variable audit tooling
+│   ├── CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md # Audit of DB variable naming, station duplications & target spec
+│   └── TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md # Schema documentation for select_query endpoint
+├── scripts/                              # Host CLI script wrappers (audit_variables, audit_stations, export_openapi, introspect_schema)
 ├── test.sh                               # Helper script running pytest with coverage
 │
 └── app/
@@ -60,12 +64,19 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
     ├── definitions.py                    # Shared literal types (country_code, language_code)
     ├── epicsawrap_link.py                # Python wrapper invoking R functions via rpy2
     │
+    ├── services/                         # Data access layer and mapping services
+    │   ├── __init__.py
+    │   ├── climate_repository.py         # Direct PostgreSQL query repository for climate summaries
+    │   └── variable_mappings.py          # Canonical EAV mapping dicts, auxiliary exclusions, and safe type converters
+    │
     ├── schemas/                          # High-level Pydantic models for DB tables and shared schemas
     │   ├── __init__.py
     │   └── database.py                   # CropRecord, DefinitionRecord, StationRecord, SummaryRecord, etc.
     │
     ├── scripts/                          # Container-compatible maintenance and export scripts
     │   ├── __init__.py
+    │   ├── audit_variables.py            # Live database audit & drift detection CLI
+    │   ├── audit_stations.py             # Station metadata, dual-identity & multi-batch audit CLI
     │   ├── export_openapi.py             # Dumps OpenAPI schema to openapi.json
     │   └── introspect_schema.py          # Introspects live DB into db_schema.json and verifies models
     │
@@ -192,6 +203,17 @@ Located in `app/schemas/`, `app/scripts/`, `scripts/`, `openapi.json`, and `db_s
   - Exports the current FastAPI OpenAPI 3.1 specification to `openapi.json` at the repo root.
   - Used by AI agents for offline context and by client generators (e.g. TypeScript `openapi-typescript` + `openapi-fetch`).
 
+### Subsystem F: Climate Variable Canonical Mapping & Ingestion Audit
+Located in `app/services/variable_mappings.py`, `app/scripts/audit_variables.py`, and documented in [`docs/CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md`](docs/CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md) and [`docs/AUDITING_AND_DRIFT_DETECTION.md`](docs/AUDITING_AND_DRIFT_DETECTION.md).
+- **The EAV Ingestion Problem**: The analytical PostgreSQL `summary` table stores climate summaries in an Entity-Attribute-Value (EAV) structure (`station_id`, `summary_type`, `summary_element`, `summary_name`, `summary_value`). The underlying table contains **no check constraints or enums** on element/name pairs, and R-Instat ingestion scripts historically generated 92+ naming permutations across countries (e.g. overloading `total_rain` with annual totals, seasonal totals, and 3-month blocks like `OND_rainfall`).
+- **Deterministic Canonical Mapping (`app/services/variable_mappings.py`)**:
+  - `ANNUAL_RAIN_EXACT_MAP`: Explicit whitelist dictionary mapping 52 distinct production `(summary_element, summary_name)` pairs directly to canonical fields (`annual_rain`, `seasonal_rain`, `n_rain`, `n_seasonal_rain`, `start_rains_doy`, `start_rains_date`, `start_rains_status`, `season_length`, `end_season_doy`, `end_season_date`, `end_season_status`, etc.) with strict type parsing (`_safe_float`, `_safe_int`, `_safe_bool`, `_safe_str`).
+  - `ANNUAL_RAIN_AUXILIARY_SET`: Whitelist of 19 sub-seasonal 3-month blocks (`ond_rainfall`, `djf_rainfall`, etc.) and dry spells (`max_dry_spell`, `longest_dry_spell`) that must be excluded from annual totals.
+  - `map_annual_rain_field()`: Centralized router mapping function used across database query services to guarantee that sub-seasonal blocks never pollute annual metrics.
+- **Audit & Drift Detection CLI (`app/scripts/audit_variables.py`)**:
+  - Scans live PostgreSQL databases, verifies all distinct variable pairs against canonical maps, and alerts if new unmapped variations are ingested by R-Instat.
+  - Run via `python -m app.scripts.audit_variables --strict` or `./scripts/audit_variables.py --strict`. Detailed documentation in [`docs/AUDITING_AND_DRIFT_DETECTION.md`](docs/AUDITING_AND_DRIFT_DETECTION.md).
+
 ---
 
 ## 4. API Endpoints Reference
@@ -271,6 +293,13 @@ Whenever proposing code changes, always bump the API version string in `app/main
 _app = FastAPI(title="E-PICSA Climate API", version="x.y.z", docs_url="/")
 ```
 
+### ⚠️ Gotcha 9: Climate Variable Drift & EAV Summaries
+The PostgreSQL `summary` table is an unconstrained Entity-Attribute-Value store populated by R-Instat.
+- **DO NOT** make heuristic assumptions about variable names (e.g. `if "rain" in name:`). Sub-seasonal blocks (e.g. `OND_rainfall`) and seasonal totals (e.g. `Seasonal_Rain`) frequently share element names with annual totals (`total_rain`).
+- **DO NOT** add inline `if/elif` parsing chains in routers or endpoints.
+- **ALWAYS** check [`docs/CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md`](docs/CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md) and register any new variable variations in `app/services/variable_mappings.py`.
+- **ALWAYS** verify with `python -m app.scripts.audit_variables --strict` (or `./scripts/audit_variables.py --strict`) to ensure 100% of production variables map cleanly. See [`docs/AUDITING_AND_DRIFT_DETECTION.md`](docs/AUDITING_AND_DRIFT_DETECTION.md).
+
 ---
 
 ## 6. Dependency Injection & Testing Patterns
@@ -341,7 +370,7 @@ def test_select_query_success(monkeypatch):
 6. **Add Tests**: Add test cases to `app/tests/test_error_response.py` overriding `get_run_epicsa_function`.
 
 ### Recipe 2: Adding a Table or Column to `select_query`
-1. Review [`TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md`](TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md).
+1. Review [`docs/TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md`](docs/TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md).
 2. In `app/api/v1/endpoints/select_query/router.py`:
    - Add/update the table entry in `_TABLE_CONFIG`.
    - Specify `"from"`, `"station_filter"`, allowed `"columns"` mapping, `"orderable"` columns, and `"default_order"`.
@@ -430,6 +459,14 @@ docker compose exec app python -m app.scripts.introspect_schema --verify
 
 # Generate TypeScript types for frontend / client applications
 npx openapi-typescript openapi.json -o api-types.ts
+
+# Audit summary table climate variable naming against canonical mappings
+python -m app.scripts.audit_variables --strict
+# (Host CLI wrapper alternative: ./scripts/audit_variables.py --strict)
+
+# Audit station metadata, duplicate IDs, and multi-batch accumulation
+python -m app.scripts.audit_stations --strict
+# (Host CLI wrapper alternative: ./scripts/audit_stations.py --strict)
 ```
 
 ---

@@ -231,12 +231,50 @@ docker compose exec app python -m app.scripts.introspect_schema --format markdow
 python -m app.scripts.introspect_schema --format markdown
 ```
 
-### 5. Generate TypeScript Types (for `openapi-fetch`)
+### 5. Audit Climate Database Variables & Drift Detection
+Scans live PostgreSQL `summary` records, checks all variable naming pairs against canonical API mappings, and reports unmapped discrepancies or ingestion drift:
+
+```bash
+# Via script wrapper (recommended):
+./scripts/audit_variables.py --strict
+
+# Local Python environment:
+python -m app.scripts.audit_variables --strict
+
+# Via Docker:
+docker compose exec app python -m app.scripts.audit_variables --strict
+```
+See [`docs/AUDITING_AND_DRIFT_DETECTION.md`](docs/AUDITING_AND_DRIFT_DETECTION.md) for complete CLI options (`--summary-type`, `--markdown`, `--json`).
+
+### 6. Audit Station Identities, Duplications & Batch Accumulation
+Scans live PostgreSQL `station` and `summary` tables for duplicate station rows, dual-format identities (numeric WMO IDs vs. text names, short codes vs. full names), missing country codes, and stale unpurged batch accumulation:
+
+```bash
+# Via script wrapper (recommended):
+./scripts/audit_stations.py
+
+# Local Python environment:
+python -m app.scripts.audit_stations --strict
+
+# Via Docker:
+docker compose exec app python -m app.scripts.audit_stations
+```
+
+### 7. Generate TypeScript Types (for `openapi-fetch`)
 To generate fully typed TypeScript definitions for frontend/client consumption from `openapi.json`:
 
 ```bash
 npx openapi-typescript openapi.json -o api-types.ts
 ```
+
+## Documentation
+
+Full architectural specifications, variable auditing guides, and schema definitions are maintained in the [`docs/`](docs/) directory:
+
+- [**Documentation Index**](docs/README.md)
+- [**Climate Variable Naming, Duplication & Discrepancies Guide**](docs/CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md): Detailed EAV database analysis, station duplication (numeric vs. text IDs), and R-Instat standardization specification.
+- [**Database Variable Auditing & Drift Detection Guide**](docs/AUDITING_AND_DRIFT_DETECTION.md): How to run audits, interpret reports, and resolve unmapped variable drift.
+- [**Table Definitions & Select Query Examples**](docs/TABLE_DEFINITIONS_AND_SELECT_QUERY_EXAMPLES.md): Schema reference for parameterized analytical queries.
 
 
 ## Deployment
