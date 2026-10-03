@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -32,5 +32,7 @@ class AnnualRainfallSummariesdata(BaseModel):
     
 
 class AnnualRainfallSummariesResponce(BaseModel):
+    generation_id: Optional[str] = None
+    generation_timestamp: Optional[datetime] = None
     metadata: AnnualRainfallSummariesMetadata
     data: list[AnnualRainfallSummariesdata]

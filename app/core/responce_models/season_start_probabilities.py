@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel, confloat, conint
 from typing import Dict, List, Optional, Union
 
@@ -14,6 +14,8 @@ class SeasonStartProbabilitiesdata(BaseModel):
     proportion : float
 
 class SeasonStartProbabilitiesResponce(BaseModel):
+    generation_id: Optional[str] = None
+    generation_timestamp: Optional[datetime] = None
     metadata: SeasonStartProbabilitiesMetadata
     data: List[SeasonStartProbabilitiesdata]
 

@@ -473,4 +473,85 @@ def test_audit_stations_logic(monkeypatch):
     assert "67991020" in beitbridge["numeric_ids"]
 
 
+def test_v2_endpoints_return_generation_metadata():
+    """Verify v2 endpoints return generation_id and generation_timestamp."""
+    # 1. Annual rainfall summaries
+    res_rain = client.post("/v2/annual_rainfall_summaries/", json={"country": "zw", "station_id": "BEITBRIDGE (MET)"})
+    assert res_rain.status_code == 200
+    body_rain = res_rain.json()
+    assert body_rain["generation_id"] == "3frqkAVCFieVq3k6"
+    assert body_rain["generation_timestamp"] is not None
+
+    # 2. Annual temperature summaries
+    res_temp = client.post("/v2/annual_temperature_summaries/", json={"country": "zw", "station_id": "BEITBRIDGE (MET)"})
+    assert res_temp.status_code == 200
+    body_temp = res_temp.json()
+    assert body_temp["generation_id"] == "3frqkAVCFieVq3k6"
+    assert body_temp["generation_timestamp"] is not None
+
+    # 3. Monthly temperature summaries
+    res_mtemp = client.post("/v2/monthly_temperature_summaries/", json={"country": "zw", "station_id": "BEITBRIDGE (MET)"})
+    assert res_mtemp.status_code == 200
+    body_mtemp = res_mtemp.json()
+    assert body_mtemp["generation_id"] == "3frqkAVCFieVq3k6"
+    assert body_mtemp["generation_timestamp"] is not None
+
+    # 4. Crop success probabilities
+    res_crop = client.post("/v2/crop_success_probabilities/", json={"country": "zw", "station_id": "CHISENGU (MET)"})
+    assert res_crop.status_code == 200
+    body_crop = res_crop.json()
+    assert body_crop["generation_id"] in ("3frqkAVCFieVq3k6", "7VcX2GcBlQiXHyQ0")
+    assert body_crop["generation_timestamp"] is not None
+
+    # 5. Season start probabilities
+    res_season = client.post("/v2/season_start_probabilities/", json={"country": "zw", "station_id": "BEITBRIDGE (MET)"})
+    assert res_season.status_code == 200
+    body_season = res_season.json()
+    assert body_season["generation_id"] == "3frqkAVCFieVq3k6"
+    assert body_season["generation_timestamp"] is not None
+
+    # 6. Station detail
+    res_stn = client.get("/v2/station/zw/BEITBRIDGE (MET)")
+    assert res_stn.status_code == 200
+    body_stn = res_stn.json()
+    assert body_stn["generation_id"] is not None
+    assert body_stn["generation_timestamp"] is not None
+
+    # 7. Station list
+    res_list = client.get("/v2/station/zw")
+    assert res_list.status_code == 200
+    body_list = res_list.json()
+    assert len(body_list["data"]) > 0
+    assert any(s["generation_timestamp"] is not None for s in body_list["data"])
+
+    # 8. Select query
+    res_query = client.post("/v2/select_query/", json={
+        "table_name": "summary",
+        "station_id": "BEITBRIDGE (MET)",
+        "order_by": "time_stamp",
+        "order_direction": "desc",
+        "max_rows": 5,
+    })
+    assert res_query.status_code == 200
+    body_query = res_query.json()
+    assert body_query["generation_id"] is not None
+    assert body_query["generation_timestamp"] is not None
+
+
+def test_climate_repository_specific_generation_id():
+    """Verify repository methods support querying a specific generation ID."""
+    from app.services.climate_repository import get_climate_repository
+
+    repo = get_climate_repository()
+    # Query with specific older generation 'f2b01PJKbeIhm9z2'
+    res = repo.get_annual_rainfall_summaries(
+        country="zw",
+        station_id="BEITBRIDGE (MET)",
+        generation_id="f2b01PJKbeIhm9z2",
+    )
+    assert res.generation_id == "f2b01PJKbeIhm9z2"
+    assert res.generation_timestamp is not None
+
+
+
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, validator
 from app.definitions import country_code
@@ -15,6 +16,7 @@ class StationDataResponce(BaseModel):
     elevation: Optional[float]
     district: Optional[str]
     country_code: country_code
+    generation_timestamp: Optional[datetime] = None
     
     @validator("station_name", pre=True, always=True)
     def normalize_station_name(cls, v, values):
@@ -49,6 +51,8 @@ class StationDefinitionDataResponce(BaseModel):
     
 
 class StationAndDefintionResponce(StationDataResponce):
+    generation_id: Optional[str] = None
+    generation_timestamp: Optional[datetime] = None
     definitions_id: list[str|object]
     climsoft_list: Optional[list[Optional[str]]]
     data : StationDefinitionDataResponce

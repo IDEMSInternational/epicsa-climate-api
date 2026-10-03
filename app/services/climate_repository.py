@@ -1,6 +1,7 @@
 import json
-from typing import Any, Dict, List, Optional
 from collections import defaultdict
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 from fastapi import HTTPException
 
 from app.core.database import execute_query
@@ -138,19 +139,114 @@ class ClimateRepository:
             return "internal_tests"
         return "zm"
 
+    def get_latest_generation_for_summary(
+        self,
+        station_id: str,
+        summary_type: str,
+        generation_id: Optional[str] = None,
+    ) -> Tuple[Optional[str], Optional[datetime]]:
+        """
+        Find (definition_id, time_stamp) for a station and summary_type.
+        If generation_id is specified, fetch the timestamp for that generation.
+        Otherwise, fetch the latest generation by time_stamp.
+        """
+        if generation_id:
+            sql = """
+                SELECT definition_id, time_stamp
+                FROM summary
+                WHERE station_id = %s AND summary_type = %s AND definition_id = %s
+                ORDER BY time_stamp DESC
+                LIMIT 1;
+            """
+            _, rows = execute_query(sql, [station_id, summary_type, generation_id])
+            if rows:
+                return rows[0].get("definition_id"), rows[0].get("time_stamp")
+            return generation_id, None
+
+        sql = """
+            SELECT definition_id, time_stamp
+            FROM summary
+            WHERE station_id = %s AND summary_type = %s AND definition_id IS NOT NULL AND definition_id != ''
+            ORDER BY time_stamp DESC
+            LIMIT 1;
+        """
+        _, rows = execute_query(sql, [station_id, summary_type])
+        if rows and rows[0].get("definition_id"):
+            return rows[0].get("definition_id"), rows[0].get("time_stamp")
+
+        sql_meta = """
+            SELECT definition_id, time_stamp
+            FROM summary_station_metadata
+            WHERE station_id = %s AND summary_type = %s AND definition_id IS NOT NULL AND definition_id != ''
+            ORDER BY time_stamp DESC
+            LIMIT 1;
+        """
+        _, rows_meta = execute_query(sql_meta, [station_id, summary_type])
+        if rows_meta and rows_meta[0].get("definition_id"):
+            return rows_meta[0].get("definition_id"), rows_meta[0].get("time_stamp")
+
+        return None, None
+
+    def get_latest_generation_for_crop(
+        self,
+        station_id: str,
+        generation_id: Optional[str] = None,
+    ) -> Tuple[Optional[str], Optional[datetime]]:
+        """
+        Find (definition_id, time_stamp) for crop table.
+        If generation_id is specified, fetch the timestamp for that generation.
+        Otherwise, fetch the latest generation by time_stamp.
+        """
+        if generation_id:
+            sql = """
+                SELECT definition_id, time_stamp
+                FROM crop
+                WHERE station_id = %s AND definition_id = %s
+                ORDER BY time_stamp DESC
+                LIMIT 1;
+            """
+            _, rows = execute_query(sql, [station_id, generation_id])
+            if rows:
+                return rows[0].get("definition_id"), rows[0].get("time_stamp")
+            return generation_id, None
+
+        sql = """
+            SELECT definition_id, time_stamp
+            FROM crop
+            WHERE station_id = %s AND definition_id IS NOT NULL AND definition_id != ''
+            ORDER BY time_stamp DESC
+            LIMIT 1;
+        """
+        _, rows = execute_query(sql, [station_id])
+        if rows and rows[0].get("definition_id"):
+            return rows[0].get("definition_id"), rows[0].get("time_stamp")
+
+        sql_meta = """
+            SELECT definition_id, time_stamp
+            FROM summary_station_metadata
+            WHERE station_id = %s AND summary_type = 'Crops' AND definition_id IS NOT NULL AND definition_id != ''
+            ORDER BY time_stamp DESC
+            LIMIT 1;
+        """
+        _, rows_meta = execute_query(sql_meta, [station_id])
+        if rows_meta and rows_meta[0].get("definition_id"):
+            return rows_meta[0].get("definition_id"), rows_meta[0].get("time_stamp")
+
+        return None, None
+
     def get_stations_by_country(self, country: str) -> List[StationDataResponce]:
         """Retrieve list of stations for a given country code."""
         db_codes = self.normalize_country_codes(country)
         placeholders = ", ".join(["%s"] * len(db_codes))
         sql = f"""
-            SELECT DISTINCT station_id, station_name, latitude, longitude, elevation, district, country_code
+            SELECT station_id, station_name, latitude, longitude, elevation, district, country_code, time_stamp
             FROM station
             WHERE country_code IN ({placeholders})
-            ORDER BY station_name ASC;
+            ORDER BY time_stamp DESC;
         """
         _, rows = execute_query(sql, db_codes)
 
-        # Deduplicate stations by station_name, prioritizing name-based station_ids
+        # Deduplicate stations by station_name, prioritizing latest timestamp and name-based station_ids
         seen_names: Dict[str, Dict[str, Any]] = {}
         for r in rows:
             stn_id = str(r["station_id"])
@@ -176,6 +272,7 @@ class ClimateRepository:
                     elevation=_safe_float(r.get("elevation")),
                     district=r.get("district"),
                     country_code=api_country,
+                    generation_timestamp=r.get("time_stamp"),
                 )
             )
         return stations
@@ -183,9 +280,10 @@ class ClimateRepository:
     def get_station_detail(self, country: str, station_id: str) -> StationAndDefintionResponce:
         """Retrieve station metadata and climate definitions for a station."""
         sql_stn = """
-            SELECT station_id, station_name, latitude, longitude, elevation, district, country_code
+            SELECT station_id, station_name, latitude, longitude, elevation, district, country_code, time_stamp
             FROM station
             WHERE station_id = %s
+            ORDER BY time_stamp DESC
             LIMIT 1;
         """
         _, stn_rows = execute_query(sql_stn, [station_id])
@@ -197,27 +295,44 @@ class ClimateRepository:
         stn_name = r.get("station_name") or stn_id
         api_country = self.map_to_api_country_code(r.get("country_code"))
 
-        # Fetch definitions linked to station
+        # Fetch definitions linked to station ordered by time_stamp DESC
         sql_defs = """
-            SELECT ssm.summary_type, d.definition_id, d.summary_element, d.definition_value
+            SELECT ssm.summary_type, ssm.definition_id, ssm.time_stamp, d.summary_element, d.definition_value
             FROM summary_station_metadata ssm
             JOIN definition d ON d.definition_id = ssm.definition_id
-            WHERE ssm.station_id = %s;
+            WHERE ssm.station_id = %s
+            ORDER BY ssm.time_stamp DESC;
         """
         _, def_rows = execute_query(sql_defs, [station_id])
 
-        def_ids: List[str] = list(set(row["definition_id"] for row in def_rows if row.get("definition_id")))
-
-        # Map definition objects
+        # Preserve latest definition values per element
         def_map: Dict[str, Any] = {}
+        ordered_def_ids: List[str] = []
+        seen_def_ids = set()
+        latest_gen_id: Optional[str] = None
+        latest_gen_time: Optional[Any] = None
+
         for d in def_rows:
+            did = d.get("definition_id")
+            if did and did not in seen_def_ids:
+                seen_def_ids.add(did)
+                ordered_def_ids.append(did)
+                if latest_gen_id is None:
+                    latest_gen_id = did
+                    latest_gen_time = d.get("time_stamp")
+
             val = _parse_definition_value(d.get("definition_value"))
             elem = d.get("summary_element")
             if elem and elem in StationDefinitionDataResponce.__fields__:
-                def_map[elem] = val
+                if elem not in def_map:
+                    def_map[elem] = val
             for k in val:
                 if k in StationDefinitionDataResponce.__fields__:
-                    def_map[k] = val[k]
+                    if k not in def_map:
+                        def_map[k] = val[k]
+
+        if latest_gen_time is None:
+            latest_gen_time = r.get("time_stamp")
 
         definition_data = StationDefinitionDataResponce.parse_obj(def_map)
 
@@ -229,7 +344,9 @@ class ClimateRepository:
             elevation=_safe_float(r.get("elevation")),
             district=r.get("district"),
             country_code=api_country,
-            definitions_id=def_ids,
+            generation_id=latest_gen_id,
+            generation_timestamp=latest_gen_time,
+            definitions_id=ordered_def_ids,
             climsoft_list=None,
             data=definition_data,
         )
@@ -241,17 +358,41 @@ class ClimateRepository:
         summaries: Optional[List[str]] = None,
         trim_start: bool = True,
         trim_end: bool = True,
+        generation_id: Optional[str] = None,
     ) -> AnnualRainfallSummariesResponce:
         """Query and pivot annual rainfall summaries from summary table."""
+        gen_id, gen_timestamp = self.get_latest_generation_for_summary(
+            station_id=station_id,
+            summary_type="Annual Rain",
+            generation_id=generation_id,
+        )
+
         # 1. Fetch metadata definitions
-        sql_defs = """
-            SELECT d.summary_element, d.definition_value
-            FROM summary_station_metadata ssm
-            JOIN definition d ON d.definition_id = ssm.definition_id
-            WHERE ssm.station_id = %s AND ssm.summary_type = 'Annual Rain';
-        """
-        _, def_rows = execute_query(sql_defs, [station_id])
         meta_dict: Dict[str, Any] = {}
+        if gen_id:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM definition d
+                WHERE d.definition_id = %s;
+            """
+            _, def_rows = execute_query(sql_defs, [gen_id])
+            if not def_rows:
+                sql_defs_fallback = """
+                    SELECT d.summary_element, d.definition_value
+                    FROM summary_station_metadata ssm
+                    JOIN definition d ON d.definition_id = ssm.definition_id
+                    WHERE ssm.station_id = %s AND ssm.summary_type = 'Annual Rain';
+                """
+                _, def_rows = execute_query(sql_defs_fallback, [station_id])
+        else:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM summary_station_metadata ssm
+                JOIN definition d ON d.definition_id = ssm.definition_id
+                WHERE ssm.station_id = %s AND ssm.summary_type = 'Annual Rain';
+            """
+            _, def_rows = execute_query(sql_defs, [station_id])
+
         for d in def_rows:
             val = _parse_definition_value(d.get("definition_value"))
             elem = d.get("summary_element")
@@ -264,15 +405,27 @@ class ClimateRepository:
         metadata = AnnualRainfallSummariesMetadata.parse_obj(meta_dict)
 
         # 2. Fetch annual summary data
-        sql_data = """
-            SELECT time_value, summary_element, summary_name, summary_value
-            FROM summary
-            WHERE station_id = %s
-              AND time_type = 'annual'
-              AND summary_type = 'Annual Rain'
-            ORDER BY time_value ASC;
-        """
-        _, data_rows = execute_query(sql_data, [station_id])
+        if gen_id:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual'
+                  AND summary_type = 'Annual Rain'
+                  AND definition_id = %s
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id, gen_id])
+        else:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual'
+                  AND summary_type = 'Annual Rain'
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id])
 
         # Pivot rows by year
         year_map: Dict[int, Dict[str, Any]] = defaultdict(dict)
@@ -296,7 +449,12 @@ class ClimateRepository:
         raw_data = [data for yr, data in sorted(year_map.items())]
         trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
         records = [AnnualRainfallSummariesdata.parse_obj(data) for data in trimmed_data]
-        return AnnualRainfallSummariesResponce(metadata=metadata, data=records)
+        return AnnualRainfallSummariesResponce(
+            generation_id=gen_id,
+            generation_timestamp=gen_timestamp,
+            metadata=metadata,
+            data=records,
+        )
 
     def get_annual_temperature_summaries(
         self,
@@ -305,17 +463,41 @@ class ClimateRepository:
         summaries: Optional[List[str]] = None,
         trim_start: bool = True,
         trim_end: bool = True,
+        generation_id: Optional[str] = None,
     ) -> AnnualTemperatureSummariesResponce:
         """Query and pivot annual temperature summaries."""
+        gen_id, gen_timestamp = self.get_latest_generation_for_summary(
+            station_id=station_id,
+            summary_type="Annual Temperature",
+            generation_id=generation_id,
+        )
+
         # Metadata
-        sql_defs = """
-            SELECT d.summary_element, d.definition_value
-            FROM summary_station_metadata ssm
-            JOIN definition d ON d.definition_id = ssm.definition_id
-            WHERE ssm.station_id = %s AND ssm.summary_type = 'Annual Temperature';
-        """
-        _, def_rows = execute_query(sql_defs, [station_id])
         meta_dict: Dict[str, Any] = {}
+        if gen_id:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM definition d
+                WHERE d.definition_id = %s;
+            """
+            _, def_rows = execute_query(sql_defs, [gen_id])
+            if not def_rows:
+                sql_defs_fallback = """
+                    SELECT d.summary_element, d.definition_value
+                    FROM summary_station_metadata ssm
+                    JOIN definition d ON d.definition_id = ssm.definition_id
+                    WHERE ssm.station_id = %s AND ssm.summary_type = 'Annual Temperature';
+                """
+                _, def_rows = execute_query(sql_defs_fallback, [station_id])
+        else:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM summary_station_metadata ssm
+                JOIN definition d ON d.definition_id = ssm.definition_id
+                WHERE ssm.station_id = %s AND ssm.summary_type = 'Annual Temperature';
+            """
+            _, def_rows = execute_query(sql_defs, [station_id])
+
         for d in def_rows:
             val = _parse_definition_value(d.get("definition_value"))
             for k in val:
@@ -324,15 +506,27 @@ class ClimateRepository:
         metadata = TemperatureSummariesMetadata.parse_obj(meta_dict)
 
         # Data
-        sql_data = """
-            SELECT time_value, summary_element, summary_name, summary_value
-            FROM summary
-            WHERE station_id = %s
-              AND time_type = 'annual'
-              AND summary_type = 'Annual Temperature'
-            ORDER BY time_value ASC;
-        """
-        _, data_rows = execute_query(sql_data, [station_id])
+        if gen_id:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual'
+                  AND summary_type = 'Annual Temperature'
+                  AND definition_id = %s
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id, gen_id])
+        else:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual'
+                  AND summary_type = 'Annual Temperature'
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id])
 
         year_map: Dict[int, Dict[str, Any]] = defaultdict(dict)
         for row in data_rows:
@@ -363,7 +557,12 @@ class ClimateRepository:
         raw_data = [data for yr, data in sorted(year_map.items())]
         trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
         records = [AnnualTempartureSummariesdata.parse_obj(data) for data in trimmed_data]
-        return AnnualTemperatureSummariesResponce(metadata=metadata, data=records)
+        return AnnualTemperatureSummariesResponce(
+            generation_id=gen_id,
+            generation_timestamp=gen_timestamp,
+            metadata=metadata,
+            data=records,
+        )
 
     def get_monthly_temperature_summaries(
         self,
@@ -372,17 +571,47 @@ class ClimateRepository:
         summaries: Optional[List[str]] = None,
         trim_start: bool = True,
         trim_end: bool = True,
+        generation_id: Optional[str] = None,
     ) -> MonthlyTemperatureSummariesResponce:
         """Query and pivot monthly temperature summaries."""
+        gen_id, gen_timestamp = self.get_latest_generation_for_summary(
+            station_id=station_id,
+            summary_type="Annual-Monthly Temperature",
+            generation_id=generation_id,
+        )
+        if not gen_id:
+            gen_id, gen_timestamp = self.get_latest_generation_for_summary(
+                station_id=station_id,
+                summary_type="Monthly Temperature",
+                generation_id=generation_id,
+            )
+
         # Metadata
-        sql_defs = """
-            SELECT d.summary_element, d.definition_value
-            FROM summary_station_metadata ssm
-            JOIN definition d ON d.definition_id = ssm.definition_id
-            WHERE ssm.station_id = %s AND ssm.summary_type IN ('Annual-Monthly Temperature', 'Monthly Temperature');
-        """
-        _, def_rows = execute_query(sql_defs, [station_id])
         meta_dict: Dict[str, Any] = {}
+        if gen_id:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM definition d
+                WHERE d.definition_id = %s;
+            """
+            _, def_rows = execute_query(sql_defs, [gen_id])
+            if not def_rows:
+                sql_defs_fallback = """
+                    SELECT d.summary_element, d.definition_value
+                    FROM summary_station_metadata ssm
+                    JOIN definition d ON d.definition_id = ssm.definition_id
+                    WHERE ssm.station_id = %s AND ssm.summary_type IN ('Annual-Monthly Temperature', 'Monthly Temperature');
+                """
+                _, def_rows = execute_query(sql_defs_fallback, [station_id])
+        else:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM summary_station_metadata ssm
+                JOIN definition d ON d.definition_id = ssm.definition_id
+                WHERE ssm.station_id = %s AND ssm.summary_type IN ('Annual-Monthly Temperature', 'Monthly Temperature');
+            """
+            _, def_rows = execute_query(sql_defs, [station_id])
+
         for d in def_rows:
             val = _parse_definition_value(d.get("definition_value"))
             for k in val:
@@ -391,15 +620,27 @@ class ClimateRepository:
         metadata = TemperatureSummariesMetadata.parse_obj(meta_dict)
 
         # Data: annual-monthly rows
-        sql_data = """
-            SELECT time_value, summary_element, summary_name, summary_value
-            FROM summary
-            WHERE station_id = %s
-              AND time_type = 'annual-monthly'
-              AND summary_type = 'Annual-Monthly Temperature'
-            ORDER BY time_value ASC;
-        """
-        _, data_rows = execute_query(sql_data, [station_id])
+        if gen_id:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual-monthly'
+                  AND summary_type IN ('Annual-Monthly Temperature', 'Monthly Temperature')
+                  AND definition_id = %s
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id, gen_id])
+        else:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual-monthly'
+                  AND summary_type IN ('Annual-Monthly Temperature', 'Monthly Temperature')
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id])
 
         month_map: Dict[tuple, Dict[str, Any]] = defaultdict(dict)
         for row in data_rows:
@@ -440,23 +681,51 @@ class ClimateRepository:
         raw_data = [data for k, data in sorted(month_map.items())]
         trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
         records = [MonthlyTempartureSummariesdata.parse_obj(data) for data in trimmed_data]
-        return MonthlyTemperatureSummariesResponce(metadata=metadata, data=records)
+        return MonthlyTemperatureSummariesResponce(
+            generation_id=gen_id,
+            generation_timestamp=gen_timestamp,
+            metadata=metadata,
+            data=records,
+        )
 
     def get_crop_success_probabilities(
         self,
         country: str,
         station_id: str,
+        generation_id: Optional[str] = None,
     ) -> CropSuccessProbabilitiesResponce:
         """Query and aggregate full crop success probabilities lookup table from crop table using SQL aggregation."""
+        gen_id, gen_timestamp = self.get_latest_generation_for_crop(
+            station_id=station_id,
+            generation_id=generation_id,
+        )
+
         # Metadata
-        sql_defs = """
-            SELECT d.summary_element, d.definition_value
-            FROM summary_station_metadata ssm
-            JOIN definition d ON d.definition_id = ssm.definition_id
-            WHERE ssm.station_id = %s AND ssm.summary_type = 'Crops';
-        """
-        _, def_rows = execute_query(sql_defs, [station_id])
         meta_dict: Dict[str, Any] = {}
+        if gen_id:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM definition d
+                WHERE d.definition_id = %s;
+            """
+            _, def_rows = execute_query(sql_defs, [gen_id])
+            if not def_rows:
+                sql_defs_fallback = """
+                    SELECT d.summary_element, d.definition_value
+                    FROM summary_station_metadata ssm
+                    JOIN definition d ON d.definition_id = ssm.definition_id
+                    WHERE ssm.station_id = %s AND ssm.summary_type = 'Crops';
+                """
+                _, def_rows = execute_query(sql_defs_fallback, [station_id])
+        else:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM summary_station_metadata ssm
+                JOIN definition d ON d.definition_id = ssm.definition_id
+                WHERE ssm.station_id = %s AND ssm.summary_type = 'Crops';
+            """
+            _, def_rows = execute_query(sql_defs, [station_id])
+
         for d in def_rows:
             val = _parse_definition_value(d.get("definition_value"))
             elem = d.get("summary_element")
@@ -468,24 +737,45 @@ class ClimateRepository:
         metadata = CropSuccessProbabilitiesMetadata.parse_obj(meta_dict)
 
         # Full lookup table aggregation query
-        sql_crop = """
-            SELECT
-              CAST(rain_total AS INTEGER) AS total_rain,
-              CAST(plant_day AS INTEGER) AS plant_day,
-              CAST(plant_length AS INTEGER) AS plant_length,
-              SUM(CASE WHEN include_start_condition IS TRUE THEN 1 ELSE 0 END) AS with_start_total,
-              SUM(CASE WHEN include_start_condition IS TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS with_start_success,
-              SUM(CASE WHEN include_start_condition IS NOT TRUE THEN 1 ELSE 0 END) AS no_start_total,
-              SUM(CASE WHEN include_start_condition IS NOT TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS no_start_success
-            FROM crop
-            WHERE station_id = %s
-              AND rain_total IS NOT NULL
-              AND plant_day IS NOT NULL
-              AND plant_length IS NOT NULL
-            GROUP BY plant_day, plant_length, rain_total
-            ORDER BY plant_day, plant_length, rain_total;
-        """
-        _, rows = execute_query(sql_crop, [station_id])
+        if gen_id:
+            sql_crop = """
+                SELECT
+                  CAST(rain_total AS INTEGER) AS total_rain,
+                  CAST(plant_day AS INTEGER) AS plant_day,
+                  CAST(plant_length AS INTEGER) AS plant_length,
+                  SUM(CASE WHEN include_start_condition IS TRUE THEN 1 ELSE 0 END) AS with_start_total,
+                  SUM(CASE WHEN include_start_condition IS TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS with_start_success,
+                  SUM(CASE WHEN include_start_condition IS NOT TRUE THEN 1 ELSE 0 END) AS no_start_total,
+                  SUM(CASE WHEN include_start_condition IS NOT TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS no_start_success
+                FROM crop
+                WHERE station_id = %s
+                  AND definition_id = %s
+                  AND rain_total IS NOT NULL
+                  AND plant_day IS NOT NULL
+                  AND plant_length IS NOT NULL
+                GROUP BY plant_day, plant_length, rain_total
+                ORDER BY plant_day, plant_length, rain_total;
+            """
+            _, rows = execute_query(sql_crop, [station_id, gen_id])
+        else:
+            sql_crop = """
+                SELECT
+                  CAST(rain_total AS INTEGER) AS total_rain,
+                  CAST(plant_day AS INTEGER) AS plant_day,
+                  CAST(plant_length AS INTEGER) AS plant_length,
+                  SUM(CASE WHEN include_start_condition IS TRUE THEN 1 ELSE 0 END) AS with_start_total,
+                  SUM(CASE WHEN include_start_condition IS TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS with_start_success,
+                  SUM(CASE WHEN include_start_condition IS NOT TRUE THEN 1 ELSE 0 END) AS no_start_total,
+                  SUM(CASE WHEN include_start_condition IS NOT TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS no_start_success
+                FROM crop
+                WHERE station_id = %s
+                  AND rain_total IS NOT NULL
+                  AND plant_day IS NOT NULL
+                  AND plant_length IS NOT NULL
+                GROUP BY plant_day, plant_length, rain_total
+                ORDER BY plant_day, plant_length, rain_total;
+            """
+            _, rows = execute_query(sql_crop, [station_id])
 
         records: List[CropSuccessProbabilitiesdata] = []
         for r in rows:
@@ -508,27 +798,56 @@ class ClimateRepository:
                 )
             )
 
-        return CropSuccessProbabilitiesResponce(metadata=metadata, data=records)
+        return CropSuccessProbabilitiesResponce(
+            generation_id=gen_id,
+            generation_timestamp=gen_timestamp,
+            metadata=metadata,
+            data=records,
+        )
 
     def get_season_start_probabilities(
         self,
         country: str,
         station_id: str,
         start_dates: Optional[List[int]] = None,
+        generation_id: Optional[str] = None,
     ) -> SeasonStartProbabilitiesResponce:
         """Query and compute cumulative season start probabilities across candidate days."""
         if start_dates is None or len(start_dates) == 0:
             start_dates = [200, 220, 250, 270, 300, 320]
 
+        gen_id, gen_timestamp = self.get_latest_generation_for_summary(
+            station_id=station_id,
+            summary_type="Annual Rain",
+            generation_id=generation_id,
+        )
+
         # Metadata
-        sql_defs = """
-            SELECT d.summary_element, d.definition_value
-            FROM summary_station_metadata ssm
-            JOIN definition d ON d.definition_id = ssm.definition_id
-            WHERE ssm.station_id = %s;
-        """
-        _, def_rows = execute_query(sql_defs, [station_id])
         meta_dict: Dict[str, Any] = {}
+        if gen_id:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM definition d
+                WHERE d.definition_id = %s;
+            """
+            _, def_rows = execute_query(sql_defs, [gen_id])
+            if not def_rows:
+                sql_defs_fallback = """
+                    SELECT d.summary_element, d.definition_value
+                    FROM summary_station_metadata ssm
+                    JOIN definition d ON d.definition_id = ssm.definition_id
+                    WHERE ssm.station_id = %s;
+                """
+                _, def_rows = execute_query(sql_defs_fallback, [station_id])
+        else:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM summary_station_metadata ssm
+                JOIN definition d ON d.definition_id = ssm.definition_id
+                WHERE ssm.station_id = %s;
+            """
+            _, def_rows = execute_query(sql_defs, [station_id])
+
         for d in def_rows:
             val = _parse_definition_value(d.get("definition_value"))
             elem = d.get("summary_element")
@@ -537,16 +856,31 @@ class ClimateRepository:
         metadata = SeasonStartProbabilitiesMetadata.parse_obj(meta_dict)
 
         # Query all annual start_rains DOYs
-        sql_data = """
-            SELECT summary_value
-            FROM summary
-            WHERE station_id = %s
-              AND time_type = 'annual'
-              AND summary_name IN ('start_rains', 'start')
-              AND summary_value IS NOT NULL
-              AND summary_value != '';
-        """
-        _, rows = execute_query(sql_data, [station_id])
+        if gen_id:
+            sql_data = """
+                SELECT summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual'
+                  AND summary_type = 'Annual Rain'
+                  AND definition_id = %s
+                  AND summary_name IN ('start_rains', 'start')
+                  AND summary_value IS NOT NULL
+                  AND summary_value != '';
+            """
+            _, rows = execute_query(sql_data, [station_id, gen_id])
+        else:
+            sql_data = """
+                SELECT summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'annual'
+                  AND summary_name IN ('start_rains', 'start')
+                  AND summary_value IS NOT NULL
+                  AND summary_value != '';
+            """
+            _, rows = execute_query(sql_data, [station_id])
+
         start_doys = [_safe_float(r["summary_value"]) for r in rows if _safe_float(r["summary_value"]) is not None]
 
         records: List[SeasonStartProbabilitiesdata] = []
@@ -564,7 +898,12 @@ class ClimateRepository:
                 )
             )
 
-        return SeasonStartProbabilitiesResponce(metadata=metadata, data=records)
+        return SeasonStartProbabilitiesResponce(
+            generation_id=gen_id,
+            generation_timestamp=gen_timestamp,
+            metadata=metadata,
+            data=records,
+        )
 
 
 # Global singleton instance & dependency injection helper
