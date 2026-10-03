@@ -139,14 +139,25 @@ def _build_select_query(payload: SelectQueryRequest) -> tuple[str, list[Any]]:
 
     order_direction = "ASC" if payload.order_direction == "asc" else "DESC"
     select_clause = ", ".join(available_columns[column] for column in selected_columns)
+    
+    where_conditions = [table_config["station_filter"]]
+    query_params: list[Any] = [payload.station_id]
+
+    if payload.generation_id and payload.table_name in ("crop", "definition", "summary", "summary_station_metadata"):
+        gen_col = "d.definition_id" if payload.table_name == "definition" else f"{payload.table_name}.definition_id"
+        where_conditions.append(f"{gen_col} = %s")
+        query_params.append(payload.generation_id)
+
+    query_params.append(payload.max_rows)
+    where_clause = " AND ".join(where_conditions)
     sql = (
         f"SELECT {select_clause} "
         f"FROM {table_config['from']} "
-        f"WHERE {table_config['station_filter']} "
+        f"WHERE {where_clause} "
         f"ORDER BY {orderable[order_key]} {order_direction} "
         "LIMIT %s"
     )
-    return sql, [payload.station_id, payload.max_rows]
+    return sql, query_params
 
 
 def execute_select_query(
@@ -174,4 +185,17 @@ def run_select_query(payload: SelectQueryRequest) -> SelectQueryResponse:
     except Exception as error:
         raise HTTPException(status_code=500, detail="Postgres query failed.") from error
 
-    return SelectQueryResponse(columns=columns, row_count=len(rows), rows=rows)
+    gen_id = payload.generation_id
+    gen_ts = None
+    if rows:
+        if not gen_id:
+            gen_id = rows[0].get("definition_id")
+        gen_ts = rows[0].get("time_stamp")
+
+    return SelectQueryResponse(
+        columns=columns,
+        row_count=len(rows),
+        rows=rows,
+        generation_id=gen_id,
+        generation_timestamp=gen_ts,
+    )

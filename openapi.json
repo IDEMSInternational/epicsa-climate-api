@@ -3,7 +3,7 @@
   "info": {
     "title": "E-PICSA Climate API",
     "description": "\n### E-PICSA Climate API Documentation\n\n* **v2 Endpoints**: High-performance endpoints querying PostgreSQL directly. [View v2 Docs Only](/v2/docs)\n* **v1 Endpoints (Legacy)**: Legacy endpoints using R (`epicsawrap`) and Cloud Storage. [View v1 Docs Only](/v1/docs)\n",
-    "version": "2.1.3"
+    "version": "2.2.0"
   },
   "paths": {
     "/v1/status/": {
@@ -1211,6 +1211,15 @@
       },
       "AnnualRainfallSummariesResponce": {
         "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
+          },
           "metadata": {
             "$ref": "#/components/schemas/AnnualRainfallSummariesMetadata"
           },
@@ -1362,6 +1371,15 @@
       },
       "AnnualTemperatureSummariesResponce": {
         "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
+          },
           "metadata": {
             "$ref": "#/components/schemas/TemperatureSummariesMetadata"
           },
@@ -1397,6 +1415,15 @@
       },
       "CropSuccessProbabilitiesResponce": {
         "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
+          },
           "metadata": {
             "$ref": "#/components/schemas/CropSuccessProbabilitiesMetadata"
           },
@@ -1727,6 +1754,15 @@
       },
       "MonthlyTemperatureSummariesResponce": {
         "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
+          },
           "metadata": {
             "$ref": "#/components/schemas/TemperatureSummariesMetadata"
           },
@@ -1782,6 +1818,15 @@
       },
       "SeasonStartProbabilitiesResponce": {
         "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
+          },
           "metadata": {
             "$ref": "#/components/schemas/SeasonStartProbabilitiesMetadata"
           },
@@ -1935,6 +1980,11 @@
             "minimum": 1.0,
             "title": "Max Rows",
             "default": 100
+          },
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id",
+            "description": "Optional generation/definition identifier to filter by."
           }
         },
         "type": "object",
@@ -1963,6 +2013,15 @@
             },
             "type": "array",
             "title": "Rows"
+          },
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
           }
         },
         "type": "object",
@@ -2097,6 +2156,15 @@
             ],
             "title": "Country Code"
           },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
+          },
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
           "definitions_id": {
             "items": {
               "anyOf": [
@@ -2171,6 +2239,11 @@
               "internal_tests"
             ],
             "title": "Country Code"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
           }
         },
         "type": "object",

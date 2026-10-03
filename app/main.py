@@ -107,7 +107,7 @@ def get_application():
     settings = get_settings()
     _app = FastAPI(
         title="E-PICSA Climate API",
-        version="2.1.3",
+        version="2.2.0",
         description=API_DESCRIPTION,
         docs_url="/",
         openapi_tags=TAGS_METADATA,

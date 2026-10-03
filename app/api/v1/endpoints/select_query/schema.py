@@ -1,5 +1,5 @@
-from typing import Any
-from typing import Literal
+from datetime import datetime
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -23,9 +23,15 @@ class SelectQueryRequest(BaseModel):
     )
     order_direction: Literal["asc", "desc"] = "desc"
     max_rows: int = Field(100, ge=1, le=1000)
+    generation_id: Optional[str] = Field(
+        default=None,
+        description="Optional generation/definition identifier to filter by.",
+    )
 
 
 class SelectQueryResponse(BaseModel):
     columns: list[str]
     row_count: int
     rows: list[dict[str, Any]]
+    generation_id: Optional[str] = None
+    generation_timestamp: Optional[datetime] = None

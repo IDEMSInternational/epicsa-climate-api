@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -18,5 +18,7 @@ class CropSuccessProbabilitiesdata(BaseModel):
     prop_success_no_start : float
 
 class CropSuccessProbabilitiesResponce(BaseModel):
+    generation_id: Optional[str] = None
+    generation_timestamp: Optional[datetime] = None
     metadata: CropSuccessProbabilitiesMetadata 
     data: list[CropSuccessProbabilitiesdata]
