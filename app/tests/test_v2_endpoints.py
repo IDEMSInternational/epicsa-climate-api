@@ -341,6 +341,18 @@ def test_variable_mappings_subseasonal_and_auxiliary_exclusion():
     assert map_annual_rain_field("total_rain", "max_dry_spell", "15") is None
     assert map_annual_rain_field("total_rain", "longest_dry_spell", "20") is None
 
+    # Start of rains with dry spell criteria must not map to standard start of rains
+    assert map_annual_rain_field("start_rain", "start_dry", "180") is None
+    assert map_annual_rain_field("start_rain", "start_dryspell", "180") is None
+    assert map_annual_rain_field("start_rain", "dryspell", "180") is None
+    assert map_annual_rain_field("start_rain_date", "start_dry_d", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_date", "star_dry_d", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_date", "start_d_dryspell", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_date", "dryspell_d", "1981-12-20") is None
+    assert map_annual_rain_field("start_rain_status", "start_dry_s", "TRUE") is None
+    assert map_annual_rain_field("start_rain_status", "start_s_dryspell", "TRUE") is None
+    assert map_annual_rain_field("start_rain_status", "dryspell_s", "1") is None
+
 
 def test_variable_mappings_safe_converters():
     from app.services.variable_mappings import (

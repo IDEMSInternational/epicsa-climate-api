@@ -121,26 +121,16 @@ ANNUAL_RAIN_EXACT_MAP: Dict[Tuple[str, str], Tuple[str, Callable[[Any], Any]]] =
     ("start_rain", "start"): ("start_rains_doy", _safe_int),
     ("start_rain", "start_rains"): ("start_rains_doy", _safe_int),
     ("start_rain", "start_season"): ("start_rains_doy", _safe_int),
-    ("start_rain", "start_dry"): ("start_rains_doy", _safe_int),
-    ("start_rain", "start_dryspell"): ("start_rains_doy", _safe_int),
-    ("start_rain", "dryspell"): ("start_rains_doy", _safe_int),
 
     # 6. Start of Rains Date (YYYY-MM-DD string)
     ("start_rain_date", "start_d"): ("start_rains_date", _safe_str),
     ("start_rain_date", "start_rains_date"): ("start_rains_date", _safe_str),
     ("start_rain_date", "start_season_date"): ("start_rains_date", _safe_str),
-    ("start_rain_date", "start_dry_d"): ("start_rains_date", _safe_str),
-    ("start_rain_date", "star_dry_d"): ("start_rains_date", _safe_str),  # Ingestion typo
-    ("start_rain_date", "start_d_dryspell"): ("start_rains_date", _safe_str),
-    ("start_rain_date", "dryspell_d"): ("start_rains_date", _safe_str),
 
     # 7. Start of Rains Status (Boolean flag)
     ("start_rain_status", "start_s"): ("start_rains_status", _safe_bool),
     ("start_rain_status", "start_rains_status"): ("start_rains_status", _safe_bool),
     ("start_rain_status", "start_season_status"): ("start_rains_status", _safe_bool),
-    ("start_rain_status", "start_dry_s"): ("start_rains_status", _safe_bool),
-    ("start_rain_status", "start_s_dryspell"): ("start_rains_status", _safe_bool),
-    ("start_rain_status", "dryspell_s"): ("start_rains_status", _safe_bool),
 
     # 8. End of Rains (DOY, Date, Status)
     ("end_rain", "end_rains"): ("end_rains_doy", _safe_int),
@@ -179,12 +169,22 @@ ANNUAL_RAIN_AUXILIARY_SET: Set[Tuple[str, str]] = {
     ("total_rain", "ndj_rainfall"),
     ("total_rain", "ndj_rain"),
 
-    # Dry spells (handled by separate dry spell summaries)
+    # Dry spells and start of rains with dry spell criteria (handled separately or reserved for future products)
     ("dry_spell", "spells"),
     ("dry_spell", "spells_90"),
     ("dry_spell", "spells_djfm"),
     ("total_rain", "max_dry_spell"),
     ("total_rain", "longest_dry_spell"),
+    ("start_rain", "start_dry"),
+    ("start_rain", "start_dryspell"),
+    ("start_rain", "dryspell"),
+    ("start_rain_date", "start_dry_d"),
+    ("start_rain_date", "star_dry_d"),
+    ("start_rain_date", "start_d_dryspell"),
+    ("start_rain_date", "dryspell_d"),
+    ("start_rain_status", "start_dry_s"),
+    ("start_rain_status", "start_s_dryspell"),
+    ("start_rain_status", "dryspell_s"),
 
     # Temperature extremes recorded in rain summaries
     ("tmax_max", "max_tmpmax"),
@@ -244,11 +244,11 @@ def map_annual_rain_field(
         return "annual_rain", _safe_float(value)
     if elem == "rain_day":
         return "n_rain", _safe_int(value)
-    if elem == "start_rain":
+    if elem == "start_rain" and not ("dry" in name or "spell" in name):
         return "start_rains_doy", _safe_int(value)
-    if elem == "start_rain_date":
+    if elem == "start_rain_date" and not ("dry" in name or "spell" in name):
         return "start_rains_date", _safe_str(value)
-    if elem == "start_rain_status":
+    if elem == "start_rain_status" and not ("dry" in name or "spell" in name):
         return "start_rains_status", _safe_bool(value)
     if elem == "end_rain":
         return "end_rains_doy", _safe_int(value)
