@@ -31,6 +31,19 @@ def _safe_float(val: Any) -> Optional[float]:
         return None
 
 
+def _safe_round(val: Any) -> Optional[int]:
+    """Parse a numeric value and round to the nearest integer mm, returning None on failure or missing sentinels."""
+    if val is None:
+        return None
+    s = str(val).strip()
+    if s.lower() in ("", "na", "null", "none"):
+        return None
+    try:
+        return int(round(float(s)))
+    except (ValueError, TypeError):
+        return None
+
+
 def _safe_int(val: Any) -> Optional[int]:
     """Parse an integer value safely, returning None on failure or missing sentinels."""
     if val is None:
@@ -72,17 +85,17 @@ def _safe_str(val: Any) -> Optional[str]:
 # Exact Lookups: (summary_element, summary_name_lower) -> (canonical_field, caster)
 # ---------------------------------------------------------------------------
 ANNUAL_RAIN_EXACT_MAP: Dict[Tuple[str, str], Tuple[str, Callable[[Any], Any]]] = {
-    # 1. Seasonal Total Rainfall (amount in mm)
+    # 1. Seasonal Total Rainfall (amount in mm rounded to nearest mm)
     # Zimbabwe convention: seasonal_total_rain with seasonal_PRECIP / season_PRECIP
-    ("seasonal_total_rain", "seasonal_precip"): ("seasonal_rain", _safe_float),
-    ("seasonal_total_rain", "season_precip"): ("seasonal_rain", _safe_float),
-    ("seasonal_total_rain", "seasonal_rain"): ("seasonal_rain", _safe_float),
-    ("seasonal_total_rain", "seasonal_rainfall"): ("seasonal_rain", _safe_float),
+    ("seasonal_total_rain", "seasonal_precip"): ("seasonal_rain", _safe_round),
+    ("seasonal_total_rain", "season_precip"): ("seasonal_rain", _safe_round),
+    ("seasonal_total_rain", "seasonal_rain"): ("seasonal_rain", _safe_round),
+    ("seasonal_total_rain", "seasonal_rainfall"): ("seasonal_rain", _safe_round),
     # Zambia convention: stored under generic total_rain with seasonal names
-    ("total_rain", "seasonal_rain"): ("seasonal_rain", _safe_float),
-    ("total_rain", "seasonal_rainfall"): ("seasonal_rain", _safe_float),
-    ("total_rain", "seasonal_precip"): ("seasonal_rain", _safe_float),
-    ("total_rain", "season_precip"): ("seasonal_rain", _safe_float),
+    ("total_rain", "seasonal_rain"): ("seasonal_rain", _safe_round),
+    ("total_rain", "seasonal_rainfall"): ("seasonal_rain", _safe_round),
+    ("total_rain", "seasonal_precip"): ("seasonal_rain", _safe_round),
+    ("total_rain", "season_precip"): ("seasonal_rain", _safe_round),
 
     # 2. Seasonal Rain Days (count of rainy days in season)
     # Zimbabwe convention: seasonal_rain_day with seasonal_rainday / season_RainyDay
@@ -94,14 +107,14 @@ ANNUAL_RAIN_EXACT_MAP: Dict[Tuple[str, str], Tuple[str, Callable[[Any], Any]]] =
     ("rain_day", "seasonal_rainday"): ("n_seasonal_rain", _safe_int),
     ("rain_day", "seasonal_raindays"): ("n_seasonal_rain", _safe_int),
 
-    # 3. Annual Rainfall Total (amount in mm for full year / agricultural year)
-    ("total_rain", "annual_rain"): ("annual_rain", _safe_float),
-    ("total_rain", "annual_rainfall"): ("annual_rain", _safe_float),
-    ("total_rain", "total_rain"): ("annual_rain", _safe_float),
-    ("total_rain", "oct_apr_precip"): ("annual_rain", _safe_float),
-    ("total_rain", "sum_precip"): ("annual_rain", _safe_float),
-    ("total_rain", "sum_rain"): ("annual_rain", _safe_float),
-    ("total_rain", "sum_rainfall"): ("annual_rain", _safe_float),
+    # 3. Annual Rainfall Total (amount in mm rounded to nearest mm)
+    ("total_rain", "annual_rain"): ("annual_rain", _safe_round),
+    ("total_rain", "annual_rainfall"): ("annual_rain", _safe_round),
+    ("total_rain", "total_rain"): ("annual_rain", _safe_round),
+    ("total_rain", "oct_apr_precip"): ("annual_rain", _safe_round),
+    ("total_rain", "sum_precip"): ("annual_rain", _safe_round),
+    ("total_rain", "sum_rain"): ("annual_rain", _safe_round),
+    ("total_rain", "sum_rainfall"): ("annual_rain", _safe_round),
 
     # 4. Annual Rain Days (count of rainy days across the year)
     ("rain_day", "no_of_raindays"): ("n_rain", _safe_int),
@@ -237,11 +250,11 @@ def map_annual_rain_field(
 
     # 3. Fallback heuristics for newly introduced variants conforming to standard patterns
     if elem in ("seasonal_total_rain", "seasonal_rain") or ("season" in name and ("precip" in name or "rain" in name)):
-        return "seasonal_rain", _safe_float(value)
+        return "seasonal_rain", _safe_round(value)
     if elem in ("seasonal_rain_day", "seasonal_rainday") or ("season" in name and "rainday" in name):
         return "n_seasonal_rain", _safe_int(value)
     if elem == "total_rain" and not any(name.startswith(p) for p in SUBSEASONAL_PREFIXES) and not ("dry" in name or "spell" in name):
-        return "annual_rain", _safe_float(value)
+        return "annual_rain", _safe_round(value)
     if elem == "rain_day":
         return "n_rain", _safe_int(value)
     if elem == "start_rain" and not ("dry" in name or "spell" in name):
