@@ -102,8 +102,8 @@ def test_v2_annual_rainfall_summaries():
     # Verify 1950 correctly separates annual rain (Oct_Apr_PRECIP) and seasonal rain (seasonal_PRECIP)
     row_1950 = next((r for r in body["data"] if r["year"] == 1950), None)
     assert row_1950 is not None
-    assert row_1950["annual_rain"] == 295.7
-    assert row_1950["seasonal_rain"] == 236.2
+    assert row_1950["annual_rain"] == 296
+    assert row_1950["seasonal_rain"] == 236
     assert row_1950["n_rain"] == 24
     assert row_1950["n_seasonal_rain"] == 14
 
@@ -272,7 +272,7 @@ def test_climate_repository_annual_rainfall_summaries_subseasonal_and_seasonal_m
     assert len(res.data) == 1
     row = res.data[0]
     assert row.year == 1981
-    assert row.annual_rain == 613.7  # NOT 123.9
+    assert row.annual_rain == 614  # NOT 123.9
     assert row.seasonal_rain is None
     assert row.n_rain == 50
     assert row.season_length == 86.0
@@ -292,8 +292,8 @@ def test_climate_repository_annual_rainfall_summaries_subseasonal_and_seasonal_m
     res_ch = repo.get_annual_rainfall_summaries("zm", "CHINSALI FTC", trim_start=False, trim_end=False)
     assert len(res_ch.data) == 1
     row_ch = res_ch.data[0]
-    assert row_ch.annual_rain == 577.2
-    assert row_ch.seasonal_rain == 577.2
+    assert row_ch.annual_rain == 577
+    assert row_ch.seasonal_rain == 577
     assert row_ch.n_rain == 33
     assert row_ch.n_seasonal_rain == 33
 
@@ -301,16 +301,16 @@ def test_climate_repository_annual_rainfall_summaries_subseasonal_and_seasonal_m
 def test_variable_mappings_exact_matches():
     from app.services.variable_mappings import map_annual_rain_field
 
-    # Exact annual rainfall metrics
-    assert map_annual_rain_field("total_rain", "Annual_Rain", "613.7") == ("annual_rain", 613.7)
-    assert map_annual_rain_field("total_rain", "annual_rain", "613.7") == ("annual_rain", 613.7)
-    assert map_annual_rain_field("total_rain", "total_rain", "613.7") == ("annual_rain", 613.7)
-    assert map_annual_rain_field("total_rain", "Annual_rainfall", "613.7") == ("annual_rain", 613.7)
+    # Exact annual rainfall metrics (rounded to nearest mm)
+    assert map_annual_rain_field("total_rain", "Annual_Rain", "613.7") == ("annual_rain", 614)
+    assert map_annual_rain_field("total_rain", "annual_rain", "613.7") == ("annual_rain", 614)
+    assert map_annual_rain_field("total_rain", "total_rain", "613.7") == ("annual_rain", 614)
+    assert map_annual_rain_field("total_rain", "Annual_rainfall", "613.7") == ("annual_rain", 614)
 
-    # Exact seasonal rainfall metrics
-    assert map_annual_rain_field("total_rain", "Seasonal_Rain", "577.2") == ("seasonal_rain", 577.2)
-    assert map_annual_rain_field("seasonal_rain", "seasonal_rain", "577.2") == ("seasonal_rain", 577.2)
-    assert map_annual_rain_field("seasonal_precip", "seasonal_precip", "577.2") == ("seasonal_rain", 577.2)
+    # Exact seasonal rainfall metrics (rounded to nearest mm)
+    assert map_annual_rain_field("total_rain", "Seasonal_Rain", "577.2") == ("seasonal_rain", 577)
+    assert map_annual_rain_field("seasonal_rain", "seasonal_rain", "577.2") == ("seasonal_rain", 577)
+    assert map_annual_rain_field("seasonal_precip", "seasonal_precip", "577.2") == ("seasonal_rain", 577)
 
     # Rain day counts
     assert map_annual_rain_field("rain_day", "Annual_Raindays", "50") == ("n_rain", 50)
@@ -357,6 +357,7 @@ def test_variable_mappings_subseasonal_and_auxiliary_exclusion():
 def test_variable_mappings_safe_converters():
     from app.services.variable_mappings import (
         _safe_float,
+        _safe_round,
         _safe_int,
         _safe_bool,
         _safe_str,
@@ -369,6 +370,16 @@ def test_variable_mappings_safe_converters():
     assert _safe_float("") is None
     assert _safe_float("NA") is None
     assert _safe_float("invalid") is None
+
+    # Round converter (nearest integer mm)
+    assert _safe_round("123.45") == 123
+    assert _safe_round("123.6") == 124
+    assert _safe_round("123") == 123
+    assert _safe_round(123.7) == 124
+    assert _safe_round(None) is None
+    assert _safe_round("") is None
+    assert _safe_round("NA") is None
+    assert _safe_round("invalid") is None
 
     # Int converter
     assert _safe_int("42") == 42
