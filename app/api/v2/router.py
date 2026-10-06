@@ -12,9 +12,6 @@ from app.api.v2.endpoints.crop_success_probabilities.router import (
 from app.api.v2.endpoints.monthly_temperature_summaries.router import (
     router as monthly_temperature_summaries_router,
 )
-from app.api.v2.endpoints.season_start_probabilities.router import (
-    router as season_start_probabilities_router,
-)
 from app.api.v2.endpoints.select_query.router import (
     router as select_query_router,
 )
@@ -45,11 +42,6 @@ v2_router.include_router(
 v2_router.include_router(
     monthly_temperature_summaries_router,
     prefix="/monthly_temperature_summaries",
-    tags=["v2: Climate"],
-)
-v2_router.include_router(
-    season_start_probabilities_router,
-    prefix="/season_start_probabilities",
     tags=["v2: Climate"],
 )
 v2_router.include_router(

@@ -74,13 +74,6 @@ def crop_success_probabilities_response():
     }
     return client.post("/v1/crop_success_probabilities/", json=test_data)
 
-def season_start_probabilities_response():
-    test_data = {
-        "country": "mw_test",
-        "station_id": "fake_station_id",
-        "start_dates": [200,220,250,270,300,320]
-    }
-    return client.post("/v1/season_start_probabilities/", json=test_data)
 
 def test_station_definitions_response_model_validation_error():
     app.dependency_overrides[get_run_epicsa_function] = get_mock_run_epicsa_function
@@ -117,12 +110,6 @@ def test_crop_success_probabilities_response_model_validation_error():
     assert "Response model validation error" in response.json()["detail"]
     app.dependency_overrides = {}
 
-def test_season_start_probabilities_response_model_validation_error():
-    app.dependency_overrides[get_run_epicsa_function] = get_mock_run_epicsa_function
-    response = season_start_probabilities_response()   
-    assert response.status_code == 500
-    assert "Response model validation error" in response.json()["detail"]
-    app.dependency_overrides = {}
 
 def test_station_definitions_error():
     response = station_definitions_response()   
@@ -142,8 +129,4 @@ def test_monthly_temperature_summaries_error():
 
 def test_crop_success_probabilities_error():
     response = crop_success_probabilities_response()   
-    assert response.status_code == 500
-
-def test_season_start_probabilities_error():
-    response = season_start_probabilities_response()   
     assert response.status_code == 500

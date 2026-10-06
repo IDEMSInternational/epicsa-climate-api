@@ -3,7 +3,7 @@
   "info": {
     "title": "E-PICSA Climate API",
     "description": "\n### E-PICSA Climate API Documentation\n\n* **v2 Endpoints**: High-performance endpoints querying PostgreSQL directly. [View v2 Docs Only](/v2/docs)\n* **v1 Endpoints (Legacy)**: Legacy endpoints using R (`epicsawrap`) and Cloud Storage. [View v1 Docs Only](/v1/docs)\n",
-    "version": "2.2.1"
+    "version": "2.3.0"
   },
   "paths": {
     "/v1/status/": {
@@ -173,47 +173,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MonthlyTemperatureSummariesResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/season_start_probabilities/": {
-      "post": {
-        "tags": [
-          "v1 (Legacy): Climate"
-        ],
-        "summary": "Get Season Start Probabilities",
-        "operationId": "get_season_start_probabilities_v1_season_start_probabilities__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__api__v1__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeasonStartProbabilitiesResponce"
                 }
               }
             }
@@ -763,48 +722,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MonthlyTemperatureSummariesResponce"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v2/season_start_probabilities/": {
-      "post": {
-        "tags": [
-          "v2: Climate"
-        ],
-        "summary": "Get Season Start Probabilities",
-        "description": "Retrieve cumulative season start probabilities from PostgreSQL.",
-        "operationId": "get_season_start_probabilities_v2_season_start_probabilities__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__api__v2__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeasonStartProbabilitiesResponce"
                 }
               }
             }
@@ -1446,27 +1363,33 @@
         "properties": {
           "station": {
             "type": "string",
-            "title": "Station"
+            "title": "Station",
+            "description": "Station identifier"
           },
           "total_rain": {
             "type": "integer",
-            "title": "Total Rain"
+            "title": "Total Rain",
+            "description": "Crop water requirement threshold in mm (e.g. 200 to 1200 mm)"
           },
           "plant_day": {
             "type": "integer",
-            "title": "Plant Day"
+            "title": "Plant Day",
+            "description": "Planting day relative to season start July 1 (e.g. 123=31-Oct, 138=15-Nov, 153=30-Nov, 168=15-Dec, 183=30-Dec)"
           },
           "plant_length": {
             "type": "integer",
-            "title": "Plant Length"
+            "title": "Plant Length",
+            "description": "Crop growth cycle / duration in days (e.g. 60 to 150 days)"
           },
           "prop_success_with_start": {
             "type": "number",
-            "title": "Prop Success With Start"
+            "title": "Prop Success With Start",
+            "description": "Probability of crop success (0.0-1.0) when planting only after rainy season start criteria are satisfied"
           },
           "prop_success_no_start": {
             "type": "number",
-            "title": "Prop Success No Start"
+            "title": "Prop Success No Start",
+            "description": "Probability of crop success (0.0-1.0) when planting on the calendar day regardless of rainy season start condition"
           }
         },
         "type": "object",
@@ -1803,70 +1726,6 @@
         },
         "type": "object",
         "title": "SeasonStartProbabilities"
-      },
-      "SeasonStartProbabilitiesMetadata": {
-        "properties": {
-          "start_rains": {
-            "$ref": "#/components/schemas/StartRains"
-          },
-          "season_start_probabilities": {
-            "$ref": "#/components/schemas/SeasonStartProbabilities"
-          }
-        },
-        "type": "object",
-        "title": "SeasonStartProbabilitiesMetadata"
-      },
-      "SeasonStartProbabilitiesResponce": {
-        "properties": {
-          "generation_id": {
-            "type": "string",
-            "title": "Generation Id"
-          },
-          "generation_timestamp": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Generation Timestamp"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/SeasonStartProbabilitiesMetadata"
-          },
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/SeasonStartProbabilitiesdata"
-            },
-            "type": "array",
-            "title": "Data"
-          }
-        },
-        "type": "object",
-        "required": [
-          "metadata",
-          "data"
-        ],
-        "title": "SeasonStartProbabilitiesResponce"
-      },
-      "SeasonStartProbabilitiesdata": {
-        "properties": {
-          "station": {
-            "type": "string",
-            "title": "Station"
-          },
-          "day": {
-            "type": "integer",
-            "title": "Day"
-          },
-          "proportion": {
-            "type": "number",
-            "title": "Proportion"
-          }
-        },
-        "type": "object",
-        "required": [
-          "station",
-          "day",
-          "proportion"
-        ],
-        "title": "SeasonStartProbabilitiesdata"
       },
       "SeasonalLength": {
         "properties": {
@@ -2618,54 +2477,6 @@
         "type": "object",
         "title": "MonthlyTemperatureSummariesParameters"
       },
-      "app__api__v1__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "start_dates": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Start Dates",
-            "default": [
-              200,
-              220,
-              250,
-              270,
-              300,
-              320
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "SeasonStartProbabilitiesParameters"
-      },
       "app__api__v2__endpoints__annual_rainfall_summaries__schema__AnnualRainfallSummariesParameters": {
         "properties": {
           "country": {
@@ -2795,11 +2606,13 @@
               "internal_tests"
             ],
             "title": "Country",
+            "description": "Two-letter country code (e.g. 'zm', 'zw', 'mw')",
             "default": "mw_test"
           },
           "station_id": {
             "type": "string",
             "title": "Station Id",
+            "description": "Target station identifier",
             "default": "Kasungu"
           }
         },
@@ -2861,54 +2674,6 @@
         },
         "type": "object",
         "title": "MonthlyTemperatureSummariesParameters"
-      },
-      "app__api__v2__endpoints__season_start_probabilities__schema__SeasonStartProbabilitiesParameters": {
-        "properties": {
-          "country": {
-            "type": "string",
-            "enum": [
-              "zm",
-              "mw",
-              "zw",
-              "zm_test",
-              "mw_test",
-              "zw_test",
-              "zm_workshops",
-              "mw_workshops",
-              "zw_workshops",
-              "internal_tests"
-            ],
-            "title": "Country",
-            "default": "mw_test"
-          },
-          "station_id": {
-            "type": "string",
-            "title": "Station Id",
-            "default": "Kasungu"
-          },
-          "start_dates": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Start Dates",
-            "default": [
-              200,
-              220,
-              250,
-              270,
-              300,
-              320
-            ]
-          },
-          "override": {
-            "type": "boolean",
-            "title": "Override",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "SeasonStartProbabilitiesParameters"
       },
       "CropRecord": {
         "title": "CropRecord",

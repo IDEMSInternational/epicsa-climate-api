@@ -65,15 +65,6 @@ def assert_crop_success_probabilities(country, station_id):
     response = client.post("/v1/crop_success_probabilities/", json=test_data)
     assert response.status_code == 200
 
-def assert_season_start_probabilities(country, station_id):
-    test_data = {
-        "country": country,
-        "station_id": station_id,
-        "start_dates": [200,220,250,270,300,320]
-    }
-    response = client.post("/v1/season_start_probabilities/", json=test_data)
-    assert response.status_code == 200
-
 def assert_extremes_summaries(country, station_id):
     return #Not tested at moment as not completed
     test_data = {
@@ -169,11 +160,6 @@ def assert_all_function_for_country(country):
             assert_monthly_temperature_summaries(country, station_id)
         except AssertionError:
             errors.append(f"Failed: monthly temperature summaries for country {country} station {station_id}")
-
-        try:
-            assert_season_start_probabilities(country, station_id)
-        except AssertionError:
-            errors.append(f"Failed: season start probabilities for country {country} station {station_id}")
 
         try:
             assert_extremes_summaries(country, station_id)
