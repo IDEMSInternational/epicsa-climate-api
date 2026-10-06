@@ -184,22 +184,6 @@ def monthly_temperature_summaries(
     return __get_list_vector_as_ordered_dict(r_list_vector)
 
 
-def season_start_probabilities(
-    country: str, 
-    station_id: str, 
-    override: bool, 
-    start_dates: List[int] = None
-) -> OrderedDict:
-    __init_data_env()
-    r_params: Dict = __get_r_params(locals())
-    r_list_vector: ListVector = r_epicsawrap.season_start_probabilities(
-        country=r_params["country"],
-        station_id=r_params["station_id"],
-        start_dates=r_params["start_dates"],
-        override= r_params["override"],
-    )
-    return __get_list_vector_as_ordered_dict(r_list_vector)
-
 def station_metadata(
     country: str,
     station_id: str,

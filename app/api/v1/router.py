@@ -12,9 +12,6 @@ from app.api.v1.endpoints.crop_success_probabilities.router import (
 from app.api.v1.endpoints.monthly_temperature_summaries.router import (
     router as monthly_temperature_summaries_router,
 )
-from app.api.v1.endpoints.season_start_probabilities.router import (
-    router as season_start_probabilities_router,
-)
 from app.api.v1.endpoints.documents.router import (
     router as documents,
 )
@@ -50,11 +47,6 @@ v1_router.include_router(
 v1_router.include_router(
     monthly_temperature_summaries_router,
     prefix="/monthly_temperature_summaries",
-    tags=["v1 (Legacy): Climate"],
-)
-v1_router.include_router(
-    season_start_probabilities_router,
-    prefix="/season_start_probabilities",
     tags=["v1 (Legacy): Climate"],
 )
 v1_router.include_router(

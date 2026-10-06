@@ -19,7 +19,6 @@ from app.core.responce_models.definitions_responce_model import (
     CropsSuccess,
     EndRains,
     EndSeason,
-    SeasonStartProbabilities,
     SeasonalLength,
     SeasonalRain,
     SeasonalTotalRainfall,
@@ -42,11 +41,6 @@ from app.core.responce_models.crop_success_probabilities_model import (
     CropSuccessProbabilitiesResponce,
     CropSuccessProbabilitiesMetadata,
     CropSuccessProbabilitiesdata,
-)
-from app.core.responce_models.season_start_probabilities import (
-    SeasonStartProbabilitiesResponce,
-    SeasonStartProbabilitiesMetadata,
-    SeasonStartProbabilitiesdata,
 )
 from app.schemas.manifest import (
     CountryManifestResponse,
@@ -913,7 +907,34 @@ class ClimateRepository:
         station_id: str,
         generation_id: Optional[str] = None,
     ) -> CropSuccessProbabilitiesResponce:
-        """Query and aggregate full crop success probabilities lookup table from crop table using SQL aggregation."""
+        """Query and aggregate full crop success probabilities lookup table from the crop table.
+
+        Agrometeorological Conventions:
+        - Agricultural Year Offsets: In PICSA and Southern African agrometeorology (R-Instat),
+          the agricultural year begins on July 1. `plant_day` represents the day offset from
+          July 1 (1 = July 1). Standard planting dates correspond to:
+            * plant_day 123 -> October 31
+            * plant_day 138 -> November 15
+            * plant_day 153 -> November 30
+            * plant_day 168 -> December 15
+            * plant_day 183 -> December 30
+        - Probability Conditions:
+            * `prop_success_with_start`: Conditional probability that the crop succeeds given
+              that seasonal onset criteria were met.
+            * `prop_success_no_start`: Unconditional probability of crop success regardless of
+              whether seasonal onset conditions were formally satisfied.
+
+        Dual Ingestion Format Compatibility:
+        - Format A (Raw yearly simulations, e.g. Zimbabwe and legacy Zambia):
+          The table contains 50k-140k rows per station with `year` populated and `summary_value`
+          stored as boolean strings ('TRUE'/'FALSE'). The backend calculates empirical success
+          rates as `successes / total_years`.
+        - Format B (Precalculated probability lookup grid, e.g. recent Zambia updates):
+          The table contains ~2,870 rows per station where `year IS NULL` and `summary_value`
+          stores precalculated probability floats (e.g. '0.6136').
+        - Dynamic Detection: The query aggregates `COUNT(year) AS year_count`. If `year_count == 0`,
+          the precomputed values are selected; otherwise, the empirical simulation ratio is computed.
+        """
         gen_id, gen_timestamp = self.get_latest_generation_for_crop(
             station_id=station_id,
             generation_id=generation_id,
@@ -1029,106 +1050,6 @@ class ClimateRepository:
             )
 
         return CropSuccessProbabilitiesResponce(
-            generation_id=gen_id,
-            generation_timestamp=gen_timestamp,
-            metadata=metadata,
-            data=records,
-        )
-
-    def get_season_start_probabilities(
-        self,
-        country: str,
-        station_id: str,
-        start_dates: Optional[List[int]] = None,
-        generation_id: Optional[str] = None,
-    ) -> SeasonStartProbabilitiesResponce:
-        """Query and compute cumulative season start probabilities across candidate days."""
-        if start_dates is None or len(start_dates) == 0:
-            start_dates = [200, 220, 250, 270, 300, 320]
-
-        gen_id, gen_timestamp = self.get_latest_generation_for_summary(
-            station_id=station_id,
-            summary_type="Annual Rain",
-            generation_id=generation_id,
-        )
-
-        # Metadata
-        meta_dict: Dict[str, Any] = {}
-        if gen_id:
-            sql_defs = """
-                SELECT d.summary_element, d.definition_value
-                FROM definition d
-                WHERE d.definition_id = %s;
-            """
-            _, def_rows = execute_query(sql_defs, [gen_id])
-            if not def_rows:
-                sql_defs_fallback = """
-                    SELECT d.summary_element, d.definition_value
-                    FROM summary_station_metadata ssm
-                    JOIN definition d ON d.definition_id = ssm.definition_id
-                    WHERE ssm.station_id = %s;
-                """
-                _, def_rows = execute_query(sql_defs_fallback, [station_id])
-        else:
-            sql_defs = """
-                SELECT d.summary_element, d.definition_value
-                FROM summary_station_metadata ssm
-                JOIN definition d ON d.definition_id = ssm.definition_id
-                WHERE ssm.station_id = %s;
-            """
-            _, def_rows = execute_query(sql_defs, [station_id])
-
-        for d in def_rows:
-            val = _parse_definition_value(d.get("definition_value"))
-            elem = d.get("summary_element")
-            if elem and elem in SeasonStartProbabilitiesMetadata.__fields__:
-                meta_dict[elem] = val
-        metadata = SeasonStartProbabilitiesMetadata.parse_obj(meta_dict)
-
-        # Query all annual start_rains DOYs
-        if gen_id:
-            sql_data = """
-                SELECT summary_value
-                FROM summary
-                WHERE station_id = %s
-                  AND time_type = 'annual'
-                  AND summary_type = 'Annual Rain'
-                  AND definition_id = %s
-                  AND summary_name IN ('start_rains', 'start')
-                  AND summary_value IS NOT NULL
-                  AND summary_value != '';
-            """
-            _, rows = execute_query(sql_data, [station_id, gen_id])
-        else:
-            sql_data = """
-                SELECT summary_value
-                FROM summary
-                WHERE station_id = %s
-                  AND time_type = 'annual'
-                  AND summary_name IN ('start_rains', 'start')
-                  AND summary_value IS NOT NULL
-                  AND summary_value != '';
-            """
-            _, rows = execute_query(sql_data, [station_id])
-
-        start_doys = [_safe_float(r["summary_value"]) for r in rows if _safe_float(r["summary_value"]) is not None]
-
-        records: List[SeasonStartProbabilitiesdata] = []
-        total_years = len(start_doys)
-        for day in start_dates:
-            if total_years > 0:
-                prop = sum(1 for doy in start_doys if doy <= day) / total_years
-            else:
-                prop = 0.0
-            records.append(
-                SeasonStartProbabilitiesdata(
-                    station=station_id,
-                    day=day,
-                    proportion=round(prop, 4),
-                )
-            )
-
-        return SeasonStartProbabilitiesResponce(
             generation_id=gen_id,
             generation_timestamp=gen_timestamp,
             metadata=metadata,
