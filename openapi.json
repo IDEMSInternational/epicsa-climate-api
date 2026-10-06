@@ -1249,7 +1249,7 @@
             "title": "Year"
           },
           "annual_rain": {
-            "type": "number",
+            "type": "integer",
             "title": "Annual Rain"
           },
           "n_rain": {
@@ -1291,7 +1291,7 @@
             "title": "End Rains Status"
           },
           "seasonal_rain": {
-            "type": "number",
+            "type": "integer",
             "title": "Seasonal Rain"
           },
           "n_seasonal_rain": {

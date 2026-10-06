@@ -206,6 +206,22 @@ def test_v2_crop_success_probabilities():
     assert 0.0 <= first_row["prop_success_with_start"] <= 1.0
     assert 0.0 <= first_row["prop_success_no_start"] <= 1.0
 
+    # Test CHOMA MET returns precalculated lookup table (from test DB fixture)
+    payload_zm = {
+        "country": "zm",
+        "station_id": "CHOMA MET",
+    }
+    res_zm = client.post("/v2/crop_success_probabilities/", json=payload_zm)
+    assert res_zm.status_code == 200
+    body_zm = res_zm.json()
+    assert len(body_zm["data"]) >= 1
+    choma_row = body_zm["data"][0]
+    assert choma_row["total_rain"] == 200
+    assert choma_row["plant_day"] == 123
+    assert choma_row["plant_length"] == 60
+    assert choma_row["prop_success_with_start"] == 0.5
+    assert choma_row["prop_success_no_start"] == 0.75
+
 
 def test_v2_season_start_probabilities():
     """Verify season start probabilities endpoint."""

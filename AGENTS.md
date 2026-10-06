@@ -133,11 +133,14 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
     │               └── router.py         # Health check endpoint (/v1/status/)
     │
     └── tests/                            # API integration & validation tests
+        ├── data/
+        │   └── test_epicsa.sql           # Portable SQLite SQL fixture (used in CI & offline tests)
         ├── results/                      # Reference JSON fixture files
         ├── test_all_stations.py          # Station integration test suite across countries
         ├── test_error_response.py        # Validates response model validation failure handling (HTTP 500)
         ├── test_get_documents.py         # Tests for GCS document retrieval
-        └── test_get_status.py            # Health check tests
+        ├── test_get_status.py            # Health check tests
+        └── test_v2_endpoints.py          # Integration tests for v2 PostgreSQL endpoints (using test DB)
 ```
 
 ---
@@ -300,6 +303,20 @@ The PostgreSQL `summary` table is an unconstrained Entity-Attribute-Value store 
 - **ALWAYS** check [`docs/CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md`](docs/CLIMATE_VARIABLE_NAMING_AND_DISCREPANCIES.md) and register any new variable variations in `app/services/variable_mappings.py`.
 - **ALWAYS** verify with `python -m app.scripts.audit_variables --strict` (or `./scripts/audit_variables.py --strict`) to ensure 100% of production variables map cleanly. See [`docs/AUDITING_AND_DRIFT_DETECTION.md`](docs/AUDITING_AND_DRIFT_DETECTION.md).
 
+### ⚠️ Gotcha 10: Tests Run Against the Test DB (SQLite), NOT Live Production Data!
+All automated tests (`pytest`, CI GitHub Actions) execute against a **local test database**, **NEVER** live production PostgreSQL:
+- **Test DB Resolution Hierarchy** (in `app/core/database.py` and `app/tests/test_v2_endpoints.py`):
+  1. `EPICSA_SQLITE_DB` environment variable (if set and pointing to an existing file).
+  2. `data_snapshot/epicsa_local.db` (local SQLite snapshot, gitignored, present on some developer workstations).
+  3. `app/tests/data/test_epicsa.sql` (portable SQL script that auto-populates a temporary SQLite database on the fly; **this is the only test DB present in CI**).
+- **Critical Rules for Agents**:
+  - **DO NOT** write unit/integration test assertions that depend on live production stations, IDs, row counts, or timestamps (e.g. `MAGOYE AGROMET`, `KASAMA MET`, `LUSAKA INT. AIRPOR`). Those stations **do not exist** in `test_epicsa.sql`.
+  - The standard stations present in `test_epicsa.sql` are:
+    - Zimbabwe (`zw`): `CHISENGU (MET)` (annual boolean simulation format), `BEITBRIDGE (MET)`.
+    - Zambia (`zm`): `CHOMA MET` (precalculated probability lookup format).
+    - Tanzania (`tz`): `dodoma`.
+  - When introducing a new data format or feature (such as precalculated crop lookups), **ALWAYS** add a corresponding minimal fixture to `app/tests/data/test_epicsa.sql` so tests pass deterministically in CI without requiring network access or production credentials.
+
 ---
 
 ## 6. Dependency Injection & Testing Patterns
@@ -339,8 +356,32 @@ def test_select_query_success(monkeypatch):
     monkeypatch.setattr(select_router, "execute_select_query",
         lambda sql, params, secret: (["station_id"], [{"station_id": "dodoma"}])
     )
-    # Test router response...
 ```
+
+### Database Testing Pattern: SQLite Test DB vs. Live PostgreSQL
+FastAPI v2 database endpoints query PostgreSQL via `app.core.database.execute_query()`.
+To allow fast, offline, and credential-free test execution in CI:
+- When `EPICSA_SQLITE_DB` is set, `execute_query()` routes queries directly to SQLite via `_execute_sqlite_query()`, converting `%s` placeholders to `?`.
+- In `app/tests/test_v2_endpoints.py`, the test environment dynamically provisions:
+  ```python
+  if not os.environ.get("EPICSA_SQLITE_DB") or not Path(os.environ["EPICSA_SQLITE_DB"]).exists():
+      snapshot_db = Path("data_snapshot/epicsa_local.db").resolve()
+      sql_fixture = Path(__file__).parent / "data" / "test_epicsa.sql"
+      if snapshot_db.exists():
+          os.environ["EPICSA_SQLITE_DB"] = str(snapshot_db)
+      elif sql_fixture.exists():
+          # Auto-create temp SQLite db from test_epicsa.sql
+          tmp_db = Path(tempfile.gettempdir()) / "epicsa_test_fixture.db"
+          ...
+          os.environ["EPICSA_SQLITE_DB"] = str(tmp_db)
+  ```
+- **Testing against live production (Ad-hoc only)**:
+  To run an ad-hoc test against the live PostgreSQL database from a script or REPL:
+  ```python
+  import os
+  os.environ.pop("EPICSA_SQLITE_DB", None)  # Ensure SQLite override is unset
+  ```
+  Ensure `postgres-secret.json` exists with valid credentials and network access to `db.epicsa.idems.international` is available.
 
 ---
 

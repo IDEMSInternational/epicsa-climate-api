@@ -743,6 +743,9 @@ class ClimateRepository:
                   CAST(rain_total AS INTEGER) AS total_rain,
                   CAST(plant_day AS INTEGER) AS plant_day,
                   CAST(plant_length AS INTEGER) AS plant_length,
+                  COUNT(year) AS year_count,
+                  MAX(CASE WHEN year IS NULL AND include_start_condition IS TRUE THEN CAST(summary_value AS FLOAT) ELSE NULL END) AS precomp_with_start,
+                  MAX(CASE WHEN year IS NULL AND include_start_condition IS NOT TRUE THEN CAST(summary_value AS FLOAT) ELSE NULL END) AS precomp_no_start,
                   SUM(CASE WHEN include_start_condition IS TRUE THEN 1 ELSE 0 END) AS with_start_total,
                   SUM(CASE WHEN include_start_condition IS TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS with_start_success,
                   SUM(CASE WHEN include_start_condition IS NOT TRUE THEN 1 ELSE 0 END) AS no_start_total,
@@ -763,6 +766,9 @@ class ClimateRepository:
                   CAST(rain_total AS INTEGER) AS total_rain,
                   CAST(plant_day AS INTEGER) AS plant_day,
                   CAST(plant_length AS INTEGER) AS plant_length,
+                  COUNT(year) AS year_count,
+                  MAX(CASE WHEN year IS NULL AND include_start_condition IS TRUE THEN CAST(summary_value AS FLOAT) ELSE NULL END) AS precomp_with_start,
+                  MAX(CASE WHEN year IS NULL AND include_start_condition IS NOT TRUE THEN CAST(summary_value AS FLOAT) ELSE NULL END) AS precomp_no_start,
                   SUM(CASE WHEN include_start_condition IS TRUE THEN 1 ELSE 0 END) AS with_start_total,
                   SUM(CASE WHEN include_start_condition IS TRUE AND UPPER(TRIM(summary_value)) IN ('TRUE', '1') THEN 1 ELSE 0 END) AS with_start_success,
                   SUM(CASE WHEN include_start_condition IS NOT TRUE THEN 1 ELSE 0 END) AS no_start_total,
@@ -779,13 +785,18 @@ class ClimateRepository:
 
         records: List[CropSuccessProbabilitiesdata] = []
         for r in rows:
-            w_tot = _safe_int(r["with_start_total"]) or 0
-            w_suc = _safe_int(r["with_start_success"]) or 0
-            n_tot = _safe_int(r["no_start_total"]) or 0
-            n_suc = _safe_int(r["no_start_success"]) or 0
+            year_count = _safe_int(r.get("year_count")) or 0
+            if year_count == 0:
+                p_with = _safe_float(r.get("precomp_with_start")) or 0.0
+                p_no = _safe_float(r.get("precomp_no_start")) or 0.0
+            else:
+                w_tot = _safe_int(r["with_start_total"]) or 0
+                w_suc = _safe_int(r["with_start_success"]) or 0
+                n_tot = _safe_int(r["no_start_total"]) or 0
+                n_suc = _safe_int(r["no_start_success"]) or 0
 
-            p_with = (w_suc / w_tot) if w_tot > 0 else 0.0
-            p_no = (n_suc / n_tot) if n_tot > 0 else 0.0
+                p_with = (w_suc / w_tot) if w_tot > 0 else 0.0
+                p_no = (n_suc / n_tot) if n_tot > 0 else 0.0
 
             records.append(
                 CropSuccessProbabilitiesdata(
