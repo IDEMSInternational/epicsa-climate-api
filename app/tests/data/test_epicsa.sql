@@ -200,7 +200,10 @@ INSERT INTO "crop" VALUES('CHISENGU (MET)','1966','124.0','90.0','300.0','0','Cr
 INSERT INTO "crop" VALUES('CHISENGU (MET)','1967','124.0','90.0','300.0','1','Crops',NULL,NULL,'7VcX2GcBlQiXHyQ0','Active','2026-09-23T14:12:20.431452+00:00');
 INSERT INTO "crop" VALUES('CHISENGU (MET)','1967','124.0','90.0','300.0','0','Crops',NULL,NULL,'7VcX2GcBlQiXHyQ0','Active','2026-09-23T14:12:20.431452+00:00');
 INSERT INTO "crop" VALUES('CHISENGU (MET)','1968','124.0','90.0','300.0','1','Crops',NULL,NULL,'7VcX2GcBlQiXHyQ0','Active','2026-09-23T14:12:20.431452+00:00');
+INSERT INTO "crop" VALUES('CHOMA MET',NULL,'123.0','60.0','200.0','1','Crops',NULL,'0.5','test_crop_precomp','Active','2026-10-03T15:36:07+00:00');
+INSERT INTO "crop" VALUES('CHOMA MET',NULL,'123.0','60.0','200.0','0','Crops',NULL,'0.75','test_crop_precomp','Active','2026-10-03T15:36:07+00:00');
 CREATE TABLE definition (definition_id,time_stamp,summary_element,summary_type,definition_value,accreditation);
+INSERT INTO "definition" VALUES('test_crop_precomp','2026-10-03T15:36:07+00:00','crops','Crops','{"s_start_doy": 1, "start_check": "TRUE", "planting_dates": {"by": 15, "to": 183, "from": 123}, "planting_length": {"by": 15, "to": 150, "from": 60}, "return_crops_table": "TRUE", "water_requirements": {"by": 25, "to": 1200, "from": 200}}','pending');
 INSERT INTO "definition" VALUES('j1nebYn8cPlB96HR','2026-09-23T09:32:34.597088+00:00','TODO','Annual Rain','{"value": 0.85, "end_day": "end_rains", "value_lb": 0, "direction": "between", "start_day": "start_rains", "s_start_doy": 1, "return_max_spell": "TRUE", "return_all_spells": "TRUE"}','pending');
 INSERT INTO "definition" VALUES('j1nebYn8cPlB96HR','2026-09-23T09:32:34.597088+00:00','annual_rain','Annual Rain','{"na_n": null, "na_rm": "TRUE", "value": 0.85, "n_rain": "FALSE", "na_n.1": null, "na_prop": null, "na_rm.1": "TRUE", "n_rain.1": "TRUE", "na_n_non": 191, "value_lb": "NA", "direction": "greater", "na_consec": null, "na_prop.1": null, "threshold": 0.85, "na_n_non.1": 191, "total_rain": "TRUE", "na_consec.1": null, "total_rain.1": "FALSE"}','pending');
 INSERT INTO "definition" VALUES('uDt1FBWqhuFCBDry','2026-09-17T12:21:05.551095+00:00','seasonal_length','Annual Rain','{"seasonal_length": {"end_type": "season"}}','pending');
@@ -4390,6 +4393,7 @@ INSERT INTO "summary" VALUES('BEITBRIDGE (MET)','f2b01PJKbeIhm9z2','annual','190
 INSERT INTO "summary" VALUES('BEITBRIDGE (MET)','f2b01PJKbeIhm9z2','annual','1909','Annual Rain','seasonal_rain_day','seasonal_rainday',NULL,'2026-09-23T14:09:46.248723+00:00','Active');
 INSERT INTO "summary" VALUES('BEITBRIDGE (MET)','f2b01PJKbeIhm9z2','annual','1909','Annual Rain','season_length','length_rains',NULL,'2026-09-23T14:09:46.248723+00:00','Active');
 CREATE TABLE summary_station_metadata (station_id,summary_type,definition_id,time_stamp);
+INSERT INTO "summary_station_metadata" VALUES('CHOMA MET','Crops','test_crop_precomp','2026-10-03T15:36:07+00:00');
 INSERT INTO "summary_station_metadata" VALUES('BEITBRIDGE (MET)','Annual Rain','Aa5Kd2stoXcJCZBS','2026-09-16T05:51:34.093450+00:00');
 INSERT INTO "summary_station_metadata" VALUES('CHISENGU (MET)','Annual Rain','Aa5Kd2stoXcJCZBS','2026-09-16T05:51:34.093450+00:00');
 INSERT INTO "summary_station_metadata" VALUES('BEITBRIDGE (MET)','Annual Rain','Vnk2sWFGMuXaQeUp','2026-09-16T21:23:58.529333+00:00');
