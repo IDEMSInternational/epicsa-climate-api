@@ -45,6 +45,10 @@ TAGS_METADATA = [
         "description": "PDF and HTML documents streamed from Google Cloud Storage.",
     },
     {
+        "name": "v2: Discovery",
+        "description": "Station data generation manifests and client sync discovery.",
+    },
+    {
         "name": "v2: Testing",
         "description": "System health and status checks for v2.",
     },
@@ -107,7 +111,7 @@ def get_application():
     settings = get_settings()
     _app = FastAPI(
         title="E-PICSA Climate API",
-        version="2.2.0",
+        version="2.3.0",
         description=API_DESCRIPTION,
         docs_url="/",
         openapi_tags=TAGS_METADATA,
