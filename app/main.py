@@ -45,6 +45,10 @@ TAGS_METADATA = [
         "description": "PDF and HTML documents streamed from Google Cloud Storage.",
     },
     {
+        "name": "v2: Discovery",
+        "description": "Station data generation manifests and client sync discovery.",
+    },
+    {
         "name": "v2: Testing",
         "description": "System health and status checks for v2.",
     },

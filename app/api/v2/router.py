@@ -20,6 +20,7 @@ from app.api.v2.endpoints.documents.router import (
 )
 from app.api.v2.endpoints.station.router import router as station_router
 from app.api.v2.endpoints.status.router import router as status_router
+from app.api.v2.endpoints.manifest.router import router as manifest_router
 
 v2_router = APIRouter()
 
@@ -58,4 +59,9 @@ v2_router.include_router(
     documents_router,
     prefix="/documents",
     tags=["v2: Documents"],
+)
+v2_router.include_router(
+    manifest_router,
+    prefix="/manifest",
+    tags=["v2: Discovery"],
 )

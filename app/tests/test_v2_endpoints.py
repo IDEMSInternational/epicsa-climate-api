@@ -553,5 +553,108 @@ def test_climate_repository_specific_generation_id():
     assert res.generation_timestamp is not None
 
 
+def test_v2_manifest_country_full():
+    """Verify GET /v2/manifest/{country} returns complete country inventory."""
+    res = client.get("/v2/manifest/zw")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["country_code"] == "zw"
+    assert body["has_updates"] is True
+    assert body["latest_timestamp"] is not None
+    assert body["station_count"] > 0
+    assert len(body["stations"]) == body["station_count"]
+
+    # Verify structure of first station
+    stn = next((s for s in body["stations"] if s["station_id"] == "BEITBRIDGE (MET)"), None)
+    assert stn is not None
+    assert stn["has_updates"] is True
+    assert stn["latest_timestamp"] is not None
+    assert "annual_rain" in stn["generations"]
+    assert "annual_temperature" in stn["generations"]
+    assert "monthly_temperature" in stn["generations"]
+    assert "crops" in stn["generations"]
+    assert "season_start_probabilities" in stn["generations"]
+
+    ar = stn["generations"]["annual_rain"]
+    assert ar["available"] is True
+    assert ar["status"] == "update_available"
+    assert ar["generation_id"] is not None
+    assert ar["generation_timestamp"] is not None
+
+
+def test_v2_manifest_station_filter():
+    """Verify station_id query parameter filters manifest to single station."""
+    res = client.get("/v2/manifest/zw?station_id=BEITBRIDGE (MET)")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["station_count"] == 1
+    assert len(body["stations"]) == 1
+    assert body["stations"][0]["station_id"] == "BEITBRIDGE (MET)"
+
+
+def test_v2_manifest_station_not_found():
+    """Verify 404 is returned when station_id does not exist."""
+    res = client.get("/v2/manifest/zw?station_id=NON_EXISTENT_STATION")
+    assert res.status_code == 404
+    assert "not found" in res.json()["detail"].lower()
+
+
+def test_v2_manifest_since_timestamp_up_to_date():
+    """Verify since_timestamp matching or exceeding latest returns empty station list and has_updates=False."""
+    # First get the latest timestamp
+    res_initial = client.get("/v2/manifest/zw")
+    assert res_initial.status_code == 200
+    latest_ts = res_initial.json()["latest_timestamp"]
+    assert latest_ts is not None
+
+    # Call with since_timestamp = latest_ts
+    res_check = client.get(f"/v2/manifest/zw?since_timestamp={latest_ts}")
+    assert res_check.status_code == 200
+    body_check = res_check.json()
+    assert body_check["has_updates"] is False
+    assert body_check["station_count"] == 0
+    assert body_check["stations"] == []
+
+
+def test_v2_manifest_since_timestamp_include_up_to_date():
+    """Verify include_up_to_date=True populates all stations with 'up_to_date' status."""
+    res_initial = client.get("/v2/manifest/zw")
+    latest_ts = res_initial.json()["latest_timestamp"]
+
+    res_check = client.get(f"/v2/manifest/zw?since_timestamp={latest_ts}&include_up_to_date=true")
+    assert res_check.status_code == 200
+    body_check = res_check.json()
+    assert body_check["has_updates"] is False
+    assert body_check["station_count"] > 0
+    assert len(body_check["stations"]) == body_check["station_count"]
+
+    for stn in body_check["stations"]:
+        assert stn["has_updates"] is False
+        for gen in stn["generations"].values():
+            if gen["available"]:
+                assert gen["status"] == "up_to_date"
+
+
+def test_v2_manifest_since_generation_id():
+    """Verify since_generation_id resolves generation and detects up-to-date vs newer data."""
+    # Up-to-date case: client has latest generation 3frqkAVCFieVq3k6
+    res_latest = client.get("/v2/manifest/zw?since_generation_id=3frqkAVCFieVq3k6")
+    assert res_latest.status_code == 200
+    body_latest = res_latest.json()
+    assert body_latest["has_updates"] is False
+    assert body_latest["station_count"] == 0
+
+    # Updates available case: client has older generation f2b01PJKbeIhm9z2
+    res_older = client.get("/v2/manifest/zw?since_generation_id=f2b01PJKbeIhm9z2")
+    assert res_older.status_code == 200
+    body_older = res_older.json()
+    assert body_older["has_updates"] is True
+    assert body_older["station_count"] > 0
+    stn = next((s for s in body_older["stations"] if s["station_id"] == "BEITBRIDGE (MET)"), None)
+    assert stn is not None
+    assert stn["has_updates"] is True
+    assert stn["generations"]["annual_rain"]["status"] == "update_available"
+
+
 
 
