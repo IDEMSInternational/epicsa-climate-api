@@ -223,26 +223,6 @@ def test_v2_crop_success_probabilities():
     assert choma_row["prop_success_no_start"] == 0.75
 
 
-def test_v2_season_start_probabilities():
-    """Verify season start probabilities endpoint."""
-    payload = {
-        "country": "zw",
-        "station_id": "BEITBRIDGE (MET)",
-        "start_dates": [100, 120, 140, 160],
-    }
-    res = client.post("/v2/season_start_probabilities/", json=payload)
-    assert res.status_code == 200
-    body = res.json()
-    assert "metadata" in body
-    assert "data" in body
-    assert len(body["data"]) == 4
-
-    days = [r["day"] for r in body["data"]]
-    assert days == [100, 120, 140, 160]
-    for r in body["data"]:
-        assert 0.0 <= r["proportion"] <= 1.0
-
-
 def test_v2_select_query():
     """Verify v2 select_query endpoint."""
     payload = {
@@ -530,14 +510,7 @@ def test_v2_endpoints_return_generation_metadata():
     assert body_crop["generation_id"] in ("3frqkAVCFieVq3k6", "7VcX2GcBlQiXHyQ0")
     assert body_crop["generation_timestamp"] is not None
 
-    # 5. Season start probabilities
-    res_season = client.post("/v2/season_start_probabilities/", json={"country": "zw", "station_id": "BEITBRIDGE (MET)"})
-    assert res_season.status_code == 200
-    body_season = res_season.json()
-    assert body_season["generation_id"] == "3frqkAVCFieVq3k6"
-    assert body_season["generation_timestamp"] is not None
-
-    # 6. Station detail
+    # 5. Station detail
     res_stn = client.get("/v2/station/zw/BEITBRIDGE (MET)")
     assert res_stn.status_code == 200
     body_stn = res_stn.json()

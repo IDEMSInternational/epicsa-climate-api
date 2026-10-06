@@ -88,7 +88,6 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
     │       ├── definitions_responce_model.py
     │       ├── extremes_summaries_responce_model.py
     │       ├── rainfall_summaries_responce_model.py
-    │       ├── season_start_probabilities.py
     │       ├── station_responce_model.py
     │       └── temperature_responce_model.py
     │
@@ -112,9 +111,6 @@ The E-PICSA (Enhanced Participatory Integrated Climate Services for Agriculture)
     │           │   ├── router.py
     │           │   └── schema.py
     │           ├── crop_success_probabilities/
-    │           │   ├── router.py
-    │           │   └── schema.py
-    │           ├── season_start_probabilities/
     │           │   ├── router.py
     │           │   └── schema.py
     │           ├── extremes_summaries/
@@ -217,6 +213,30 @@ Located in `app/services/variable_mappings.py`, `app/scripts/audit_variables.py`
   - Scans live PostgreSQL databases, verifies all distinct variable pairs against canonical maps, and alerts if new unmapped variations are ingested by R-Instat.
   - Run via `python -m app.scripts.audit_variables --strict` or `./scripts/audit_variables.py --strict`. Detailed documentation in [`docs/AUDITING_AND_DRIFT_DETECTION.md`](docs/AUDITING_AND_DRIFT_DETECTION.md).
 
+### Subsystem G: Probability & Crop Modeling Engine (`crop_success_probabilities`)
+Located in `app/services/climate_repository.py`, `app/api/v1/endpoints/crop_success_probabilities/`, `app/api/v2/endpoints/crop_success_probabilities/`, and `app/core/responce_models/crop_success_probabilities_model.py`.
+- **Crop Success Probabilities Architecture**:
+  - Serves the complete multi-parameter lookup grid of simulated crop viability across combinations of planting day (`plant_day`), crop maturity length (`plant_length`), and minimum seasonal rainfall (`total_rain`).
+  - **Agrometeorological Calendar Convention (July 1 Origin)**: In PICSA agrometeorological practice (R-Instat), the Southern African agricultural year begins on **July 1**. `plant_day` values are day offsets from July 1 ($1 = \text{July 1}$):
+    - `123` $\rightarrow$ **October 31**
+    - `138` $\rightarrow$ **November 15**
+    - `153` $\rightarrow$ **November 30**
+    - `168` $\rightarrow$ **December 15**
+    - `183` $\rightarrow$ **December 30**
+    Frontend dashboards receive and render these predefined planting windows directly without client-side date assertions.
+  - **Dual Ingestion Format Compatibility**:
+    - *Format A (Raw yearly simulations — Zimbabwe & legacy Zambia)*: 50,000–140,000 rows per station where `year` is populated and `summary_value` contains `'TRUE'` / `'FALSE'` strings. The backend calculates empirical success rates via SQL aggregation ($\frac{\text{successes}}{\text{total}}$).
+    - *Format B (Precalculated probability lookup grid — latest Zambia updates, e.g. `wYUwjW9rYEn7b31P`)*: ~2,870 rows per station where `year IS NULL` and `summary_value` contains precalculated probability floats (e.g. `'0.6136'`).
+    - *Dynamic Format Detection*: The SQL query calculates `COUNT(year) AS year_count`. When `year_count == 0`, precomputed float columns (`precomp_with_start`, `precomp_no_start`) are selected; otherwise, empirical ratios are aggregated. Both formats coexist cleanly across countries.
+  - **Probability Conditions**:
+    - `prop_success_with_start`: Conditional probability that the crop succeeds given that seasonal start criteria were formally met.
+    - `prop_success_no_start`: Unconditional probability of crop success regardless of whether start criteria were met (standard baseline for risk planning).
+- **Removal of Legacy `season_start_probabilities` Endpoint**:
+  - Historically, a dedicated `/season_start_probabilities/` endpoint existed to evaluate onset CDF probabilities against arbitrary day thresholds (`[200, 220, 250, ... ]`).
+  - This endpoint was removed as redundant dead code: downstream dashboards derive onset probabilities directly by comparing `annual_rainfall_summaries` (`start_rains_doy`) against `crop_success_probabilities` (`plant_day`), both of which share the exact July 1 agricultural year coordinate system ($1 = \text{July 1}$).
+- **Database Performance Precaution**:
+  - The `crop` table contains millions of rows across all stations. Queries MUST always filter by `station_id` (and ideally `definition_id`). Unfiltered scans will hit statement timeouts.
+
 ---
 
 ## 4. API Endpoints Reference
@@ -230,7 +250,6 @@ All endpoints are registered under the `/v1` prefix.
 | `POST` | `/v1/annual_temperature_summaries/` | Climate | `AnnualTemperatureSummariesParameters` | `AnnualTemperatureSummariesResponce` | Annual temperature summaries (tmin/tmax means, mins, maxs) |
 | `POST` | `/v1/monthly_temperature_summaries/` | Climate | `MonthlyTemperatureSummariesParameters` | `MonthlyTemperatureSummariesResponce` | Monthly aggregated temperature summaries |
 | `POST` | `/v1/crop_success_probabilities/` | Climate | `CropSuccessProbabilitiesParameters` | `CropSuccessProbabilitiesResponce` | Crop success probabilities based on planting day & length |
-| `POST` | `/v1/season_start_probabilities/` | Climate | `SeasonStartProbabilitiesParameters` | `SeasonStartProbabilitiesResponce` | Probabilities of season starting by given day-of-year |
 | `POST` | `/v1/extremes_summaries/` | Climate | `ExtremesSummariesParameters` | `OrderedDict` (raw JSON) | Extremes rainfall & temperature summaries (work in progress) |
 | `GET` | `/v1/station/{country}` | Metadata | `country: country_code` | `StationListResponce` | List all stations for a country |
 | `GET` | `/v1/station/{country}/{station_id}` | Metadata | `country: country_code`, `station_id: str` | `StationAndDefintionResponce` | Station details & statistical definitions |
@@ -258,7 +277,6 @@ The class names inside use `Responce`:
 - `AnnualTemperatureSummariesResponce`
 - `MonthlyTemperatureSummariesResponce`
 - `CropSuccessProbabilitiesResponce`
-- `SeasonStartProbabilitiesResponce`
 - `StationListResponce`
 - `StationAndDefintionResponce`
 - In temperature models: `AnnualTempartureSummariesdata` (missing 'e' in temperature).
