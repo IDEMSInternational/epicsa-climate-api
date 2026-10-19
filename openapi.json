@@ -1056,6 +1056,108 @@
           }
         }
       }
+    },
+    "/v2/manifest/{country}": {
+      "get": {
+        "tags": [
+          "v2: Discovery"
+        ],
+        "summary": "Get Manifest",
+        "description": "Retrieve discovery manifest of data generations for a country or station.\nSupports fast change detection and delta sync via since_timestamp and since_generation_id.",
+        "operationId": "get_manifest_v2_manifest__country__get",
+        "parameters": [
+          {
+            "description": "Two-letter country code (e.g. zm, mw, zw)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "zm",
+                "mw",
+                "zw",
+                "zm_test",
+                "mw_test",
+                "zw_test",
+                "zm_workshops",
+                "mw_workshops",
+                "zw_workshops",
+                "internal_tests"
+              ],
+              "title": "Country",
+              "description": "Two-letter country code (e.g. zm, mw, zw)"
+            },
+            "name": "country",
+            "in": "path"
+          },
+          {
+            "description": "Optional station identifier to filter to a single station",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Station Id",
+              "description": "Optional station identifier to filter to a single station"
+            },
+            "name": "station_id",
+            "in": "query"
+          },
+          {
+            "description": "Only return stations and metrics with updates newer than this ISO-8601 timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Since Timestamp",
+              "description": "Only return stations and metrics with updates newer than this ISO-8601 timestamp"
+            },
+            "name": "since_timestamp",
+            "in": "query"
+          },
+          {
+            "description": "Only return stations and metrics with updates newer than this generation definition ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Since Generation Id",
+              "description": "Only return stations and metrics with updates newer than this generation definition ID"
+            },
+            "name": "since_generation_id",
+            "in": "query"
+          },
+          {
+            "description": "Whether to include stations and metrics that are already up to date when using since_timestamp or since_generation_id",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Include Up To Date",
+              "description": "Whether to include stations and metrics that are already up to date when using since_timestamp or since_generation_id",
+              "default": false
+            },
+            "name": "include_up_to_date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryManifestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1314,6 +1416,48 @@
           "data"
         ],
         "title": "AnnualTemperatureSummariesResponce"
+      },
+      "CountryManifestResponse": {
+        "properties": {
+          "country_code": {
+            "type": "string",
+            "title": "Country Code",
+            "description": "Country code (e.g. zm, mw, zw)"
+          },
+          "has_updates": {
+            "type": "boolean",
+            "title": "Has Updates",
+            "description": "True if any station has an update available"
+          },
+          "latest_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Latest Timestamp",
+            "description": "Latest generation timestamp across all stations in the country"
+          },
+          "station_count": {
+            "type": "integer",
+            "title": "Station Count",
+            "description": "Number of stations returned in this manifest"
+          },
+          "stations": {
+            "items": {
+              "$ref": "#/components/schemas/StationManifestEntry"
+            },
+            "type": "array",
+            "title": "Stations",
+            "description": "List of station manifest entries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "country_code",
+          "has_updates",
+          "station_count",
+          "stations"
+        ],
+        "title": "CountryManifestResponse",
+        "description": "Manifest response representing climate data generation inventory for a country."
       },
       "CropSuccessProbabilitiesMetadata": {
         "properties": {
@@ -1614,6 +1758,43 @@
         },
         "type": "object",
         "title": "ExtremesSummariesParameters"
+      },
+      "GenerationMetricInfo": {
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "title": "Available",
+            "description": "Whether this metric has data available for this station"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "no_data",
+              "up_to_date",
+              "update_available"
+            ],
+            "title": "Status",
+            "description": "Availability or update status relative to query parameters"
+          },
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id",
+            "description": "Latest batch definition/generation ID"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp",
+            "description": "Timestamp of the generation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "available",
+          "status"
+        ],
+        "title": "GenerationMetricInfo",
+        "description": "Metadata about a specific climate metric generation for a station."
       },
       "HTTPValidationError": {
         "properties": {
@@ -2179,6 +2360,48 @@
           "data"
         ],
         "title": "StationListResponce"
+      },
+      "StationManifestEntry": {
+        "properties": {
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "description": "Station identifier"
+          },
+          "station_name": {
+            "type": "string",
+            "title": "Station Name",
+            "description": "Station human-readable name"
+          },
+          "has_updates": {
+            "type": "boolean",
+            "title": "Has Updates",
+            "description": "True if any metric has an update available"
+          },
+          "latest_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Latest Timestamp",
+            "description": "Latest timestamp across all metrics for this station"
+          },
+          "generations": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GenerationMetricInfo"
+            },
+            "type": "object",
+            "title": "Generations",
+            "description": "Map of climate metric keys (annual_rain, annual_temperature, monthly_temperature, crops, season_start_probabilities) to their generation info"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station_id",
+          "station_name",
+          "has_updates",
+          "generations"
+        ],
+        "title": "StationManifestEntry",
+        "description": "Manifest entry for a single station showing generation statuses across all metrics."
       },
       "Temp": {
         "properties": {
@@ -2938,6 +3161,10 @@
     {
       "name": "v2: Documents",
       "description": "PDF and HTML documents streamed from Google Cloud Storage."
+    },
+    {
+      "name": "v2: Discovery",
+      "description": "Station data generation manifests and client sync discovery."
     },
     {
       "name": "v2: Testing",

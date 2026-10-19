@@ -27,8 +27,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN R --version
 
 # Install R packages
-COPY install_packages_picsa.R .
-RUN Rscript install_packages_picsa.R
+# COPY install_packages_picsa.R .
+# RUN Rscript install_packages_picsa.R
 
 # Set up Python virtual environment
 RUN python -m venv /opt/idems/venv

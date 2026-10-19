@@ -1,6 +1,6 @@
 import json
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 from fastapi import HTTPException
 
@@ -41,6 +41,11 @@ from app.core.responce_models.crop_success_probabilities_model import (
     CropSuccessProbabilitiesResponce,
     CropSuccessProbabilitiesMetadata,
     CropSuccessProbabilitiesdata,
+)
+from app.schemas.manifest import (
+    CountryManifestResponse,
+    GenerationMetricInfo,
+    StationManifestEntry,
 )
 
 # Month mapping for annual-monthly format (e.g. "1951-Jul")
@@ -89,6 +94,21 @@ def _safe_bool(val: Any) -> Optional[bool]:
     if s in ("FALSE", "0", "F"):
         return False
     return None
+
+
+def _normalize_datetime(val: Any) -> Optional[datetime]:
+    if not val:
+        return None
+    if isinstance(val, datetime):
+        dt = val
+    else:
+        try:
+            dt = datetime.fromisoformat(str(val))
+        except (ValueError, TypeError):
+            return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 def _parse_definition_value(val: Any) -> Dict[str, Any]:
@@ -270,6 +290,205 @@ class ClimateRepository:
                 )
             )
         return stations
+
+    def resolve_generation_timestamp(self, generation_id: str) -> Optional[datetime]:
+        """Resolve timestamp for a definition/generation ID."""
+        if not generation_id:
+            return None
+        sql = """
+            SELECT time_stamp
+            FROM definition
+            WHERE definition_id = %s
+            ORDER BY time_stamp DESC
+            LIMIT 1;
+        """
+        _, rows = execute_query(sql, [generation_id])
+        if rows and rows[0].get("time_stamp"):
+            return _normalize_datetime(rows[0].get("time_stamp"))
+
+        sql_meta = """
+            SELECT time_stamp
+            FROM summary_station_metadata
+            WHERE definition_id = %s
+            ORDER BY time_stamp DESC
+            LIMIT 1;
+        """
+        _, rows_meta = execute_query(sql_meta, [generation_id])
+        if rows_meta and rows_meta[0].get("time_stamp"):
+            return _normalize_datetime(rows_meta[0].get("time_stamp"))
+
+        return None
+
+    def get_country_manifest(
+        self,
+        country: str,
+        station_id: Optional[str] = None,
+        since_timestamp: Optional[datetime] = None,
+        since_generation_id: Optional[str] = None,
+        include_up_to_date: bool = False,
+    ) -> CountryManifestResponse:
+        """
+        Produce a discovery manifest of data generations for a country or station.
+        Supports change detection via since_timestamp and since_generation_id.
+        """
+        # 1. Resolve cutoff timestamp
+        cutoff_ts: Optional[datetime] = _normalize_datetime(since_timestamp)
+        if since_generation_id:
+            gen_ts = self.resolve_generation_timestamp(since_generation_id)
+            if gen_ts:
+                if cutoff_ts is None or gen_ts > cutoff_ts:
+                    cutoff_ts = gen_ts
+
+        # 2. Fetch stations in country
+        stations = self.get_stations_by_country(country)
+        if station_id:
+            matching = [s for s in stations if s.station_id == station_id or s.station_name == station_id]
+            if not matching:
+                db_codes = self.normalize_country_codes(country)
+                placeholders = ", ".join(["%s"] * len(db_codes))
+                sql_check = f"SELECT station_id FROM station WHERE (station_id = %s OR station_name = %s) AND country_code IN ({placeholders}) LIMIT 1;"
+                _, check_rows = execute_query(sql_check, [station_id, station_id] + db_codes)
+                if not check_rows:
+                    raise HTTPException(status_code=404, detail=f"Station '{station_id}' not found for country '{country}'.")
+            stations = matching
+
+        if not stations:
+            return CountryManifestResponse(
+                country_code=self.map_to_api_country_code(country),
+                has_updates=False,
+                latest_timestamp=None,
+                station_count=0,
+                stations=[],
+            )
+
+        # 3. Collect all station IDs (including aliases)
+        db_codes = self.normalize_country_codes(country)
+        placeholders_cc = ", ".join(["%s"] * len(db_codes))
+        sql_stn_aliases = f"""
+            SELECT station_id, station_name
+            FROM station
+            WHERE country_code IN ({placeholders_cc});
+        """
+        _, alias_rows = execute_query(sql_stn_aliases, db_codes)
+
+        # Map each DB station_id to its canonical station_name
+        id_to_canonical: Dict[str, str] = {}
+        for r in alias_rows:
+            raw_id = str(r["station_id"])
+            stn_name = r.get("station_name") or raw_id
+            id_to_canonical[raw_id] = stn_name
+
+        # Determine target DB station IDs for the selected stations
+        selected_names = {s.station_name for s in stations}
+        target_db_ids = [s_id for s_id, s_name in id_to_canonical.items() if s_name in selected_names]
+        if not target_db_ids:
+            target_db_ids = [s.station_id for s in stations]
+
+        # 4. Fetch summary metadata for all target stations in a single query
+        placeholders_ids = ", ".join(["%s"] * len(target_db_ids))
+        sql_meta = f"""
+            SELECT station_id, summary_type, definition_id, time_stamp
+            FROM summary_station_metadata
+            WHERE station_id IN ({placeholders_ids})
+            ORDER BY time_stamp DESC;
+        """
+        _, meta_rows = execute_query(sql_meta, target_db_ids)
+
+        # Group by canonical station name and summary_type, keeping the latest entry
+        stn_meta: Dict[str, Dict[str, Tuple[str, datetime]]] = defaultdict(dict)
+        for r in meta_rows:
+            raw_id = str(r["station_id"])
+            c_name = id_to_canonical.get(raw_id, raw_id)
+            stype = r.get("summary_type")
+            def_id = r.get("definition_id")
+            ts = _normalize_datetime(r.get("time_stamp"))
+            if stype and def_id and ts and stype not in stn_meta[c_name]:
+                stn_meta[c_name][stype] = (str(def_id), ts)
+
+        # 5. Build station entries
+        station_entries: List[StationManifestEntry] = []
+        for stn in stations:
+            c_name = stn.station_name
+            meta = stn_meta.get(c_name, {})
+            generations: Dict[str, GenerationMetricInfo] = {}
+
+            ar = meta.get("Annual Rain")
+            at = meta.get("Annual Temperature")
+            amt = meta.get("Annual-Monthly Temperature")
+            mt = meta.get("Monthly Temperature")
+            best_mt = None
+            if amt and mt:
+                best_mt = amt if amt[1] >= mt[1] else mt
+            elif amt:
+                best_mt = amt
+            elif mt:
+                best_mt = mt
+            cr = meta.get("Crops")
+            ssp = ar  # season_start_probabilities derived from Annual Rain
+
+            metric_mapping = [
+                ("annual_rain", ar),
+                ("annual_temperature", at),
+                ("monthly_temperature", best_mt),
+                ("crops", cr),
+                ("season_start_probabilities", ssp),
+            ]
+
+            for key, candidate in metric_mapping:
+                if candidate and candidate[0]:
+                    def_id, ts = candidate
+                    if cutoff_ts is None and since_generation_id is None:
+                        status = "update_available"
+                    else:
+                        if since_generation_id and def_id == since_generation_id:
+                            status = "up_to_date"
+                        elif cutoff_ts is not None and ts <= cutoff_ts:
+                            status = "up_to_date"
+                        else:
+                            status = "update_available"
+
+                    generations[key] = GenerationMetricInfo(
+                        available=True,
+                        status=status,
+                        generation_id=def_id,
+                        generation_timestamp=ts,
+                    )
+                else:
+                    generations[key] = GenerationMetricInfo(
+                        available=False,
+                        status="no_data",
+                        generation_id=None,
+                        generation_timestamp=None,
+                    )
+
+            has_updates = any(m.status == "update_available" for m in generations.values())
+            latest_ts = max((m.generation_timestamp for m in generations.values() if m.generation_timestamp is not None), default=None)
+
+            station_entries.append(
+                StationManifestEntry(
+                    station_id=stn.station_id,
+                    station_name=c_name,
+                    has_updates=has_updates,
+                    latest_timestamp=latest_ts,
+                    generations=generations,
+                )
+            )
+
+        country_has_updates = any(s.has_updates for s in station_entries)
+        country_latest_ts = max((s.latest_timestamp for s in station_entries if s.latest_timestamp is not None), default=None)
+
+        if (cutoff_ts is not None or since_generation_id is not None) and not include_up_to_date:
+            filtered_stations = [s for s in station_entries if s.has_updates]
+        else:
+            filtered_stations = station_entries
+
+        return CountryManifestResponse(
+            country_code=self.map_to_api_country_code(country),
+            has_updates=country_has_updates,
+            latest_timestamp=country_latest_ts,
+            station_count=len(filtered_stations),
+            stations=filtered_stations,
+        )
 
     def get_station_detail(self, country: str, station_id: str) -> StationAndDefintionResponce:
         """Retrieve station metadata and climate definitions for a station."""
