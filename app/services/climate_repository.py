@@ -29,6 +29,9 @@ from app.core.responce_models.rainfall_summaries_responce_model import (
     AnnualRainfallSummariesResponce,
     AnnualRainfallSummariesMetadata,
     AnnualRainfallSummariesdata,
+    MonthlyRainfallSummariesResponce,
+    MonthlyRainfallSummariesMetadata,
+    MonthlyRainfallSummariesdata,
 )
 from app.core.responce_models.temperature_responce_model import (
     AnnualTemperatureSummariesResponce,
@@ -413,6 +416,7 @@ class ClimateRepository:
             generations: Dict[str, GenerationMetricInfo] = {}
 
             ar = meta.get("Annual Rain")
+            mr = meta.get("Monthly Rain")
             at = meta.get("Annual Temperature")
             amt = meta.get("Annual-Monthly Temperature")
             mt = meta.get("Monthly Temperature")
@@ -428,6 +432,7 @@ class ClimateRepository:
 
             metric_mapping = [
                 ("annual_rain", ar),
+                ("monthly_rain", mr),
                 ("annual_temperature", at),
                 ("monthly_temperature", best_mt),
                 ("crops", cr),
@@ -895,6 +900,117 @@ class ClimateRepository:
         trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
         records = [MonthlyTempartureSummariesdata.parse_obj(data) for data in trimmed_data]
         return MonthlyTemperatureSummariesResponce(
+            generation_id=gen_id,
+            generation_timestamp=gen_timestamp,
+            metadata=metadata,
+            data=records,
+        )
+
+    def get_monthly_rainfall_summaries(
+        self,
+        country: str,
+        station_id: str,
+        summaries: Optional[List[str]] = None,
+        trim_start: bool = True,
+        trim_end: bool = True,
+        generation_id: Optional[str] = None,
+    ) -> MonthlyRainfallSummariesResponce:
+        """Query and pivot monthly rainfall summaries from PostgreSQL."""
+        gen_id, gen_timestamp = self.get_latest_generation_for_summary(
+            station_id=station_id,
+            summary_type="Monthly Rain",
+            generation_id=generation_id,
+        )
+
+        # 1. Fetch metadata definitions
+        meta_dict: Dict[str, Any] = {}
+        if gen_id:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM definition d
+                WHERE d.definition_id = %s;
+            """
+            _, def_rows = execute_query(sql_defs, [gen_id])
+            if not def_rows:
+                sql_defs_fallback = """
+                    SELECT d.summary_element, d.definition_value
+                    FROM summary_station_metadata ssm
+                    JOIN definition d ON d.definition_id = ssm.definition_id
+                    WHERE ssm.station_id = %s AND ssm.summary_type = 'Monthly Rain';
+                """
+                _, def_rows = execute_query(sql_defs_fallback, [station_id])
+        else:
+            sql_defs = """
+                SELECT d.summary_element, d.definition_value
+                FROM summary_station_metadata ssm
+                JOIN definition d ON d.definition_id = ssm.definition_id
+                WHERE ssm.station_id = %s AND ssm.summary_type = 'Monthly Rain';
+            """
+            _, def_rows = execute_query(sql_defs, [station_id])
+
+        for d in def_rows:
+            val = _parse_definition_value(d.get("definition_value"))
+            elem = d.get("summary_element")
+            if elem in ("annual_rain", "monthly_rain", "total_rain"):
+                meta_dict["monthly_rain"] = val
+            for k in val:
+                if k in MonthlyRainfallSummariesMetadata.__fields__:
+                    meta_dict[k] = val[k]
+        metadata = MonthlyRainfallSummariesMetadata.parse_obj(meta_dict)
+
+        # 2. Fetch monthly data rows
+        if gen_id:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'monthly'
+                  AND summary_type = 'Monthly Rain'
+                  AND definition_id = %s
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id, gen_id])
+        else:
+            sql_data = """
+                SELECT time_value, summary_element, summary_name, summary_value
+                FROM summary
+                WHERE station_id = %s
+                  AND time_type = 'monthly'
+                  AND summary_type = 'Monthly Rain'
+                ORDER BY time_value ASC;
+            """
+            _, data_rows = execute_query(sql_data, [station_id])
+
+        month_map: Dict[tuple, Dict[str, Any]] = defaultdict(dict)
+        for row in data_rows:
+            t_val = str(row.get("time_value") or "").strip()
+            # e.g. "1977-Feb"
+            parts = t_val.split("-")
+            if len(parts) != 2:
+                continue
+            yr = _safe_int(parts[0])
+            m_str = parts[1].lower()
+            month_num = MONTH_NAME_TO_INT.get(m_str)
+            if yr is None or month_num is None:
+                continue
+
+            name = (row.get("summary_name") or "").strip().lower()
+            elem = (row.get("summary_element") or "").strip().lower()
+            val = _safe_float(row.get("summary_value"))
+
+            key = (yr, month_num)
+            entry = month_map[key]
+            entry["station"] = station_id
+            entry["year"] = yr
+            entry["month"] = month_num
+
+            if (elem == "total_rain" and name == "sum_rainfall") or elem in ("monthly_rain", "total_rain") or name in ("monthly_rain", "sum_rainfall"):
+                entry["monthly_rain"] = val
+
+        raw_data = [data for k, data in sorted(month_map.items())]
+        trimmed_data = trim_empty_records(raw_data, trim_start=trim_start, trim_end=trim_end)
+        records = [MonthlyRainfallSummariesdata.parse_obj(data) for data in trimmed_data]
+        return MonthlyRainfallSummariesResponce(
             generation_id=gen_id,
             generation_timestamp=gen_timestamp,
             metadata=metadata,

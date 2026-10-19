@@ -157,6 +157,37 @@ def test_v2_monthly_temperature_summaries():
     assert not any(r["year"] < 1950 for r in body["data"])
 
 
+def test_v2_monthly_rainfall_summaries():
+    """Verify monthly rainfall summaries endpoint returns data for Zambia stations."""
+    payload = {
+        "country": "zm",
+        "station_id": "CHOMA MET",
+    }
+    res = client.post("/v2/monthly_rainfall_summaries/", json=payload)
+    assert res.status_code == 200
+    body = res.json()
+    assert "metadata" in body
+    assert "data" in body
+    assert len(body["data"]) > 0
+
+    first_row = body["data"][0]
+    assert first_row["station"] == "CHOMA MET"
+    assert "year" in first_row
+    assert "month" in first_row
+    assert "monthly_rain" in first_row
+    assert first_row["year"] == 1977
+    assert 1 <= first_row["month"] <= 12
+
+    # Check known values from fixture
+    row_jan = next((r for r in body["data"] if r["year"] == 1977 and r["month"] == 1), None)
+    assert row_jan is not None
+    assert row_jan["monthly_rain"] == 212.2
+
+    row_jul = next((r for r in body["data"] if r["year"] == 1977 and r["month"] == 7), None)
+    assert row_jul is not None
+    assert row_jul["monthly_rain"] == 0.0
+
+
 def test_climate_repository_internal_trim_parameters():
     """Verify ClimateRepository methods support internal trim_start and trim_end parameters."""
     from app.services.climate_repository import get_climate_repository
@@ -178,6 +209,11 @@ def test_climate_repository_internal_trim_parameters():
     res_m_trimmed = repo.get_monthly_temperature_summaries("zw", "BEITBRIDGE (MET)", trim_start=True)
     assert res_m_trimmed.data[0].year in (1951, 1952)
     assert not any(r.year < 1950 for r in res_m_trimmed.data)
+
+    # Monthly rainfall: trimmed returns non-empty for CHOMA MET
+    res_mr_trimmed = repo.get_monthly_rainfall_summaries("zm", "CHOMA MET", trim_start=True)
+    assert len(res_mr_trimmed.data) > 0
+    assert res_mr_trimmed.data[0].year == 1977
 
 
 def test_v2_crop_success_probabilities():
@@ -570,6 +606,7 @@ def test_v2_manifest_country_full():
     assert stn["has_updates"] is True
     assert stn["latest_timestamp"] is not None
     assert "annual_rain" in stn["generations"]
+    assert "monthly_rain" in stn["generations"]
     assert "annual_temperature" in stn["generations"]
     assert "monthly_temperature" in stn["generations"]
     assert "crops" in stn["generations"]

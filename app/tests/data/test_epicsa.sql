@@ -4554,4 +4554,10 @@ INSERT INTO "summary_station_metadata" VALUES('BEITBRIDGE (MET)','Annual-Monthly
 INSERT INTO "summary_station_metadata" VALUES('CHISENGU (MET)','Annual-Monthly Temperature','3frqkAVCFieVq3k6','2026-09-23T19:51:21.412776+00:00');
 INSERT INTO "summary_station_metadata" VALUES('BEITBRIDGE (MET)','Crops','3frqkAVCFieVq3k6','2026-09-23T19:51:21.412776+00:00');
 INSERT INTO "summary_station_metadata" VALUES('CHISENGU (MET)','Crops','3frqkAVCFieVq3k6','2026-09-23T19:51:21.412776+00:00');
+INSERT INTO "definition" VALUES('XieJEGkwnu0LR3bg','2026-10-03T13:10:39.163186+00:00','annual_rain','Monthly Rain','{"na_n": null, "na_rm": null, "n_rain": "FALSE", "na_prop": null, "na_n_non": null, "na_consec": null, "total_rain": "TRUE"}','pending');
+INSERT INTO "summary_station_metadata" VALUES('CHOMA MET','Monthly Rain','XieJEGkwnu0LR3bg','2026-10-03T13:10:39.163186+00:00');
+INSERT INTO "summary" VALUES('CHOMA MET','XieJEGkwnu0LR3bg','monthly','1977-Jan','Monthly Rain','total_rain','sum_rainfall','212.2','2026-10-03T13:10:39.163186+00:00','Active');
+INSERT INTO "summary" VALUES('CHOMA MET','XieJEGkwnu0LR3bg','monthly','1977-Feb','Monthly Rain','total_rain','sum_rainfall','139.0','2026-10-03T13:10:39.163186+00:00','Active');
+INSERT INTO "summary" VALUES('CHOMA MET','XieJEGkwnu0LR3bg','monthly','1977-Mar','Monthly Rain','total_rain','sum_rainfall','209.2','2026-10-03T13:10:39.163186+00:00','Active');
+INSERT INTO "summary" VALUES('CHOMA MET','XieJEGkwnu0LR3bg','monthly','1977-Jul','Monthly Rain','total_rain','sum_rainfall','0.0','2026-10-03T13:10:39.163186+00:00','Active');
 COMMIT;

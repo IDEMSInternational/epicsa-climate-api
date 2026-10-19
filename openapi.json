@@ -613,6 +613,48 @@
         }
       }
     },
+    "/v2/monthly_rainfall_summaries/": {
+      "post": {
+        "tags": [
+          "v2: Climate"
+        ],
+        "summary": "Get Monthly Rainfall Summaries",
+        "description": "Retrieve monthly rainfall summaries from PostgreSQL.",
+        "operationId": "get_monthly_rainfall_summaries_v2_monthly_rainfall_summaries__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonthlyRainfallSummariesParameters"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthlyRainfallSummariesResponce"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/annual_temperature_summaries/": {
       "post": {
         "tags": [
@@ -1809,6 +1851,118 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "MonthlyRainfallSummariesMetadata": {
+        "properties": {
+          "monthly_rain": {
+            "$ref": "#/components/schemas/AnnualRain"
+          }
+        },
+        "type": "object",
+        "title": "MonthlyRainfallSummariesMetadata"
+      },
+      "MonthlyRainfallSummariesParameters": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "enum": [
+              "zm",
+              "mw",
+              "zw",
+              "zm_test",
+              "mw_test",
+              "zw_test",
+              "zm_workshops",
+              "mw_workshops",
+              "zw_workshops",
+              "internal_tests"
+            ],
+            "title": "Country",
+            "default": "zm"
+          },
+          "station_id": {
+            "type": "string",
+            "title": "Station Id",
+            "default": "MAGOYE AGROMET"
+          },
+          "summaries": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "monthly_rain",
+                "total_rain"
+              ]
+            },
+            "type": "array",
+            "title": "Summaries",
+            "default": [
+              "monthly_rain"
+            ]
+          },
+          "override": {
+            "type": "boolean",
+            "title": "Override",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "MonthlyRainfallSummariesParameters"
+      },
+      "MonthlyRainfallSummariesResponce": {
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "generation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generation Timestamp"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/MonthlyRainfallSummariesMetadata"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MonthlyRainfallSummariesdata"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metadata",
+          "data"
+        ],
+        "title": "MonthlyRainfallSummariesResponce"
+      },
+      "MonthlyRainfallSummariesdata": {
+        "properties": {
+          "station": {
+            "type": "string",
+            "title": "Station"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          },
+          "monthly_rain": {
+            "type": "number",
+            "title": "Monthly Rain"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station",
+          "year",
+          "month"
+        ],
+        "title": "MonthlyRainfallSummariesdata"
+      },
       "MonthlyTempartureSummariesdata": {
         "properties": {
           "station": {
@@ -2390,7 +2544,7 @@
             },
             "type": "object",
             "title": "Generations",
-            "description": "Map of climate metric keys (annual_rain, annual_temperature, monthly_temperature, crops, season_start_probabilities) to their generation info"
+            "description": "Map of climate metric keys (annual_rain, monthly_rain, annual_temperature, monthly_temperature, crops, season_start_probabilities) to their generation info"
           }
         },
         "type": "object",
