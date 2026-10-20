@@ -21,7 +21,7 @@ class StationManifestEntry(BaseModel):
     latest_timestamp: Optional[datetime] = Field(None, description="Latest timestamp across all metrics for this station")
     generations: Dict[str, GenerationMetricInfo] = Field(
         ...,
-        description="Map of climate metric keys (annual_rain, annual_temperature, monthly_temperature, crops, season_start_probabilities) to their generation info",
+        description="Map of climate metric keys (annual_rain, monthly_rain, annual_temperature, monthly_temperature, crops, season_start_probabilities) to their generation info",
     )
 
 

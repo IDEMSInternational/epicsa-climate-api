@@ -45,3 +45,30 @@ class AnnualRainfallSummariesResponce(BaseModel):
     generation_timestamp: Optional[datetime] = None
     metadata: AnnualRainfallSummariesMetadata
     data: list[AnnualRainfallSummariesdata]
+
+
+class MonthlyRainfallSummariesMetadata(BaseModel):
+    monthly_rain: Optional[AnnualRain] = None
+
+
+class MonthlyRainfallSummariesdata(BaseModel):
+    station: str
+    year: int
+    month: int
+    monthly_rain: Optional[float] = None
+
+    @validator("monthly_rain", pre=True)
+    def parse_monthly_rain(cls, v):
+        if v is None or v == "" or v == "NA" or v == "NA_character_":
+            return None
+        try:
+            return float(v)
+        except (ValueError, TypeError):
+            return None
+
+
+class MonthlyRainfallSummariesResponce(BaseModel):
+    generation_id: Optional[str] = None
+    generation_timestamp: Optional[datetime] = None
+    metadata: MonthlyRainfallSummariesMetadata
+    data: list[MonthlyRainfallSummariesdata]

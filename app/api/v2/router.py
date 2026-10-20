@@ -3,6 +3,9 @@ from fastapi import APIRouter
 from app.api.v2.endpoints.annual_rainfall_summaries.router import (
     router as annual_rainfall_summaries_router,
 )
+from app.api.v2.endpoints.monthly_rainfall_summaries.router import (
+    router as monthly_rainfall_summaries_router,
+)
 from app.api.v2.endpoints.annual_temperature_summaries.router import (
     router as annual_temperature_summaries_router,
 )
@@ -28,6 +31,11 @@ v2_router.include_router(status_router, prefix="/status", tags=["v2: Testing"])
 v2_router.include_router(
     annual_rainfall_summaries_router,
     prefix="/annual_rainfall_summaries",
+    tags=["v2: Climate"],
+)
+v2_router.include_router(
+    monthly_rainfall_summaries_router,
+    prefix="/monthly_rainfall_summaries",
     tags=["v2: Climate"],
 )
 v2_router.include_router(
